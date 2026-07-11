@@ -1,0 +1,65 @@
+/* ── Custom container overrides ── */
+
+/* "In Plain English" sections — calm green */
+:root {
+  --vp-custom-block-tip-border: #42b883;
+  --vp-custom-block-tip-bg: rgba(66, 184, 131, 0.1);
+  --vp-custom-block-tip-text: var(--vp-c-text-1);
+  --vp-custom-block-tip-code-bg: rgba(66, 184, 131, 0.15);
+}
+
+.dark {
+  --vp-custom-block-tip-bg: rgba(66, 184, 131, 0.06);
+  --vp-custom-block-tip-code-bg: rgba(66, 184, 131, 0.1);
+}
+
+/* "Where It Bites" sections — amber */
+:root {
+  --vp-custom-block-warning-border: #e2a241;
+  --vp-custom-block-warning-bg: rgba(226, 162, 65, 0.1);
+  --vp-custom-block-warning-text: var(--vp-c-text-1);
+  --vp-custom-block-warning-code-bg: rgba(226, 162, 65, 0.15);
+}
+
+.dark {
+  --vp-custom-block-warning-bg: rgba(226, 162, 65, 0.06);
+  --vp-custom-block-warning-code-bg: rgba(226, 162, 65, 0.1);
+}
+
+/* ── Interview weight badges ── */
+
+.badge-hot {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.badge-hot-3 {
+  background: #ef4444;
+  color: #fff;
+}
+
+.badge-hot-2 {
+  background: #f97316;
+  color: #fff;
+}
+
+.badge-hot-1 {
+  background: #eab308;
+  color: #1a1a1a;
+}
+
+/* ── Planned stub badge ── */
+
+.badge-planned {
+  display: inline-block;
+  background: #8b5cf6;
+  color: #fff;
+  padding: 2px 10px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-weight: 600;
+}
