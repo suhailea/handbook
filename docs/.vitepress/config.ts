@@ -42,6 +42,7 @@ export default defineConfig({
             { text: '6. Iterators & Generators', link: '/js-core/06-iterators-generators' },
             { text: '7. Memory & GC (V8)', link: '/js-core/07-memory-gc' },
             { text: '8. ES Modules', link: '/js-core/08-es-modules' },
+            { text: '📝 25 Interview Questions', link: '/js-core/questions' },
           ],
         },
       ],
@@ -259,6 +260,12 @@ export default defineConfig({
             { text: 'Summary', link: '/nodejs/module-17/summary' },
           ],
         },
+        {
+          text: '📝 Interview Questions',
+          items: [
+            { text: '25 Node.js Questions', link: '/nodejs/questions' },
+          ],
+        },
       ],
 
       // ── Track 3: Frameworks ──
@@ -285,6 +292,12 @@ export default defineConfig({
             { text: 'Request Lifecycle', link: '/frameworks/nestjs/02-request-lifecycle' },
             { text: 'Provider Scopes & CLS', link: '/frameworks/nestjs/03-provider-scopes' },
             { text: 'Microservices Transports', link: '/frameworks/nestjs/04-microservices' },
+          ],
+        },
+        {
+          text: '📝 Interview Questions',
+          items: [
+            { text: '25 Frameworks Questions', link: '/frameworks/questions' },
           ],
         },
       ],
@@ -341,6 +354,12 @@ export default defineConfig({
             { text: 'Overview', link: '/system-design/scaling/' },
             { text: 'Horizontal vs Vertical', link: '/system-design/scaling/01-horizontal-vertical' },
             { text: 'Rate Limiting Algorithms', link: '/system-design/scaling/02-rate-limiting' },
+          ],
+        },
+        {
+          text: '📝 Interview Questions',
+          items: [
+            { text: '25 System Design Questions', link: '/system-design/questions' },
           ],
         },
       ],
