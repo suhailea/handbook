@@ -24,6 +24,7 @@ export default defineConfig({
       { text: 'Node.js', link: '/nodejs/', activeMatch: '/nodejs/' },
       { text: 'Frameworks', link: '/frameworks/', activeMatch: '/frameworks/' },
       { text: 'System Design', link: '/system-design/', activeMatch: '/system-design/' },
+      { text: 'Python', link: '/python/', activeMatch: '/python/' },
       { text: 'Interview Prep', link: '/interview/', activeMatch: '/interview/' },
     ],
 
@@ -364,6 +365,154 @@ export default defineConfig({
         },
       ],
 
+      // ── Track 6: Python ──
+      '/python/': [
+        {
+          text: 'Python',
+          items: [{ text: 'Overview', link: '/python/' }],
+        },
+        {
+          text: 'Module 1 — Language Foundations',
+          collapsed: false,
+          items: [
+            { text: 'Overview', link: '/python/module-01/' },
+            { text: '1.1 What Python Actually Is', link: '/python/module-01/01-what-python-is' },
+            { text: '1.2 Data Model', link: '/python/module-01/02-data-model' },
+            { text: '1.3 Core Syntax & Truthiness', link: '/python/module-01/03-core-syntax' },
+            { text: '1.4 Numbers, Strings & None', link: '/python/module-01/04-numbers-strings-none' },
+            { text: 'Summary', link: '/python/module-01/summary' },
+          ],
+        },
+        {
+          text: 'Module 2 — Data Structures',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/python/module-02/' },
+            { text: '2.1 Lists & Tuples', link: '/python/module-02/01-lists-tuples' },
+            { text: '2.2 Dictionaries', link: '/python/module-02/02-dicts' },
+            { text: '2.3 Sets & Collections', link: '/python/module-02/03-sets-collections' },
+            { text: 'Summary', link: '/python/module-02/summary' },
+          ],
+        },
+        {
+          text: 'Module 3 — Functions & Scoping',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/python/module-03/' },
+            { text: '3.1 Functions as First-Class Objects', link: '/python/module-03/01-functions-first-class' },
+            { text: '3.2 LEGB Scoping & Closures', link: '/python/module-03/02-scoping-closures' },
+            { text: '3.3 Decorators', link: '/python/module-03/03-decorators' },
+            { text: '3.4 Functional Tools', link: '/python/module-03/04-functional-tools' },
+            { text: 'Summary', link: '/python/module-03/summary' },
+          ],
+        },
+        {
+          text: 'Module 4 — OOP & Descriptors',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/python/module-04/' },
+            { text: '4.1 Classes & Instances', link: '/python/module-04/01-classes-instances' },
+            { text: '4.2 Inheritance & MRO', link: '/python/module-04/02-inheritance-mro' },
+            { text: '4.3 Descriptors & Properties', link: '/python/module-04/03-descriptors-properties' },
+            { text: '4.4 Metaclasses & __slots__', link: '/python/module-04/04-metaclasses-slots' },
+            { text: 'Summary', link: '/python/module-04/summary' },
+          ],
+        },
+        {
+          text: 'Module 5 — Iterators & Generators',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/python/module-05/' },
+            { text: '5.1 The Iterator Protocol', link: '/python/module-05/01-iterator-protocol' },
+            { text: '5.2 Generators', link: '/python/module-05/02-generators' },
+            { text: '5.3 Comprehensions & itertools', link: '/python/module-05/03-comprehensions-itertools' },
+            { text: 'Summary', link: '/python/module-05/summary' },
+          ],
+        },
+        {
+          text: 'Module 6 — Errors & Context Managers',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/python/module-06/' },
+            { text: '6.1 Exceptions', link: '/python/module-06/01-exceptions' },
+            { text: '6.2 Context Managers', link: '/python/module-06/02-context-managers' },
+            { text: 'Summary', link: '/python/module-06/summary' },
+          ],
+        },
+        {
+          text: 'Module 7 — Concurrency',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/python/module-07/' },
+            { text: '7.1 The GIL', link: '/python/module-07/01-gil' },
+            { text: '7.2 Threading', link: '/python/module-07/02-threading' },
+            { text: '7.3 Multiprocessing', link: '/python/module-07/03-multiprocessing' },
+            { text: '7.4 asyncio', link: '/python/module-07/04-asyncio' },
+            { text: '7.5 concurrent.futures', link: '/python/module-07/05-concurrent-futures' },
+            { text: 'Summary', link: '/python/module-07/summary' },
+          ],
+        },
+        {
+          text: 'Module 8 — Imports & Packaging',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/python/module-08/' },
+            { text: '8.1 How import Works', link: '/python/module-08/01-import-mechanics' },
+            { text: '8.2 Venvs & Packaging', link: '/python/module-08/02-venvs-packaging' },
+            { text: 'Summary', link: '/python/module-08/summary' },
+          ],
+        },
+        {
+          text: 'Module 9 — Memory & Performance',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/python/module-09/' },
+            { text: '9.1 CPython Memory Management', link: '/python/module-09/01-memory-management' },
+            { text: '9.2 Profiling & Optimization', link: '/python/module-09/02-profiling-optimization' },
+            { text: 'Summary', link: '/python/module-09/summary' },
+          ],
+        },
+        {
+          text: 'Module 10 — Type Hints & Modern Python',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/python/module-10/' },
+            { text: '10.1 Type Hints Basics', link: '/python/module-10/01-type-hints-basics' },
+            { text: '10.2 Advanced Typing', link: '/python/module-10/02-advanced-typing' },
+            { text: '10.3 mypy & Pydantic', link: '/python/module-10/03-mypy-pydantic' },
+            { text: 'Summary', link: '/python/module-10/summary' },
+          ],
+        },
+        {
+          text: 'Module 11 — Standard Library',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/python/module-11/' },
+            { text: '11.1 pathlib & OS', link: '/python/module-11/01-pathlib-os' },
+            { text: '11.2 Serialization', link: '/python/module-11/02-serialization' },
+            { text: '11.3 Logging & Datetime', link: '/python/module-11/03-logging-datetime' },
+            { text: 'Summary', link: '/python/module-11/summary' },
+          ],
+        },
+        {
+          text: 'Module 12 — Testing & Tooling',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/python/module-12/' },
+            { text: '12.1 pytest', link: '/python/module-12/01-pytest' },
+            { text: '12.2 Mocking & Coverage', link: '/python/module-12/02-mocking-coverage' },
+            { text: '12.3 Debugging & Tooling', link: '/python/module-12/03-debugging-tooling' },
+            { text: 'Summary', link: '/python/module-12/summary' },
+          ],
+        },
+        {
+          text: '📝 Interview Questions',
+          items: [
+            { text: '25 Python Questions', link: '/python/questions' },
+          ],
+        },
+      ],
+
       // ── Track 5: Interview Prep ──
       '/interview/': [
         {
@@ -372,6 +521,7 @@ export default defineConfig({
             { text: 'Overview', link: '/interview/' },
             { text: 'JS Crash Sheet', link: '/interview/crash-sheet-js' },
             { text: 'Node.js Crash Sheet', link: '/interview/crash-sheet-node' },
+            { text: 'Python Crash Sheet', link: '/interview/crash-sheet-python' },
             { text: 'System Design Crash Sheet', link: '/interview/crash-sheet-system-design' },
             { text: 'Question Bank', link: '/interview/question-bank' },
           ],
