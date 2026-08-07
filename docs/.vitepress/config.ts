@@ -506,6 +506,23 @@ export default defineConfig({
           ],
         },
         {
+          text: 'Module 13 — FastAPI',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/python/module-13/' },
+            { text: '13.1 FastAPI Architecture', link: '/python/module-13/01-architecture' },
+            { text: '13.2 Routing, Params & Validation', link: '/python/module-13/02-routing-validation' },
+            { text: '13.3 Dependency Injection', link: '/python/module-13/03-dependency-injection' },
+            { text: '13.4 Middleware, CORS & Error Handling', link: '/python/module-13/04-middleware-errors' },
+            { text: '13.5 Auth — JWT, OAuth2 & Security', link: '/python/module-13/05-auth-security' },
+            { text: '13.6 Database Integration', link: '/python/module-13/06-database-integration' },
+            { text: '13.7 Background Tasks, WebSockets & SSE', link: '/python/module-13/07-background-websockets' },
+            { text: '13.8 Testing FastAPI Applications', link: '/python/module-13/08-testing' },
+            { text: '13.9 Deployment & Production', link: '/python/module-13/09-deployment' },
+            { text: 'Summary', link: '/python/module-13/summary' },
+          ],
+        },
+        {
           text: '📝 Interview Questions',
           items: [
             { text: '25 Python Questions', link: '/python/questions' },

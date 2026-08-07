@@ -23,3 +23,4 @@ This track covers Python from fundamentals to advanced internals, following the 
 - Module 10: Type Hints & Modern Python
 - Module 11: Standard Library Power Tools
 - Module 12: Testing, Debugging & Tooling
+- Module 13: FastAPI — from first endpoint to production deployment
