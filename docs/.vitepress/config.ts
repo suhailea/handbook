@@ -25,6 +25,7 @@ export default defineConfig({
       { text: 'Frameworks', link: '/frameworks/', activeMatch: '/frameworks/' },
       { text: 'System Design', link: '/system-design/', activeMatch: '/system-design/' },
       { text: 'Python', link: '/python/', activeMatch: '/python/' },
+      { text: 'RAG', link: '/rag/', activeMatch: '/rag/' },
       { text: 'Interview Prep', link: '/interview/', activeMatch: '/interview/' },
     ],
 
@@ -526,6 +527,204 @@ export default defineConfig({
           text: '📝 Interview Questions',
           items: [
             { text: '25 Python Questions', link: '/python/questions' },
+          ],
+        },
+      ],
+
+      // ── Track 7: Production RAG ──
+      '/rag/': [
+        {
+          text: 'Production RAG',
+          items: [{ text: 'Overview', link: '/rag/' }],
+        },
+        {
+          text: 'Module 1 — RAG Fundamentals',
+          collapsed: false,
+          items: [
+            { text: 'Overview', link: '/rag/module-01/' },
+            { text: '1.1 What Is RAG & When to Use It', link: '/rag/module-01/01-what-is-rag' },
+            { text: '1.2 RAG vs Alternatives', link: '/rag/module-01/02-rag-vs-alternatives' },
+            { text: 'Summary', link: '/rag/module-01/summary' },
+          ],
+        },
+        {
+          text: 'Module 2 — System Requirements',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/rag/module-02/' },
+            { text: '2.1 Designing Before Building', link: '/rag/module-02/01-requirements' },
+            { text: 'Summary', link: '/rag/module-02/summary' },
+          ],
+        },
+        {
+          text: 'Module 3 — Data Ingestion',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/rag/module-03/' },
+            { text: '3.1 Ingestion Pipelines', link: '/rag/module-03/01-ingestion-pipelines' },
+            { text: '3.2 Reliability & Monitoring', link: '/rag/module-03/02-reliability' },
+            { text: 'Summary', link: '/rag/module-03/summary' },
+          ],
+        },
+        {
+          text: 'Module 4 — Document Parsing',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/rag/module-04/' },
+            { text: '4.1 Parsing Every Format', link: '/rag/module-04/01-parsing-formats' },
+            { text: '4.2 CSV, Excel & Structured Data', link: '/rag/module-04/02-csv-excel' },
+            { text: 'Summary', link: '/rag/module-04/summary' },
+          ],
+        },
+        {
+          text: 'Module 5 — Chunking',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/rag/module-05/' },
+            { text: '5.1 Chunking Strategies', link: '/rag/module-05/01-chunking-strategies' },
+            { text: '5.2 Chunk Size & Evaluation', link: '/rag/module-05/02-chunk-size' },
+            { text: 'Summary', link: '/rag/module-05/summary' },
+          ],
+        },
+        {
+          text: 'Module 6 — Metadata',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/rag/module-06/' },
+            { text: '6.1 Production Metadata Schema', link: '/rag/module-06/01-metadata-schema' },
+            { text: 'Summary', link: '/rag/module-06/summary' },
+          ],
+        },
+        {
+          text: 'Module 7 — Embeddings',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/rag/module-07/' },
+            { text: '7.1 Embedding Models & Similarity', link: '/rag/module-07/01-embeddings-similarity' },
+            { text: '7.2 Model Selection & Migration', link: '/rag/module-07/02-model-selection' },
+            { text: 'Summary', link: '/rag/module-07/summary' },
+          ],
+        },
+        {
+          text: 'Module 8 — Vector Databases',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/rag/module-08/' },
+            { text: '8.1 Vector DB Internals', link: '/rag/module-08/01-vector-db-internals' },
+            { text: '8.2 Schema & Index Design', link: '/rag/module-08/02-schema-design' },
+            { text: 'Summary', link: '/rag/module-08/summary' },
+          ],
+        },
+        {
+          text: 'Module 9 — Retrieval & Hybrid Search',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/rag/module-09/' },
+            { text: '9.1 Retrieval Strategies', link: '/rag/module-09/01-retrieval-strategies' },
+            { text: '9.2 Hybrid Search & Fusion', link: '/rag/module-09/02-hybrid-search' },
+            { text: 'Summary', link: '/rag/module-09/summary' },
+          ],
+        },
+        {
+          text: 'Module 10 — Query Processing',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/rag/module-10/' },
+            { text: '10.1 Query Rewriting & Routing', link: '/rag/module-10/01-query-rewriting' },
+            { text: 'Summary', link: '/rag/module-10/summary' },
+          ],
+        },
+        {
+          text: 'Module 11 — Reranking & Context',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/rag/module-11/' },
+            { text: '11.1 Reranking', link: '/rag/module-11/01-reranking' },
+            { text: '11.2 Context Construction', link: '/rag/module-11/02-context-construction' },
+            { text: 'Summary', link: '/rag/module-11/summary' },
+          ],
+        },
+        {
+          text: 'Module 12 — Generation & Hallucination',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/rag/module-12/' },
+            { text: '12.1 Grounded Generation', link: '/rag/module-12/01-grounded-generation' },
+            { text: '12.2 Hallucination Mitigation', link: '/rag/module-12/02-hallucination' },
+            { text: 'Summary', link: '/rag/module-12/summary' },
+          ],
+        },
+        {
+          text: 'Module 13 — Evaluation',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/rag/module-13/' },
+            { text: '13.1 Retrieval & Generation Metrics', link: '/rag/module-13/01-metrics' },
+            { text: '13.2 Evaluation Frameworks & Datasets', link: '/rag/module-13/02-frameworks' },
+            { text: 'Summary', link: '/rag/module-13/summary' },
+          ],
+        },
+        {
+          text: 'Module 14 — Security & Guardrails',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/rag/module-14/' },
+            { text: '14.1 RAG Security', link: '/rag/module-14/01-security' },
+            { text: '14.2 Guardrails', link: '/rag/module-14/02-guardrails' },
+            { text: 'Summary', link: '/rag/module-14/summary' },
+          ],
+        },
+        {
+          text: 'Module 15 — Advanced RAG Patterns',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/rag/module-15/' },
+            { text: '15.1 Agentic RAG', link: '/rag/module-15/01-agentic-rag' },
+            { text: '15.2 GraphRAG', link: '/rag/module-15/02-graphrag' },
+            { text: '15.3 Multimodal RAG', link: '/rag/module-15/03-multimodal' },
+            { text: '15.4 MCP & Human-in-the-Loop', link: '/rag/module-15/04-mcp-hitl' },
+            { text: 'Summary', link: '/rag/module-15/summary' },
+          ],
+        },
+        {
+          text: 'Module 16 — Production Architecture',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/rag/module-16/' },
+            { text: '16.1 Full System Architecture', link: '/rag/module-16/01-system-architecture' },
+            { text: '16.2 Microservices & Async Processing', link: '/rag/module-16/02-microservices' },
+            { text: 'Summary', link: '/rag/module-16/summary' },
+          ],
+        },
+        {
+          text: 'Module 17 — Operations',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/rag/module-17/' },
+            { text: '17.1 Caching & Freshness', link: '/rag/module-17/01-caching-freshness' },
+            { text: '17.2 Scaling & Cost Optimization', link: '/rag/module-17/02-scaling-cost' },
+            { text: '17.3 Latency, Failure & Versioning', link: '/rag/module-17/03-latency-failure' },
+            { text: '17.4 Observability', link: '/rag/module-17/04-observability' },
+            { text: 'Summary', link: '/rag/module-17/summary' },
+          ],
+        },
+        {
+          text: 'Module 18 — Case Studies & Implementation',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/rag/module-18/' },
+            { text: '18.1 Design Case Studies', link: '/rag/module-18/01-case-studies' },
+            { text: '18.2 Reference Implementation', link: '/rag/module-18/02-implementation' },
+            { text: '18.3 Production Checklist', link: '/rag/module-18/03-checklist' },
+            { text: 'Summary', link: '/rag/module-18/summary' },
+          ],
+        },
+        {
+          text: '📝 Interview Prep',
+          items: [
+            { text: '100 RAG Interview Questions', link: '/rag/questions' },
+            { text: 'Interview Answer Framework', link: '/rag/interview-framework' },
+            { text: 'RAG Crash Sheet', link: '/rag/crash-sheet' },
           ],
         },
       ],
