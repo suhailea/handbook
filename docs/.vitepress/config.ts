@@ -7,7 +7,7 @@ export default defineConfig({
   cleanUrls: true,
   lastUpdated: true,
 
-  base: process.env.GITHUB_ACTIONS ? '/engineering-handbook/' : '/',
+  base: process.env.GITHUB_ACTIONS ? '/handbook/' : '/',
 
   head: [
     ['meta', { name: 'theme-color', content: '#42b883' }],
@@ -757,7 +757,7 @@ export default defineConfig({
     },
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/msuhailea/engineering-handbook' },
+      { icon: 'github', link: 'https://github.com/suhailea/handbook' },
     ],
 
     footer: {
