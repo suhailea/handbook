@@ -535,5 +535,5 @@ Elasticsearch internally combines the BM25 score and kNN score using the `boost`
 
 - [Retrieval Strategies](01-retrieval-strategies.md) — the individual retrieval methods that hybrid search combines
 - [Reranking](../module-11/01-reranking.md) — the next stage after fusion
-- [Query Rewriting](../module-10/01-query-rewriting.md) — query transformations that improve both dense and sparse retrieval
+- [Query Transformations](../module-10/01-query-transformations.md) — query transformations that improve both dense and sparse retrieval
 - [Vector DB Internals](../module-08/01-vector-db-internals.md) — HNSW and IVF indexes powering the vector search side

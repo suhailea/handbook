@@ -1,9 +1,9 @@
 ---
-title: Query Rewriting, Expansion, HyDE & Routing
+title: Query Transformations
 outline: deep
 ---
 
-# Query Rewriting, Expansion, HyDE & Routing
+# Query Transformations — Rewriting, Expansion, Decomposition, HyDE & Multi-Query
 
 **Interview weight:** 🔥🔥🔥 | **Prerequisites:** [Retrieval Strategies](../module-09/01-retrieval-strategies.md), [Embedding Models](../module-07/01-embeddings-similarity.md) | **Builds toward:** [Hybrid Search](../module-09/02-hybrid-search.md), [Reranking](../module-11/01-reranking.md)
 
@@ -456,332 +456,16 @@ Write in the style of official documentation. If you are unsure, say so.`,
 
 ---
 
-### 7. Query Classification
+### Techniques Comparison
 
-**What:** Detect the type of query so downstream components can handle it appropriately. Not all queries need the same treatment.
-
-**Common query types:**
-
-| Type | Example | Handling |
-|------|---------|----------|
-| Factual | "What is the max file upload size?" | Standard retrieval → direct answer |
-| Comparison | "Compare Plan A vs Plan B pricing" | Decompose → retrieve for each → tabulate |
-| Summarization | "Summarize the Q3 report" | Retrieve full document → summarize |
-| Temporal | "What changed since last update?" | Filter by date, retrieve multiple versions |
-| Aggregation | "How many support tickets last month?" | Route to SQL/analytics, not vector DB |
-| Conversational | "Tell me more about that" | Rewrite with history first |
-| Out-of-scope | "What's the weather today?" | Polite refusal, no retrieval |
-
-```typescript
-// run: npx tsx query-classification.ts
-import { OpenAI } from 'openai';
-
-const openai = new OpenAI();
-
-type QueryType =
-  | 'factual'
-  | 'comparison'
-  | 'summarization'
-  | 'temporal'
-  | 'aggregation'
-  | 'conversational'
-  | 'out_of_scope';
-
-interface ClassifiedQuery {
-  type: QueryType;
-  confidence: number;
-  reasoning: string;
-}
-
-async function classifyQuery(query: string): Promise<ClassifiedQuery> {
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
-    temperature: 0.0,
-    response_format: { type: 'json_object' },
-    messages: [
-      {
-        role: 'system',
-        content: `Classify the user query into one of these types:
-- factual: seeking a specific fact or answer
-- comparison: comparing two or more things
-- summarization: asking for a summary of a document or topic
-- temporal: asking about changes over time
-- aggregation: asking for counts, statistics, or analytics
-- conversational: follow-up that needs history context
-- out_of_scope: unrelated to the knowledge base
-
-Return JSON: { "type": "...", "confidence": 0.0-1.0, "reasoning": "..." }`,
-      },
-      { role: 'user', content: query },
-    ],
-    max_tokens: 150,
-  });
-
-  return JSON.parse(response.choices[0].message.content!) as ClassifiedQuery;
-}
-
-const result = await classifyQuery("How many tickets were created last week?");
-console.log(result);
-// { type: "aggregation", confidence: 0.95, reasoning: "Asking for a count with a time range" }
-```
-
----
-
-### 8. Query Routing
-
-**What:** Based on the classification, route the query to the appropriate backend. Not everything should go to the vector database.
-
-**Routing decisions:**
-
-```text
-                    Classified Query
-                          │
-            ┌─────────────┼──────────────┐
-            ▼             ▼              ▼
-      factual /      aggregation    out_of_scope
-      comparison /                       │
-      summarization                      ▼
-            │                      Polite refusal
-            ▼                      (no retrieval)
-      ┌─────┴──────┐
-      │ Needs       │
-      │ structured  │
-      │ data?       │
-      ├─ YES ──►  SQL Database
-      ├─ NO ───►  Vector DB + BM25
-      └─ LIVE ──► External API (real-time data)
-```
-
-```typescript
-// run: npx tsx query-router.ts
-import { OpenAI } from 'openai';
-
-const openai = new OpenAI();
-
-type RouteTarget = 'vector_search' | 'sql_database' | 'live_api' | 'refusal';
-
-interface RoutingDecision {
-  target: RouteTarget;
-  rewrittenQuery: string;
-  sqlQuery?: string;
-  apiEndpoint?: string;
-}
-
-async function routeQuery(
-  query: string,
-  queryType: string
-): Promise<RoutingDecision> {
-  // Rule-based routing for clear cases
-  if (queryType === 'out_of_scope') {
-    return {
-      target: 'refusal',
-      rewrittenQuery: query,
-    };
-  }
-
-  if (queryType === 'aggregation') {
-    // Generate SQL for structured data queries
-    const sqlResponse = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      temperature: 0.0,
-      messages: [
-        {
-          role: 'system',
-          content: `Convert the user question into a SQL query against the following schema:
-- tickets(id, created_at, status, priority, assigned_to, category)
-- users(id, name, department)
-Return ONLY the SQL query.`,
-        },
-        { role: 'user', content: query },
-      ],
-      max_tokens: 200,
-    });
-
-    return {
-      target: 'sql_database',
-      rewrittenQuery: query,
-      sqlQuery: sqlResponse.choices[0].message.content!.trim(),
-    };
-  }
-
-  // Default: semantic retrieval
-  return {
-    target: 'vector_search',
-    rewrittenQuery: query,
-  };
-}
-
-// Example routing decisions:
-// "What is the refund policy?" → vector_search
-// "How many tickets last week?" → sql_database (with generated SQL)
-// "What's the weather?" → refusal
-```
-
----
-
-### The Complete Pipeline: Putting It All Together
-
-```typescript
-// run: npx tsx complete-query-pipeline.ts
-import { OpenAI } from 'openai';
-
-const openai = new OpenAI();
-
-interface ProcessedQuery {
-  originalQuery: string;
-  rewrittenQuery: string;
-  queryType: string;
-  routeTarget: string;
-  retrievalQueries: string[];  // may be multiple (multi-query or decomposed)
-}
-
-async function processQuery(
-  rawQuery: string,
-  chatHistory: Array<{ role: 'user' | 'assistant'; content: string }>
-): Promise<ProcessedQuery> {
-
-  // Step 1: Conversational rewriting (if history exists)
-  let query = rawQuery;
-  if (chatHistory.length > 0) {
-    query = await rewriteWithContext(rawQuery, chatHistory);
-  }
-
-  // Step 2: Basic query cleanup (typos, abbreviations)
-  query = await cleanupQuery(query);
-
-  // Step 3: Classify query type
-  const classification = await classifyQueryType(query);
-
-  // Step 4: Route
-  if (classification.type === 'out_of_scope') {
-    return {
-      originalQuery: rawQuery,
-      rewrittenQuery: query,
-      queryType: classification.type,
-      routeTarget: 'refusal',
-      retrievalQueries: [],
-    };
-  }
-
-  if (classification.type === 'aggregation') {
-    return {
-      originalQuery: rawQuery,
-      rewrittenQuery: query,
-      queryType: classification.type,
-      routeTarget: 'sql_database',
-      retrievalQueries: [query], // SQL generation happens downstream
-    };
-  }
-
-  // Step 5: For retrieval queries — expand or decompose
-  let retrievalQueries: string[];
-
-  if (classification.type === 'comparison') {
-    // Decompose comparison queries
-    retrievalQueries = await decomposeIntoSubQueries(query);
-  } else {
-    // Multi-query expansion for better recall
-    retrievalQueries = await generateVariants(query, 3);
-  }
-
-  return {
-    originalQuery: rawQuery,
-    rewrittenQuery: query,
-    queryType: classification.type,
-    routeTarget: 'vector_search',
-    retrievalQueries,
-  };
-}
-
-// Simplified helper functions (full implementations shown above)
-async function rewriteWithContext(
-  query: string,
-  history: Array<{ role: string; content: string }>
-): Promise<string> {
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
-    temperature: 0.0,
-    messages: [
-      {
-        role: 'system',
-        content: 'Rewrite the follow-up question as a standalone question. Output ONLY the question.',
-      },
-      {
-        role: 'user',
-        content: `History:\n${history.map(m => `${m.role}: ${m.content}`).join('\n')}\n\nFollow-up: ${query}`,
-      },
-    ],
-    max_tokens: 150,
-  });
-  return response.choices[0].message.content!.trim();
-}
-
-async function cleanupQuery(query: string): Promise<string> {
-  // In production: fast model or rule-based for typo/abbreviation handling
-  return query; // simplified
-}
-
-async function classifyQueryType(query: string): Promise<{ type: string }> {
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
-    temperature: 0.0,
-    response_format: { type: 'json_object' },
-    messages: [
-      {
-        role: 'system',
-        content: `Classify: factual, comparison, summarization, temporal, aggregation, out_of_scope.
-Return JSON: {"type": "..."}`,
-      },
-      { role: 'user', content: query },
-    ],
-    max_tokens: 50,
-  });
-  return JSON.parse(response.choices[0].message.content!);
-}
-
-async function decomposeIntoSubQueries(query: string): Promise<string[]> {
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
-    temperature: 0.0,
-    messages: [
-      {
-        role: 'system',
-        content: 'Break into sub-questions. One per line. No numbering.',
-      },
-      { role: 'user', content: query },
-    ],
-    max_tokens: 200,
-  });
-  return response.choices[0].message.content!.trim().split('\n').filter(Boolean);
-}
-
-async function generateVariants(query: string, count: number): Promise<string[]> {
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
-    temperature: 0.7,
-    messages: [
-      {
-        role: 'system',
-        content: `Generate ${count} search query variants. One per line. No numbering.`,
-      },
-      { role: 'user', content: query },
-    ],
-    max_tokens: 200,
-  });
-  const variants = response.choices[0].message.content!.trim().split('\n').filter(Boolean);
-  return [query, ...variants];
-}
-
-// Example usage
-const result = await processQuery(
-  "what about its warranty?",
-  [
-    { role: 'user', content: 'Tell me about the iPhone 15 Pro' },
-    { role: 'assistant', content: 'The iPhone 15 Pro features...' },
-  ]
-);
-console.log(JSON.stringify(result, null, 2));
-```
+| Technique | Cost & Latency Added | Best For | Risk |
+|-----------|---------------------|----------|------|
+| Query Rewriting | 1 LLM call, 100-300ms, ~$0.0001 | Typos, abbreviations, vague queries | Minimal — low risk of harm |
+| Conversational Rewrite | 1 LLM call, 100-300ms, ~$0.0001 | Multi-turn conversations | Topic drift misdetection |
+| Query Expansion | 1 LLM call, 50-200ms, ~$0.0001 | Domain-specific acronyms | Over-expansion adds noise |
+| Multi-Query | 1 LLM call + N retrievals, 200-400ms, ~$0.0002 | Broad or ambiguous queries | Latency explosion if uncapped |
+| Decomposition | 1 LLM call + N retrievals, 200-400ms, ~$0.0002 | Complex multi-part questions | Cost multiplied by sub-query count |
+| HyDE | 1 LLM call + 1 embedding, 300-1000ms, ~$0.001 | Formal corpus with question-document gap | Hallucinated hypothesis misdirects retrieval |
 
 ### Decision Matrix: Which Techniques to Apply
 
@@ -825,8 +509,6 @@ Every LLM call in the query processing pipeline adds latency and cost:
 
 **Multi-query explosion kills latency.** A team generates 5 query variants, each with 20 results, producing 100 candidates to deduplicate and rerank. P95 latency jumps from 200ms to 2 seconds. Fix: cap at 3 variants, retrieve 10 per variant, and set a hard wall-clock budget with `Promise.race` / `AbortController` timeout.
 
-**Query routing misclassifies and drops valid queries.** The classifier marks "How do I reset my password?" as out-of-scope because it looks like a generic internet question, but the RAG system is a customer support assistant that absolutely should answer this. Fix: tune the classifier on your actual query distribution, not generic examples. "Out-of-scope" should be very narrowly defined.
-
 **HyDE hypothesis is confidently wrong.** For a domain-specific question about internal company policy, the LLM generates a hypothesis based on generic knowledge. The hypothesis embedding pulls retrieval toward wrong documents. The retrieved context contains incorrect information that the generation LLM then presents as fact. Fix: use HyDE only for domains where the LLM has reasonable base knowledge. For internal/proprietary data, direct embedding or multi-query is safer.
 :::
 
@@ -838,13 +520,7 @@ Every LLM call in the query processing pipeline adds latency and cost:
 **A:** Design: take the last 3-5 turns of chat history and the current message. Use a fast LLM to rewrite the current message as a standalone query by resolving all pronouns and implicit references. Include the system's responses in the history (not just user messages) because the user often references information the system provided. Failure modes: (1) Topic drift — the user changed subjects but the rewriter merges old context. Detect via semantic similarity between current query and recent history. (2) Accumulated error — each rewrite introduces slight distortions that compound. The 5th rewrite is based on the 4th rewritten query, not the original. Fix: always rewrite from the raw user message + original history, not from previously rewritten queries. (3) Information loss — the rewriter drops nuance from the original question while trying to make it standalone.
 :::
 
-::: details Question 2 — Routing architecture
-**Q:** Design a query routing system for a RAG application that serves both a knowledge base (vector search) and a metrics dashboard (SQL). Some queries are ambiguous ("how is our error rate?") — could mean "what is our error rate metric" (SQL) or "why is our error rate high?" (knowledge base). How do you handle this?
-
-**A:** For ambiguous queries, route to both backends and let the generation model synthesize. Step 1: classify the query. If classification confidence is above 0.8, route to the predicted backend. If confidence is below 0.8 (ambiguous), route to both: execute the SQL query for the metric and vector search for explanatory documents. Step 2: pass both results to the LLM — the metric value and the retrieved context about error causes. The LLM can then answer comprehensively: "Your error rate is 2.3% (from metrics), which is above the 1% SLA. Common causes include timeout errors in the payment service (from knowledge base)." The key insight: routing does not have to be exclusive. For ambiguous queries, multi-source retrieval with LLM synthesis is better than forcing a single route.
-:::
-
-::: details Question 3 — Cost-benefit of query processing
+::: details Question 2 — Cost-benefit of query processing
 **Q:** A stakeholder asks: "We are spending $0.001 per query on query processing LLM calls before even hitting retrieval. Is this worth it?" How do you evaluate this?
 
 **A:** Measure the impact empirically. Set up an A/B test: Group A uses the full query processing pipeline, Group B sends raw queries directly to retrieval. Measure: (1) Retrieval recall@10 — does query processing find more relevant documents? A 20-30% recall improvement is common. (2) End-to-end answer quality — human evaluation or LLM-as-judge on answer correctness. (3) User satisfaction / thumbs-up rate. Then calculate ROI: if $0.001/query in processing prevents even one support escalation per 1000 queries (each costing $5-15 in human agent time), the processing pays for itself 5-15x over. The cost is almost always worth it — query processing is the highest-ROI intervention in most RAG systems because it directly improves retrieval quality, which is the ceiling for answer quality.
@@ -854,12 +530,12 @@ Every LLM call in the query processing pipeline adds latency and cost:
 
 - **Query processing bridges the gap** between how humans ask questions and how retrieval systems find answers. Skip it and you leave 20-40% of recall on the table.
 - **Conversational rewriting is mandatory** for multi-turn RAG. Without it, the retrieval system receives "what about it?" and finds nothing.
-- **Classification enables routing.** Not every query should go to the vector database — some need SQL, some need live APIs, some need refusal.
 - **Every LLM call adds latency.** Budget the full pipeline (rewrite + classify + expand) at 500-1500ms. Skip stages based on query type to stay within budget.
 - **Multi-query and decomposition boost recall** but multiply retrieval cost. Cap variant counts and set hard latency budgets.
 
 ## Related
 
+- [Routing & Classification](02-routing-classification.md) — classifying query intent and routing to backends
 - [Retrieval Strategies](../module-09/01-retrieval-strategies.md) — the retrieval methods that receive processed queries
 - [Hybrid Search & Fusion](../module-09/02-hybrid-search.md) — RRF for merging multi-query results
 - [Reranking](../module-11/01-reranking.md) — post-retrieval refinement after query processing

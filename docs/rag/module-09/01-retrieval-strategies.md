@@ -540,6 +540,6 @@ Results: [doc_47, doc_112, ...]
 
 - [Hybrid Search & Fusion](02-hybrid-search.md) — how to combine multiple retrieval strategies
 - [Reranking](../module-11/01-reranking.md) — refining retrieval results after the first stage
-- [Query Rewriting & Routing](../module-10/01-query-rewriting.md) — transforming queries before retrieval
+- [Query Transformations](../module-10/01-query-transformations.md) — transforming queries before retrieval
 - [Embedding Models](../module-07/01-embeddings-similarity.md) — the models powering dense retrieval
 - [Vector DB Internals](../module-08/01-vector-db-internals.md) — ANN indexes that make dense retrieval fast

@@ -15,7 +15,8 @@ Users ask messy questions: vague, ambiguous, multi-part, full of pronouns refere
 
 | Page | Topic | Interview Weight |
 |------|-------|-----------------|
-| [Query Rewriting, Expansion, HyDE & Routing](01-query-rewriting.md) | Full query processing pipeline from raw input to routed retrieval | 🔥🔥🔥 |
+| [Query Transformations](01-query-transformations.md) | Rewriting, expansion, decomposition, HyDE, multi-query | 🔥🔥🔥 |
+| [Routing & Classification](02-routing-classification.md) | Classification, routing, the decision pipeline | 🔥🔥🔥 |
 | [Summary](summary.md) | Mental models and self-assessment |
 
 ## Prerequisites
