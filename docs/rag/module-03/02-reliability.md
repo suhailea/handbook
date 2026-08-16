@@ -10,7 +10,7 @@ outline: deep
 ## 🗣️ In Plain English
 
 ::: tip In Plain English
-A pipeline that works 99% of the time loses 1 in 100 documents silently. At 10,000 documents, that is 100 missing answers your users will never get. Reliability engineering is the art of making failures visible, recoverable, and non-duplicating.
+Picture a mailroom that handles thousands of letters daily. A reliable mailroom never loses a letter, never delivers the same letter twice, and when a clerk drops a tray, every scattered letter gets picked up and re-sorted — not silently swept under the rug. That is what reliability engineering does for your ingestion pipeline: it makes every failure visible, every delivery exactly-once, and every dropped document recoverable.
 :::
 
 ## ⚙️ Under the Hood

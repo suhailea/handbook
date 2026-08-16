@@ -10,7 +10,7 @@ outline: deep
 ## 🗣️ In Plain English
 
 ::: tip In Plain English
-Ingestion is the loading dock of a warehouse. Documents arrive in trucks (sources), get unpacked (parsed), cut to size (chunked), labeled (embedded), and shelved (indexed). A good loading dock handles deliveries at any hour, never loses a package, and tells you exactly what is on every shelf.
+Think of a newspaper printing pipeline. Stories arrive continuously from reporters, get typeset by editors, and must hit the morning edition. Batch ingestion is the nightly print run — collect everything, process once, publish. Streaming ingestion is the live website — each story goes online the moment it's filed. Your choice depends on whether readers tolerate yesterday's news or need the latest headline.
 :::
 
 ## ⚙️ Under the Hood

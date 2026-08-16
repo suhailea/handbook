@@ -12,7 +12,7 @@ outline: deep
 ## 🗣️ In Plain English
 
 ::: tip In Plain English
-If the vector is the content of a library book, metadata is the label on the spine — the author, the category, the shelf number, who is allowed to check it out. Without metadata, you have a pile of books on the floor. With it, you can say "show me only the engineering books from this year that this team is allowed to see."
+A library where every book has a card in the catalog recording who may read it, which edition it is, when it was shelved, and which department owns it. The card is what lets a librarian answer "show me only HR documents from this year that this manager is allowed to see" — without reading every book. In RAG, that card is metadata: the data about your data that makes filtering, security, and citations possible.
 :::
 
 ## ⚙️ Under the Hood
