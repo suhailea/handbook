@@ -15,6 +15,18 @@ A production RAG system is not one service -- it is a dozen components working t
 
 ## ⚙️ Under the Hood
 
+### Smallest Viable Production Architecture
+
+Not every RAG system needs 15 services. For teams of 1-3 engineers with <1M documents and <100 QPS, the smallest viable production architecture is:
+
+1. **App server** — FastAPI/NestJS with embedded orchestration (query -> embed -> search -> rerank -> generate)
+2. **PostgreSQL + pgvector** — vector storage, metadata, keyword search (tsvector), all in one database
+3. **One queue worker** — processes ingestion jobs from a Redis/BullMQ queue
+
+This is enough until: you need independent scaling of retrieval vs generation, ingestion volume exceeds one worker, or team size makes service boundaries valuable. At that point, extract services from the monolith as described below.
+
+---
+
 ### Complete Architecture Diagram
 
 ```text

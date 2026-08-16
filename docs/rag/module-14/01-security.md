@@ -500,6 +500,16 @@ The database layer is the correct enforcement point because it operates before t
 - **Indirect injection is the RAG-specific threat** -- documents are data AND potential attack vectors. Scan at ingestion, not just at query time.
 - **Defense in depth, not a single layer** -- input validation catches casual attacks, database filters enforce authorization, output scanning catches leakage, audit logging catches everything else.
 
+### OWASP LLM Top 10 Mapping
+
+| Threat (on this page) | OWASP LLM Top 10 ID |
+|----------------------|---------------------|
+| Prompt injection (direct & indirect) | LLM01: Prompt Injection |
+| Data leakage / cross-tenant leakage | LLM02: Sensitive Information Disclosure |
+| Data poisoning / malicious documents | LLM03: Training Data Poisoning (analogous: index poisoning) |
+| Unauthorized retrieval / ACL bypass | LLM05: Improper Output Handling / LLM06: Excessive Agency |
+| PII exposure | LLM02: Sensitive Information Disclosure |
+
 ## Related
 
 - [Guardrails](02-guardrails.md) -- runtime protection patterns that complement security controls

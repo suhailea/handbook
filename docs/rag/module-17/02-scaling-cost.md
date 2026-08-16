@@ -151,6 +151,10 @@ async function batchEmbeddings(
 
 ### Complete Cost Breakdown
 
+::: warning Prices as of Q1 2026
+Pricing data below reflects Q1 2026 rates. LLM and embedding API prices change frequently — recheck before quoting in proposals or interviews.
+:::
+
 Here is a realistic cost breakdown for a RAG system at different scales.
 
 #### Example: 1M Document Knowledge Base

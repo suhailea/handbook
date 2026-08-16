@@ -250,6 +250,16 @@ One of the hardest challenges in grounded generation is getting the model to say
 | Abstention | Context does not cover the question | None (correct behavior) |
 | Hallucinated answer | Context does not cover it, model answers anyway | **High** |
 
+### Abstention Decision Table
+
+| Signal | Confidence | Action |
+|--------|-----------|--------|
+| Top rerank score > 0.8, consistent sources | High | Answer normally with citations |
+| Top rerank score 0.5-0.8, partial coverage | Medium | Answer with caveat: "Based on available information..." |
+| Top rerank score < 0.5, or no retrieved docs | Low | Abstain: "I don't have enough information to answer this reliably." |
+| Retrieved docs contradict each other | Conflicting | Present both viewpoints with sources, ask user to clarify |
+| Query is clearly out of scope | Off-topic | Politely redirect: "I can help with [domain]. For [other topic], please contact..." |
+
 **Improving abstention:**
 
 1. **Explicit instruction:** "If the answer is not in the context, say so." (Necessary but not sufficient.)

@@ -336,6 +336,14 @@ For each chunk config:
 
 **Start with 500 tokens + 15% overlap + recursive splitting.** Measure. Adjust. There is no shortcut past evaluation.
 
+### Evidence & Further Reading
+
+The size recommendations above are informed by empirical studies:
+- Chroma Research, *Evaluating Chunking Strategies for Retrieval* (2024) — benchmarked fixed, sentence, and semantic chunking across retrieval metrics, finding that optimal size depends heavily on query type.
+- Gunther et al. (Jina AI), *Late Chunking: Contextual Chunk Embeddings* (arXiv:2409.04701, 2024) — demonstrated that embedding full documents before chunking preserves cross-sentence context that fixed-size chunking destroys.
+
+Consult these sources for domain-specific tuning guidance.
+
 ## 💥 Where It Bites (Production Lens)
 
 ::: warning Where It Bites

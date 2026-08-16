@@ -25,4 +25,6 @@ This module covers a complete production metadata schema and shows how every fie
 ## Prerequisites
 
 - [Module 5 — Chunking](/rag/module-05/) — metadata attaches to chunks
+
+**Related (covered later):**
 - [Module 8 — Vector Databases](/rag/module-08/) — metadata filtering depends on DB capabilities

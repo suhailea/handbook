@@ -90,6 +90,18 @@ Example: 128K window, 500 system, 100 query, 1000 history, 2000 output, 500 safe
 
 **Practical target:** 3,000-10,000 tokens of context for most queries. Up to 20,000 for synthesis tasks requiring multiple sources.
 
+### Token Budget Worked Example
+
+| Category | Tokens | Notes |
+|----------|--------|-------|
+| System prompt | 400 | Grounding instructions, output format |
+| Conversation history | 1,500 | Last 3-4 turns |
+| Retrieved chunks | 5,000 | ~5 chunks x 1,000 tokens each |
+| Output reserve | 1,100 | Max expected response length |
+| **Total** | **8,000** | Fits gpt-4o-mini's 128K but optimized for cost |
+
+> Always reserve output tokens — if you fill the context to the max, the model has no room to respond.
+
 ```typescript
 // run: npx tsx token-budget.ts
 // Requires: npm install tiktoken

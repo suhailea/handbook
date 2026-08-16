@@ -340,6 +340,8 @@ console.log("Legal search:", legal);
 
 ---
 
+<details><summary>Example 2: Airline Customer Support Bot</summary>
+
 ### Example 2: Airline Customer Support Bot
 
 ```text
@@ -407,7 +409,11 @@ console.log("Legal search:", legal);
 - Small corpus (2M tokens) → could consider long-context for some query types, but QPS makes RAG mandatory for cost
 - Account-specific queries → route to booking API, not RAG
 
+</details>
+
 ---
+
+<details><summary>Example 3: Legal Document Search</summary>
 
 ### Example 3: Legal Document Search
 
@@ -490,6 +496,8 @@ console.log("Legal search:", legal);
 - Clause comparison → need to retrieve from multiple documents and present side-by-side
 - PII + privilege → self-hosted or BAA-covered services, encryption at rest, access logging
 - $25K budget with low QPS → can afford larger, more accurate models (Claude Sonnet, GPT-4o) and expensive rerankers
+
+</details>
 
 ---
 
