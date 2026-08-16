@@ -19,7 +19,7 @@ Should you build your RAG system as one big application or split it into many sm
 
 A production RAG system can be split along these boundaries:
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────┐
 │                    SERVICE BOUNDARIES                         │
 ├──────────────┬──────────────┬──────────────┬─────────────────┤
@@ -110,7 +110,7 @@ interface RetrievalModule {
 
 The ingestion pipeline is the first component to make asynchronous, regardless of whether you use microservices:
 
-```
+```text
 Synchronous (bad):
   Upload → Parse → Chunk → Embed → Store → Response
   (blocks for 10s-2min per document)
@@ -367,7 +367,7 @@ const hpaConfig = {
 
 Changing an embedding model, LLM, or reranker affects output quality. Do not flip a switch for all users:
 
-```
+```text
 1. Deploy new model version to 5% of traffic
 2. Run evaluation on both populations
 3. Compare metrics (faithfulness, correctness, latency, cost)
@@ -379,7 +379,7 @@ Changing an embedding model, LLM, or reranker affects output quality. Do not fli
 
 When changing embedding models, you need to re-embed the entire corpus:
 
-```
+```text
 1. Blue: current vector collection (old embeddings)
 2. Green: new vector collection (new embeddings)
 3. Re-embed entire corpus into Green (background job)

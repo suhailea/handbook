@@ -522,7 +522,7 @@ class VectorStore {
 
 pgvector queries are CPU-intensive — each computes distances for thousands of vectors. Without connection pooling, concurrent RAG queries can exhaust Postgres connections.
 
-```
+```text
 Without pooling:
   20 concurrent RAG queries → 20 Postgres connections
   Each holds the connection during vector computation (50-200ms)

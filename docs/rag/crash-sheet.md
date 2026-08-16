@@ -11,7 +11,7 @@ Last-minute interview prep. Scan this in 10 minutes. Every bullet is a fact you 
 
 ## Architecture
 
-```
+```text
           ┌─────────────────── INGESTION (offline) ────────────────────┐
           │                                                             │
   Documents → Parse → Clean → Chunk → Embed → Store (Vector DB + Metadata DB)
@@ -50,7 +50,7 @@ Last-minute interview prep. Scan this in 10 minutes. Every bullet is a fact you 
 
 **Decision tree:**
 
-```
+```text
 Document has clear structure (headers, sections)?
   YES → Structure-aware chunking (split by headers/sections)
   NO  → Is it long prose?
@@ -144,7 +144,7 @@ Document has clear structure (headers, sections)?
 
 **Grounding prompt template:**
 
-```
+```text
 You are a helpful assistant. Answer the user's question using ONLY
 the information in the CONTEXT below. Do not use prior knowledge.
 

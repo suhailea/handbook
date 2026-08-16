@@ -29,7 +29,7 @@ The key insight: the LLM's parametric knowledge (what it learned during training
 
 Every RAG system has two distinct data paths:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────┐
 │                   OFFLINE PATH (Ingestion)              │
 │                                                         │
@@ -96,7 +96,7 @@ Every RAG system has two distinct data paths:
 
 ### The Taxonomy: Naive → Advanced → Modular
 
-```
+```text
 Naive RAG                Advanced RAG              Modular RAG
 ──────────               ────────────              ───────────
 embed → search →         query rewrite →           routing →
@@ -139,7 +139,7 @@ RAG is the right tool when:
 
 ### Decision Flowchart
 
-```
+```text
 Does the LLM need external knowledge to answer?
 │
 ├─ NO → Do you need to change the model's behavior/style?

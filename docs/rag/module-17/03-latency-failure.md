@@ -19,7 +19,7 @@ A RAG query passes through a dozen components, each adding latency and each capa
 
 Every RAG query must complete within a time budget. Here is a realistic breakdown for a 2-second target.
 
-```
+```text
 Total budget: 2,000 ms
 ┌──────────────────────────────────────────────────────────────────┐
 │ Query processing & validation          │    50 ms  │  2.5%      │
@@ -422,7 +422,7 @@ A production RAG system has many independently versioned components. Changing an
 
 Changing the embedding model is the most disruptive migration. Old embeddings are incompatible with the new model -- you cannot mix them in the same index.
 
-```
+```text
 Phase 1: Dual-Write
 ┌─────────────────────────────────────────────┐
 │  New documents are embedded with BOTH models │

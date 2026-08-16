@@ -17,7 +17,7 @@ Context construction is assembling the cheat sheet you hand to the LLM before it
 
 ### The Context Construction Pipeline
 
-```
+```text
 Reranked Chunks (top K)
         │
         ▼
@@ -64,7 +64,7 @@ Reranked Chunks (top K)
 
 The LLM has a fixed context window. Every token matters.
 
-```
+```text
 Total Context Window (e.g., 128K tokens)
 ├── System Prompt:           ~500 tokens
 ├── Retrieved Context:       ??? tokens (this is what we're calculating)
@@ -76,7 +76,7 @@ Total Context Window (e.g., 128K tokens)
 
 **Available context tokens:**
 
-```
+```text
 available = total_window - system_prompt - user_query - chat_history - output_buffer - safety_margin
 ```
 
@@ -337,7 +337,7 @@ If nothing is relevant, respond with "NOT_RELEVANT".`,
 
 Research (Liu et al., 2023, "Lost in the Middle") demonstrated that LLMs pay significantly more attention to information at the **beginning** and **end** of the context, and less to information in the **middle**.
 
-```
+```text
 Attention Distribution:
 ┌──────────────────────────────────────┐
 │  ████████░░░░░░░░░░░░░░░░░░████████ │
@@ -610,7 +610,7 @@ console.log(JSON.stringify(messages, null, 2));
 
 **Example assembled prompt:**
 
-```
+```text
 SYSTEM:
 You are a helpful assistant that answers questions based on the provided context.
 

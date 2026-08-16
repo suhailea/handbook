@@ -70,7 +70,7 @@ Modern LLMs support massive context windows (Claude: 200K tokens, Gemini: 2M tok
 
 **The "lost in the middle" problem** (Liu et al., 2023): LLMs perform best on information at the beginning and end of the context window. Information in the middle is disproportionately ignored. This means stuffing 200K tokens of documents actually *reduces* accuracy for facts that land in the middle positions.
 
-```
+```text
 Accuracy vs Position in Context Window
 
 100% |
@@ -87,7 +87,7 @@ Accuracy vs Position in Context Window
 
 **Cost comparison at scale:**
 
-```
+```yaml
 Scenario: 500K-token corpus, 10K queries/day, GPT-4o pricing
 
 Long-Context (stuff everything):
@@ -171,7 +171,7 @@ An agent is a system that can decide which tools to use and when. RAG is one too
 | **Cost** | Fixed per query | Variable (more complex = more LLM calls) |
 | **Reliability** | Predictable failure modes | Can loop, use wrong tools, compound errors |
 
-```
+```text
 Standard RAG:
   Query --> Retrieve --> Generate --> Response
 

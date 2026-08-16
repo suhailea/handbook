@@ -21,7 +21,7 @@ First-stage retrieval (bi-encoder) embeds query and documents **separately**, th
 
 Reranking (cross-encoder) processes the query and document **together** as a single input, allowing full cross-attention between query tokens and document tokens. This is much more accurate but slow — you cannot pre-compute anything, because the output depends on the specific query-document pair.
 
-```
+```text
 ┌──────────────────────────────────────────────────┐
 │           BI-ENCODER (First Stage)                │
 │                                                    │
@@ -53,7 +53,7 @@ Reranking (cross-encoder) processes the query and document **together** as a sin
 
 This is the two-stage retrieval pattern:
 
-```
+```text
 Query ──► Retrieve Top 50-100 (bi-encoder, fast)
               │
               ▼
@@ -221,7 +221,7 @@ Score 0 = completely irrelevant. Score 10 = directly answers the query.`,
 
 The two-stage pipeline has three numbers to tune:
 
-```
+```text
 Retrieve N candidates → Rerank → Return top K
 ```
 

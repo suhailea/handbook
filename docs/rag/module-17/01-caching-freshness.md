@@ -19,7 +19,7 @@ A RAG system has three expensive operations -- embedding the question, searching
 
 A production RAG pipeline has three distinct points where caching provides value, each with different key strategies, TTLs, and invalidation requirements.
 
-```
+```text
 Query → [Embedding Cache] → [Retrieval Cache] → [LLM Response Cache] → Answer
          exact-match           exact-match          semantic-match
          TTL: long             TTL: short           TTL: medium

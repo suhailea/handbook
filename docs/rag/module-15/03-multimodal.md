@@ -307,7 +307,7 @@ function chunkBySpeaker(
 
 Video combines visual and audio streams:
 
-```
+```text
 Video Processing Pipeline:
                     ┌──────────┐
                     │  Video   │
@@ -378,7 +378,7 @@ function combineVideoChunk(
 
 ### Architecture for Multimodal Document Processing
 
-```
+```text
                     ┌───────────────────────┐
                     │   Document Upload     │
                     │   (PDF, DOCX, etc.)   │

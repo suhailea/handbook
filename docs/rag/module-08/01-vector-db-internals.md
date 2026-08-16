@@ -21,7 +21,7 @@ Finding the most similar vector by checking every single one is like searching f
 
 Exact nearest neighbor search (brute force) compares the query vector against every vector in the database.
 
-```
+```text
 Query vector: [0.12, -0.34, 0.56, ...]
 
 For each of N stored vectors:
@@ -56,7 +56,7 @@ Time complexity: O(N × D)
 
 ANN algorithms trade a small amount of accuracy (recall) for dramatic speed improvements. Instead of checking every vector, they use an index structure to find the approximately nearest neighbors.
 
-```
+```text
 Exact NN:   100% recall, O(N) time
 ANN:        95-99% recall, O(log N) or O(√N) time
 ```
@@ -75,7 +75,7 @@ The most common ANN index in production vector databases. Used by default in pgv
 
 HNSW builds a multi-layer graph where each vector is a node, and edges connect nodes to their nearest neighbors.
 
-```
+```text
 Layer 2 (sparse):    A ──── F ──── K
                      │              │
 Layer 1 (medium):    A ─ C ─ F ─ H ─ K ─ M
@@ -114,7 +114,7 @@ Layer 0 (dense):     A B C D E F G H I J K L M N O
 
 #### HNSW Trade-offs
 
-```
+```yaml
 Pros:
   ✓ Fast queries: O(log N) typical
   ✓ High recall at reasonable speed (95-99% at ~1ms for 1M vectors)
@@ -129,7 +129,7 @@ Cons:
 ```
 
 **Memory estimation:**
-```
+```text
 HNSW memory ≈ N × (D × 4 bytes + M × 2 × 8 bytes)
             = N × (vector_bytes + edge_bytes)
 
@@ -147,7 +147,7 @@ IVF partitions the vector space into clusters (Voronoi cells) and searches only 
 
 #### How It Works
 
-```
+```text
 Build time:
   1. Run K-means clustering on all vectors → create nlist centroids
   2. Assign each vector to its nearest centroid
@@ -159,7 +159,7 @@ Query time:
   3. Return top-K results
 ```
 
-```
+```text
                     ┌────────────┐
                     │ nlist=100  │
                     │ centroids  │
@@ -185,7 +185,7 @@ Query: compare to 100 centroids, search top nprobe=10 clusters
 
 #### IVF Trade-offs
 
-```
+```yaml
 Pros:
   ✓ Lower memory than HNSW (no graph edges)
   ✓ Can work with disk-based storage (vectors don't all need to fit in RAM)
@@ -208,7 +208,7 @@ PQ compresses vectors to reduce memory, trading accuracy for storage efficiency.
 
 #### How It Works
 
-```
+```text
 Original vector (1536 dims, 6 KB):
   [0.12, -0.34, 0.56, ..., 0.23]
 
@@ -261,7 +261,7 @@ No indexing at all. Compute exact distances for every query.
 
 How metadata filtering interacts with ANN search is a critical implementation detail:
 
-```
+```yaml
 Pre-filter:
   [1M vectors] → filter by metadata → [50K matching] → HNSW search on 50K → [top K]
   ✓ Always returns K results (if ≥K match the filter)
@@ -298,7 +298,7 @@ When a filter is very selective (e.g., `tenant_id=X` matches 0.1% of vectors), t
 
 ### Decision Heuristic
 
-```
+```text
 Already using PostgreSQL?
   └── <5M vectors → pgvector (add extension, done)
   └── >5M vectors → consider dedicated vector DB
@@ -327,7 +327,7 @@ Need the richest filtering and SQL joins?
 
 Split vectors across multiple nodes by some partition key.
 
-```
+```text
 Shard by tenant_id:
   Node 1: tenants A-M (500K vectors)
   Node 2: tenants N-Z (500K vectors)
@@ -344,7 +344,7 @@ Shard by hash:
 
 Read replicas for query throughput. Writes go to the primary; reads can hit any replica.
 
-```
+```text
 Write path: Application → Primary node → replicate to replicas
 Read path:  Application → Load balancer → any replica
 ```

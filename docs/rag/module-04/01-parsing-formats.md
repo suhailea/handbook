@@ -146,7 +146,7 @@ def format_table_as_markdown(table: list[list[str]]) -> str:
 
 **Choosing a PDF parser:**
 
-```
+```text
 Is the PDF scanned (images of text)?
 ├─ YES → OCR pipeline (Textract/Tesseract) + vision LLM for complex layouts
 └─ NO → Does it contain important tables?
@@ -505,7 +505,7 @@ class DocumentParser:
 
 ### Structure Preservation: Why It Matters
 
-```
+```text
 WRONG: Flatten a table into text
   "Name John Age 32 Salary 85000 Name Jane Age 28 Salary 92000"
   → Embedding captures some words but loses ALL relationships

@@ -17,7 +17,7 @@ Query processing is the translator between how a human asks a question and how a
 
 ### The Complete Query Processing Pipeline
 
-```
+```text
 Raw User Query
       │
       ▼
@@ -533,7 +533,7 @@ console.log(result);
 
 **Routing decisions:**
 
-```
+```text
                     Classified Query
                           │
             ┌─────────────┼──────────────┐

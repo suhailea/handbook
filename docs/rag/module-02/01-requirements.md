@@ -19,7 +19,7 @@ You would not build a house without blueprints. A RAG system needs the same trea
 
 Before writing a single line of code, answer these eight categories of questions. Each one eliminates options and narrows the design space.
 
-```
+```text
 Requirements Framework for RAG Systems
 
   ┌──────────────────────────────────────────────┐
@@ -87,7 +87,7 @@ Requirements Framework for RAG Systems
 
 **Latency budget breakdown for a typical RAG query:**
 
-```
+```yaml
 Target: P95 < 3 seconds end-to-end
 
   Query embedding:        50-100ms   (API call to embedding model)
@@ -136,7 +136,7 @@ Target: P95 < 3 seconds end-to-end
 
 **Security requirements cascade into architecture decisions:**
 
-```
+```text
 HIPAA Compliance Required?
 │
 ├─ YES ──► External embedding APIs (OpenAI, etc.)?
@@ -275,7 +275,7 @@ print("Legal search:", legal)
 
 ### Example 1: Enterprise Knowledge Base
 
-```
+```text
 ┌─────────────────────────────────────────────────────┐
 │  REQUIREMENTS DOCUMENT: Enterprise Knowledge Base   │
 ├─────────────────────────────────────────────────────┤
@@ -343,7 +343,7 @@ print("Legal search:", legal)
 
 ### Example 2: Airline Customer Support Bot
 
-```
+```text
 ┌─────────────────────────────────────────────────────┐
 │  REQUIREMENTS DOCUMENT: Airline Support Bot          │
 ├─────────────────────────────────────────────────────┤
@@ -412,7 +412,7 @@ print("Legal search:", legal)
 
 ### Example 3: Legal Document Search
 
-```
+```text
 ┌─────────────────────────────────────────────────────┐
 │  REQUIREMENTS DOCUMENT: Legal Document Search        │
 ├─────────────────────────────────────────────────────┤

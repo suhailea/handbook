@@ -72,7 +72,7 @@ function simpleHash(input: string): number {
 
 ### Replication: Read Replicas for Vector DB
 
-```
+```text
                     ┌──────────────┐
      Writes ───────►│  Primary     │
                     │  (read/write)│

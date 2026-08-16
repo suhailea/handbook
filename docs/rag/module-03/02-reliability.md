@@ -169,7 +169,7 @@ async def embed_with_retry(texts: list[str]) -> list[list[float]]:
 
 A DLQ captures messages that failed all retry attempts. It is the safety net that prevents silent data loss.
 
-```
+```text
 Normal Flow:
   Queue ──► Worker ──► Success ──► Vector DB
 
@@ -339,7 +339,7 @@ Sometimes you need to re-index everything: new embedding model, new chunking str
 
 **Blue-green is the production standard:**
 
-```
+```text
 Phase 1: Build new index alongside old
 
   [collection-v1] ◄── queries go here (alias: "production")
@@ -527,7 +527,7 @@ async def process_with_metrics(doc_id: str, content: str):
 
 When you change the embedding model, add a metadata field, or change the chunking strategy, you need to backfill existing documents.
 
-```
+```text
 Backfill Scenarios:
 
 1. New embedding model

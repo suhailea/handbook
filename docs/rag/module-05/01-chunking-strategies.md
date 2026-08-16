@@ -163,7 +163,7 @@ function recursiveChunk(
 
 Embed individual sentences, then split where the cosine similarity between consecutive sentences drops below a threshold.
 
-```
+```text
 Sentence 1  ──embed──→  [0.23, 0.87, ...]  ┐
                                               ├── similarity: 0.91 (same topic)
 Sentence 2  ──embed──→  [0.25, 0.85, ...]  ┘
@@ -254,7 +254,7 @@ interface CodeChunk {
 | **Best for** | Code search, developer documentation, code Q&A systems |
 
 **Production pattern:** For code RAG, prepend metadata context:
-```
+```text
 File: src/auth/jwt.ts
 Class: JwtService
 Method: validateToken
@@ -290,7 +290,7 @@ Tables are the hardest content type to chunk. Naive text splitting destroys row-
 
 Create two levels of chunks: small chunks for retrieval precision, linked to larger parent chunks for context.
 
-```
+```text
 Document
 └── Parent chunk (e.g., full section, ~1500 tokens)
     ├── Child chunk 1 (e.g., paragraph, ~300 tokens)  ← embed & search this
@@ -318,7 +318,7 @@ At query time:
 
 Prepend contextual information to each chunk: the document title, section heading hierarchy, or a short document summary.
 
-```
+```text
 BEFORE (raw chunk):
 "Use --force to override the safety check. This skips pre-push hooks."
 
@@ -343,7 +343,7 @@ Use --force to override the safety check. This skips pre-push hooks."
 
 Conventional chunking splits text first, then embeds each chunk independently. Late chunking reverses this: embed the full document, then chunk the embeddings.
 
-```
+```text
 Conventional:
 Document → split into chunks → embed each chunk independently
 
@@ -369,7 +369,7 @@ Document → embed full document (all tokens get contextual embeddings)
 
 Embed individual sentences for maximum retrieval precision. At generation time, expand the window to include N surrounding sentences.
 
-```
+```yaml
 Index: embed each sentence individually
 Query: find the best-matching sentence
 Return to LLM: the matched sentence ± 2-5 surrounding sentences
@@ -406,7 +406,7 @@ Return to LLM: the matched sentence ± 2-5 surrounding sentences
 
 ### Choosing a Strategy: Decision Framework
 
-```
+```text
 Start here:
 │
 ├── Prototyping / quick baseline?

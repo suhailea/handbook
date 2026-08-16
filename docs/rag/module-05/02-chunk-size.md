@@ -33,7 +33,7 @@ The commonly cited 500-token chunk size is a reasonable starting point for gener
 
 #### Small Chunks (200-300 tokens)
 
-```
+```yaml
 Pros:
   ✓ High retrieval precision — each chunk is tightly focused
   ✓ Less noise in retrieved context
@@ -51,7 +51,7 @@ Cons:
 
 #### Medium Chunks (400-600 tokens)
 
-```
+```yaml
 Pros:
   ✓ Balanced precision and recall
   ✓ Usually contains a complete paragraph or idea
@@ -66,7 +66,7 @@ Cons:
 
 #### Large Chunks (800-1500 tokens)
 
-```
+```text
 Pros:
   ✓ High recall — more context captured per chunk
   ✓ Fewer chunks overall (less storage, faster search)
@@ -87,7 +87,7 @@ Cons:
 
 Overlap means each chunk repeats N tokens from the end of the previous chunk.
 
-```
+```text
 Chunk 1: [====================]
 Chunk 2:              [====================]
                       ↑ overlap zone ↑
@@ -160,7 +160,7 @@ function validateChunkSize(
 
 At generation time, the LLM must fit: system prompt + user query + K retrieved chunks + output tokens.
 
-```
+```text
 LLM context budget:
 ┌──────────────────────────────────────────────────────────────┐
 │ System prompt (~200-500 tokens)                               │
@@ -305,7 +305,7 @@ Retrieval metrics alone are not enough. Ultimately, you care about answer qualit
 | **Token cost** | Total tokens consumed (embedding + generation) per query |
 
 **The evaluation loop:**
-```
+```text
 For each chunk config:
   1. Re-chunk all documents
   2. Re-embed all chunks

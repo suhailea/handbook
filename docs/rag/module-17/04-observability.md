@@ -19,7 +19,7 @@ Observability for RAG is like having security cameras, speedometers, and health 
 
 RAG systems need standard observability (logs, metrics, traces) plus LLM-specific observability (prompt traces, token usage, retrieval quality). The three standard pillars are necessary but not sufficient.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    RAG Observability Stack                    │
 │                                                              │

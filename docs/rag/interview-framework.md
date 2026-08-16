@@ -208,7 +208,7 @@ Can you defend your choices? A candidate who explains trade-offs demonstrates th
 
 ### Step 5: Ingestion Pipeline
 
-```
+```text
 Policy PDFs -> PDF Parser (layout-aware) -> Chunk by section/clause
 FAQ entries -> Clean HTML -> Each FAQ as one chunk (already small)
 Loyalty rules -> Markdown parser -> Chunk by rule/tier
@@ -232,7 +232,7 @@ Loyalty rules -> Markdown parser -> Chunk by rule/tier
 
 ### Step 9: Generation
 
-```
+```text
 System prompt:
 You are an airline customer service assistant. Answer ONLY using the provided
 context. If the context does not contain the answer, say "I don't have that
@@ -291,7 +291,7 @@ Do you understand the boundary between RAG (unstructured knowledge retrieval) an
 
 **Step 2: Build a multi-path system.**
 
-```
+```text
 User Query
     |
     v

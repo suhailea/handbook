@@ -17,7 +17,7 @@ A production RAG system is not one service -- it is a dozen components working t
 
 ### Complete Architecture Diagram
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                           EXTERNAL CLIENTS                                  │
 │                    Web App / Mobile App / API Consumers                      │
@@ -322,7 +322,7 @@ async function generateWithFallback(
 
 **Role:** Process uploaded documents into searchable chunks. This is the write path of the system.
 
-```
+```text
 Document Upload → Queue → Worker picks up → Process:
 
 1. PARSE:        PDF/DOCX/HTML → raw text + images + tables
@@ -406,7 +406,7 @@ const metrics = {
 
 **Role:** Automated quality measurement, runs in CI/CD and on a schedule.
 
-```
+```text
 On deploy:
   1. Run evaluation dataset (300 QA pairs) through new code
   2. Compute: Recall@10, Faithfulness, Answer Correctness
@@ -424,7 +424,7 @@ On schedule (daily):
 
 ### Data Flow: Query Path
 
-```
+```text
 1. Client sends query
 2. API Gateway: authenticate, rate limit, validate
 3. Orchestrator: input guardrails
@@ -458,7 +458,7 @@ On schedule (daily):
 
 ### Data Flow: Ingestion Path
 
-```
+```text
 1. Client uploads document via Ingestion API
 2. API validates format, size, permissions
 3. Store raw document in Object Storage (S3)

@@ -20,7 +20,7 @@ Imagine you need to find a specific book in a massive library. You could search 
 **What:** Encode the query into an embedding vector, then find the K nearest vectors in the index using ANN (Approximate Nearest Neighbor) search.
 
 **How it works:**
-```
+```text
 query → embedding model → query_vector (768/1536-dim)
                                 ↓
                     ANN search (HNSW/IVF) over pre-indexed doc vectors
@@ -95,7 +95,7 @@ function cosineSimilarity(a: number[], b: number[]): number {
 
 BM25 scores each document D for query Q:
 
-```
+```text
 score(D, Q) = Σ IDF(qi) * (f(qi, D) * (k1 + 1)) / (f(qi, D) + k1 * (1 - b + b * |D|/avgdl))
 ```
 
@@ -221,7 +221,7 @@ function search(query: string, index: BM25Index, topK = 5) {
 
 **Pre-filtering vs post-filtering:**
 
-```
+```text
 Pre-filtering:  filter first → ANN search on filtered subset
                 ✅ Always returns K results from the valid set
                 ❌ May require separate indexes per filter combination
@@ -250,7 +250,7 @@ Post-filtering: ANN search on all → filter results
 **What:** Index small chunks for precision, but retrieve their parent document (or a larger surrounding chunk) for context.
 
 **Architecture:**
-```
+```text
 Document: "Company Policy Manual" (50 pages)
     ├── Section: "Leave Policy" (5 pages)
     │    ├── Chunk 1: "Annual leave is 24 days..." (200 tokens)
@@ -308,7 +308,7 @@ Search matches Chunk 2 → Return Section "Leave Policy" (all 3 chunks)
 **What:** Generate multiple variants of the user's query using an LLM, retrieve results for each variant, then merge and deduplicate.
 
 **How it works:**
-```
+```text
 User query: "How do I handle errors in NestJS?"
     ↓ LLM generates variants
 Query 1: "NestJS exception handling"
@@ -348,7 +348,7 @@ Final: [A, B, C, F, G, D, J, ...]
 - Query expansion: enrich a single query with additional terms, run one retrieval
 
 **Example:**
-```
+```yaml
 Original: "K8s pod crash"
 Expanded: "K8s Kubernetes pod crash CrashLoopBackOff restart failure OOMKilled"
 ```
@@ -374,7 +374,7 @@ Expanded: "K8s Kubernetes pod crash CrashLoopBackOff restart failure OOMKilled"
 **What:** Instead of embedding the query directly, ask an LLM to generate a hypothetical answer, then embed *that answer* and search for similar documents. The hypothesis is closer in "register" to the actual documents than the question is.
 
 **How it works:**
-```
+```yaml
 Query: "How does NestJS handle dependency injection?"
     ↓ LLM generates hypothetical answer
 Hypothesis: "NestJS uses a built-in IoC container that reads constructor
@@ -448,7 +448,7 @@ async function hydeRetrieval(query: string) {
 **What:** Traverse a knowledge graph to find related entities and their relationships, then retrieve documents connected to those entities.
 
 **Architecture:**
-```
+```yaml
 Query: "What drugs interact with metformin?"
     ↓ entity extraction
 Entity: "metformin" → Node in knowledge graph

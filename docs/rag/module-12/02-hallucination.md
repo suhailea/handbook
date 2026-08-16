@@ -31,7 +31,7 @@ RAG hallucination has specific, diagnosable causes that differ from general LLM 
 
 **The RAG hallucination chain:**
 
-```
+```text
 Retrieval Failure ──► Wrong context ──► Model answers from wrong docs
                                         or from parametric knowledge
                                         ──► Hallucinated response
@@ -49,14 +49,14 @@ Perfect Retrieval ──► Perfect context ──► Model still misquotes a nu
 
 **Intrinsic hallucination:** The response contradicts the provided context.
 
-```
+```yaml
 Context: "The refund policy is 30 days."
 Response: "You can get a refund within 60 days."  ← directly contradicts context
 ```
 
 **Extrinsic hallucination:** The response adds information not present in the context.
 
-```
+```yaml
 Context: "The refund policy is 30 days."
 Response: "The refund policy is 30 days, and you can also exchange items within 90 days."
                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -65,7 +65,7 @@ Response: "The refund policy is 30 days, and you can also exchange items within 
 
 **Fabricated details:** The response invents specific details (numbers, dates, names) that sound plausible but are not in the context.
 
-```
+```yaml
 Context: "Our support team is available during business hours."
 Response: "Support is available Monday-Friday, 9am-5pm EST."
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -530,7 +530,7 @@ Even with perfect retrieval, perfect context construction, and perfect prompting
 
 **Implication:** No RAG system can guarantee zero hallucination. Defense must be **layered:**
 
-```
+```text
 Layer 1: Better retrieval (catch 60% of hallucinations)
     ↓
 Layer 2: Better context construction (catch 15%)

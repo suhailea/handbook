@@ -141,7 +141,7 @@ function checkQueryPII(query: string): GuardrailResult {
 
 **Input guardrail pipeline:**
 
-```
+```text
 Query → Length Check → PII Check → Content Safety → Intent Classification → Proceed
          (fast)       (fast)       (API call)       (LLM call, optional)
 ```
@@ -454,7 +454,7 @@ function validateToolCall(
 
 Putting it all together:
 
-```
+```text
                          ┌──────────────┐
                          │  User Query  │
                          └──────┬───────┘

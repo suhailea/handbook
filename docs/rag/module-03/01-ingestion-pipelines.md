@@ -30,7 +30,7 @@ Every RAG ingestion pipeline falls into one of four patterns, determined by the 
 
 The simplest pattern. A cron job runs periodically, processes all (or changed) documents, and updates the index.
 
-```
+```text
 Batch Ingestion
 
   ┌──────────┐    Cron (daily)     ┌────────────┐
@@ -128,7 +128,7 @@ def batch_ingest(
 
 Only processes documents that have changed since the last run. Uses content hashing or timestamps for change detection.
 
-```
+```text
 Incremental Ingestion
 
   ┌──────────┐   List changes     ┌────────────┐
@@ -226,7 +226,7 @@ def incremental_ingest(source, vector_db, embedder, chunker):
 
 Documents are processed as events occur — a file is uploaded to S3, a page is updated in Confluence, a webhook fires.
 
-```
+```text
 Event-Driven Ingestion
 
   ┌──────────┐
@@ -347,7 +347,7 @@ async def get_ingestion_status(task_id: str):
 
 For systems that need seconds-level freshness. Uses a message stream (Kafka, Kinesis) as the backbone.
 
-```
+```text
 Streaming Ingestion
 
   ┌──────────┐    ┌─────────────┐    ┌──────────────┐    ┌───────────┐
@@ -379,7 +379,7 @@ Choosing the right queue is one of the most impactful infrastructure decisions:
 
 **Decision guide:**
 
-```
+```text
 Already using AWS and want managed?          → SQS
 Need replay and high throughput?             → Kafka
 Python stack, need task queue with retries?  → Celery + Redis/RabbitMQ
@@ -390,7 +390,7 @@ Need complex routing (dead-letter, priority)?→ RabbitMQ
 
 ### The Production Pipeline: Full Architecture
 
-```
+```text
 ┌────────────────────────────────────────────────────────────────┐
 │                    PRODUCTION INGESTION PIPELINE               │
 │                                                                │

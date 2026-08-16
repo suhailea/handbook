@@ -30,7 +30,7 @@ The pattern: dense search catches semantic similarity but misses exact terms. BM
 
 ### Production Architecture
 
-```
+```text
                     User Query
                         │
               ┌─────────┴──────────┐
@@ -76,7 +76,7 @@ Raw scores from different engines are not comparable. Cosine similarity ranges f
 
 **Min-Max Normalization:**
 
-```
+```text
 normalized_score = (score - min_score) / (max_score - min_score)
 ```
 
@@ -84,7 +84,7 @@ Maps all scores to `[0, 1]`. Simple, but sensitive to outliers — a single very
 
 **Z-Score Normalization:**
 
-```
+```text
 normalized_score = (score - mean) / std_dev
 ```
 
@@ -129,7 +129,7 @@ RRF merges ranked lists without using raw scores at all — only positions matte
 
 **Formula:**
 
-```
+```text
 RRF_score(doc) = Σ  1 / (k + rank_i(doc))
                  i∈rankers
 ```
@@ -223,7 +223,7 @@ for (const [docId, score] of sorted) {
 
 When you trust one retriever more than the other, use weighted linear combination of normalized scores:
 
-```
+```text
 final_score = α * norm_vector_score + (1 - α) * norm_bm25_score
 ```
 

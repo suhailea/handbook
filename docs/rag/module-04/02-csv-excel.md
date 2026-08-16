@@ -19,7 +19,7 @@ You would not cut a spreadsheet into random strips and ask someone to answer que
 
 This is the single most common mistake in RAG systems that handle tabular data. Here is what happens:
 
-```
+```text
 ORIGINAL CSV:
   employee_id, name,    department, salary, hire_date
   1001,        Alice,   Engineering, 95000, 2020-03-15
@@ -57,7 +57,7 @@ PROBLEMS:
 
 Different questions about the same data need different tools:
 
-```
+```text
                         ┌─────────────────────┐
                         │    User Query        │
                         └──────────┬──────────┘
@@ -523,7 +523,7 @@ def route_excel_sheet(sheet: ExcelSheet) -> str:
 
 ### Complete Architecture: CSV in a RAG System
 
-```
+```text
 CSV Upload Flow:
 
   1. Upload CSV → S3

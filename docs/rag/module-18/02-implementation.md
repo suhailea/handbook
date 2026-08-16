@@ -17,7 +17,7 @@ This is the blueprint for a RAG system you could actually deploy. Think of it as
 
 ### 1. Project Structure
 
-```
+```text
 rag-service/
 ├── docker-compose.yml
 ├── Dockerfile
@@ -688,7 +688,7 @@ volumes:
 
 ### Putting It Together — The Query Flow
 
-```
+```text
 User Query
     │
     ▼

@@ -28,7 +28,7 @@ Designing a RAG system is like planning a restaurant kitchen — the menu determ
 
 **Architecture:**
 
-```
+```text
 ┌─────────────┐     ┌──────────────┐     ┌──────────────────┐
 │  Chat UI    │────▶│  API Gateway │────▶│  RAG Orchestrator│
 │  (React)    │     │  (Auth/ACL)  │     │  (FastAPI)       │
@@ -115,7 +115,7 @@ Designing a RAG system is like planning a restaurant kitchen — the menu determ
 
 **Architecture:**
 
-```
+```text
 ┌──────────┐    ┌───────────────┐    ┌───────────────────────┐
 │ Customer │───▶│  Chat Gateway │───▶│  Orchestrator         │
 │ (Web/App)│    │  (WebSocket)  │    │  (LangGraph Agent)    │
@@ -201,7 +201,7 @@ However, passengers don't only ask real-time questions. They also ask:
 - "What gate does my flight leave from?" — Live API
 - "If my flight is delayed more than 3 hours, am I entitled to a hotel?" — RAG (policies) + API (check delay duration)
 
-```
+```text
 ┌───────────┐    ┌──────────────────────────────────────────────┐
 │  User     │───▶│          LangGraph Router Agent              │
 └───────────┘    └──────┬─────────────┬──────────────┬──────────┘
@@ -252,7 +252,7 @@ However, passengers don't only ask real-time questions. They also ask:
 
 **Architecture:**
 
-```
+```text
 ┌──────────┐    ┌──────────────┐    ┌──────────────────────────────┐
 │ Customer │───▶│ Chat Gateway │───▶│  LangGraph Stateful Agent    │
 └──────────┘    └──────────────┘    │  ┌────────────────────────┐  │
@@ -340,7 +340,7 @@ However, passengers don't only ask real-time questions. They also ask:
 
 **Architecture:**
 
-```
+```text
 ┌──────────────┐     ┌──────────────────────────────────────┐
 │  Lawyer UI   │────▶│  Search / QA Orchestrator            │
 │  (Query +    │     │  ┌───────────┐  ┌─────────────────┐  │
@@ -420,7 +420,7 @@ However, passengers don't only ask real-time questions. They also ask:
 
 **Architecture:**
 
-```
+```text
 ┌──────────────┐     ┌──────────────┐     ┌──────────────────────────┐
 │  Clinician   │────▶│  Auth + Audit│────▶│  RAG Orchestrator        │
 │  (EMR-       │     │  Gateway     │     │  (on-prem FastAPI)       │
@@ -498,7 +498,7 @@ However, passengers don't only ask real-time questions. They also ask:
 
 **Architecture:**
 
-```
+```text
 ┌──────────┐    ┌──────────────────────────────────────────────────┐
 │ Shopper  │───▶│              Search Orchestrator                 │
 └──────────┘    │  ┌──────────┐  ┌────────────┐  ┌─────────────┐  │
@@ -573,7 +573,7 @@ However, passengers don't only ask real-time questions. They also ask:
 
 **Architecture:**
 
-```
+```text
 ┌──────────────┐    ┌──────────────┐    ┌──────────────────────┐
 │  Employee    │───▶│  SSO + Role  │───▶│  RAG Orchestrator    │
 │  (Slack bot  │    │  Resolver    │    │  (filters by role +  │
@@ -654,7 +654,7 @@ This is the second case study where naive RAG is the wrong approach. Consider wh
 
 **The Correct Approach: NL-to-SQL (Text-to-SQL):**
 
-```
+```text
 ┌──────────┐    ┌──────────────┐    ┌──────────────────────────────┐
 │ Analyst  │───▶│  File Upload │───▶│  Analytics Orchestrator      │
 │          │    │  + Schema    │    │  ┌──────────────────────┐    │
@@ -724,7 +724,7 @@ This is the second case study where naive RAG is the wrong approach. Consider wh
 
 **Architecture:**
 
-```
+```text
 ┌──────────────┐     ┌──────────────────────────────────────────┐
 │  Consultant  │────▶│  Multimodal RAG Orchestrator             │
 └──────────────┘     └──────────┬──────────────────────────────┘
@@ -740,7 +740,7 @@ This is the second case study where naive RAG is the wrong approach. Consider wh
 
 **Ingestion Pipeline (the core challenge):**
 
-```
+```text
 PDF ──▶ ┌──────────────────────────────────────────┐
         │  Step 1: Layout Analysis                 │
         │  (Document AI / LayoutLMv3 /             │

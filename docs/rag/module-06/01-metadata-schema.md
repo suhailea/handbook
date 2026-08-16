@@ -89,7 +89,7 @@ interface ChunkMetadata {
 | `row_range` | Row range for table-origin chunks | Precise table citations: "rows 15-30 of the pricing sheet" |
 
 **Citation flow at query time:**
-```
+```text
 User asks a question
   → Retrieve top-K chunks
   → Extract metadata: uri, page, section
@@ -287,7 +287,7 @@ function buildCitation(metadata: ChunkMetadata): string {
 
 When something goes wrong — a user gets a bad answer, a compliance audit asks "where did this answer come from?" — you need to trace back through the pipeline:
 
-```
+```text
 Bad answer
   → Which chunks were retrieved? (chunk_ids from the response log)
   → What text is in those chunks? (fetch by chunk_id)
@@ -325,7 +325,7 @@ How a vector database applies metadata filters fundamentally affects result qual
 | **Pre-filter** | Filter metadata first, then run ANN search on the filtered subset | Exact filter compliance. If you ask for K results with `access_level=internal`, you get K internal results. | If the filtered subset is small, ANN index may be inefficient (sparse graph traversal in HNSW). |
 | **Post-filter** | Run ANN search first (get more than K candidates), then filter metadata | ANN search runs on the full index (efficient). | May return fewer than K results after filtering. Must over-fetch to compensate. |
 
-```
+```yaml
 Pre-filter:  [all vectors] → filter by metadata → [subset] → ANN search → [K results]
 Post-filter: [all vectors] → ANN search → [K' candidates] → filter by metadata → [≤K results]
 ```

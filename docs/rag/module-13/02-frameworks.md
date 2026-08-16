@@ -179,7 +179,7 @@ If kappa < 0.60, your evaluation criteria are ambiguous -- fix the rubric before
 
 The quality of your evaluation is only as good as your dataset. A RAG evaluation dataset has four columns:
 
-```
+```text
 Question → Expected Documents → Expected Answer → Evaluation Criteria
 ```
 
@@ -249,7 +249,7 @@ Output JSON:
 
 **Offline evaluation pipeline:**
 
-```
+```text
 Code change → CI triggers eval →
   Run pipeline on eval dataset →
     Compute metrics →
@@ -268,7 +268,7 @@ Code change → CI triggers eval →
 
 The most practical use of evaluation: **A/B test your RAG pipeline changes.**
 
-```
+```yaml
 Experiment: "Does adding a reranker improve quality?"
 
 Control:  query → embed → vector search top-10 → LLM
@@ -294,7 +294,7 @@ Decision: reranker adds 300ms and $0.001 but significantly improves quality → 
 
 In production, evaluation is not a one-time activity. Build a **continuous loop**:
 
-```
+```text
                     ┌─────────────────────┐
                     │   Production RAG    │
                     │      System         │

@@ -27,7 +27,7 @@ Every retrieval metric answers the same fundamental question: **given a query, h
 
 **Formula:**
 
-```
+```text
 Recall@K = |Relevant ∩ Retrieved@K| / |Relevant|
 ```
 
@@ -54,7 +54,7 @@ Recall@K = |Relevant ∩ Retrieved@K| / |Relevant|
 
 **Formula:**
 
-```
+```text
 Precision@K = |Relevant ∩ Retrieved@K| / K
 ```
 
@@ -80,7 +80,7 @@ Precision@K = |Relevant ∩ Retrieved@K| / K
 
 **Formula:**
 
-```
+```text
 Hit@K = 1 if |Relevant ∩ Retrieved@K| > 0, else 0
 Average Hit Rate@K = sum(Hit@K for all queries) / number of queries
 ```
@@ -104,7 +104,7 @@ Average Hit Rate@K = sum(Hit@K for all queries) / number of queries
 
 **Formula:**
 
-```
+```text
 Reciprocal Rank = 1 / rank_of_first_relevant_document
 MRR = mean(Reciprocal Rank across all queries)
 ```
@@ -131,7 +131,7 @@ MRR = mean(Reciprocal Rank across all queries)
 
 **Formula:**
 
-```
+```text
 DCG@K = Σ (2^rel_i - 1) / log₂(i + 1)  for i = 1 to K
 
 IDCG@K = DCG@K for the ideal ranking (sort by relevance, descending)
@@ -143,7 +143,7 @@ NDCG@K = DCG@K / IDCG@K
 
 Retrieved ranking with relevance scores: [3, 0, 2, 1, 0]
 
-```
+```text
 DCG@5 = (2³-1)/log₂(2) + (2⁰-1)/log₂(3) + (2²-1)/log₂(4) + (2¹-1)/log₂(5) + (2⁰-1)/log₂(6)
        = 7/1 + 0/1.585 + 3/2 + 1/2.322 + 0/2.585
        = 7.0 + 0.0 + 1.5 + 0.431 + 0.0
@@ -249,7 +249,7 @@ Generation metrics evaluate the **LLM's output** given the retrieved context. Th
 
 **Formula:**
 
-```
+```text
 F1 = 2 * (Precision * Recall) / (Precision + Recall)
 
 where:
@@ -278,7 +278,7 @@ Answer Correctness = w1 * F1 + w2 * semantic_similarity
 
 **Formula:**
 
-```
+```text
 Citation Correctness = correct citations / total citations
 ```
 
@@ -299,7 +299,7 @@ Citation Correctness = correct citations / total citations
 
 **Formula:**
 
-```
+```text
 Citation Completeness = cited claims / citable claims
 ```
 
@@ -335,7 +335,7 @@ System metrics measure the **operational health** of the RAG pipeline. These are
 
 **Break down latency by stage** to find bottlenecks:
 
-```
+```text
 Total Latency = Embedding Latency
               + Retrieval Latency
               + Reranking Latency
@@ -352,7 +352,7 @@ Typical breakdown in production:
 
 #### Throughput
 
-```
+```text
 QPS = queries processed per second
 ```
 
@@ -362,7 +362,7 @@ QPS = queries processed per second
 
 #### Cost Per Query
 
-```
+```text
 Cost/Query = Embedding Cost + Retrieval Cost + Reranking Cost + LLM Cost
 
 LLM Cost = (input_tokens * input_price + output_tokens * output_price)
@@ -390,7 +390,7 @@ Monitor for: context window overflow, runaway conversation history, unnecessaril
 
 #### Cache Hit Rate
 
-```
+```text
 Cache Hit Rate = cache hits / total queries
 ```
 
@@ -400,7 +400,7 @@ Cache Hit Rate = cache hits / total queries
 
 #### Error Rate
 
-```
+```text
 Error Rate = failed queries / total queries
 ```
 

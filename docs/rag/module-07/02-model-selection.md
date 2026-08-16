@@ -21,7 +21,7 @@ Choosing an embedding model is like choosing a language for your filing system. 
 
 Choosing an embedding model is a multi-variable optimization. Here is the evaluation order — start with hard constraints, then optimize soft preferences:
 
-```
+```text
 Step 1: Hard constraints (eliminate models that don't qualify)
   ├── Privacy: Can data leave your infrastructure? No → open-source only
   ├── Language: Need multilingual? → Cohere, BGE-M3, multilingual E5
@@ -99,7 +99,7 @@ Vectors from different models exist in incompatible vector spaces. You cannot:
 - Mix vectors from different models in the same collection
 - Upgrade your model without re-embedding every document
 
-```
+```text
 Model A vector space:          Model B vector space:
     * doc1                         * doc3
   * doc2    * doc3               * doc1
@@ -124,7 +124,7 @@ When you must change models, you need a strategy that avoids downtime and data l
 
 #### Blue-Green Re-Embedding
 
-```
+```text
 Phase 1: Embed into new collection (background)
 ┌────────────────┐     ┌──────────────┐     ┌──────────────┐
 │ Source Documents│────→│ New Embedding│────→│ New Collection│

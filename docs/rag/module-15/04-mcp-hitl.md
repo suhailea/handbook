@@ -25,7 +25,7 @@ MCP (Model Context Protocol), introduced by Anthropic, is a **standardized inter
 
 #### Architecture
 
-```
+```text
 ┌─────────────────┐         ┌─────────────────┐
 │   MCP Client    │         │   MCP Server    │
 │   (LLM App)     │◄──────►│   (Tool Host)   │

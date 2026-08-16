@@ -68,7 +68,7 @@ Three metrics dominate vector search. Understanding when to use each is critical
 
 Measures the angle between two vectors, ignoring magnitude.
 
-```
+```text
                     A · B
 cos(θ) = ─────────────────────
           ‖A‖ × ‖B‖
@@ -97,7 +97,7 @@ function cosineSimilarity(a: number[], b: number[]): number {
 
 #### Dot Product (Inner Product)
 
-```
+```text
 dot(A, B) = A · B = Σ(aᵢ × bᵢ)
 
 Range: (-∞, +∞)
@@ -112,7 +112,7 @@ Higher = more similar
 
 #### Euclidean Distance (L2)
 
-```
+```text
 L2(A, B) = √(Σ(aᵢ - bᵢ)²)
 
 Range: [0, ∞)
@@ -146,7 +146,7 @@ The number of dimensions determines how much semantic nuance the vector can capt
 | 3072 | 12 KB | Maximum nuance | Slowest | OpenAI text-embedding-3-large |
 
 **Storage math at scale:**
-```
+```text
 1 million vectors × 1536 dimensions × 4 bytes/float = 5.7 GB (vectors only)
 1 million vectors × 3072 dimensions × 4 bytes/float = 11.4 GB
 ```

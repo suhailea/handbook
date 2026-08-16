@@ -31,7 +31,7 @@ Basic RAG is like a one-shot library trip: you walk in, grab five books from the
 
 ### Architecture
 
-```
+```text
                     ┌────────────────────┐
                     │    User Query      │
                     └─────────┬──────────┘
@@ -381,7 +381,7 @@ Respond with just the route name.`,
 
 ### Cost and Latency Budget
 
-```
+```text
 Basic RAG:    1 embed + 1 search + 1 LLM call = ~$0.008, ~2s
 Agentic RAG:  1 embed + 3 searches + 4 LLM calls = ~$0.03, ~8s
 

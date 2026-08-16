@@ -19,7 +19,7 @@ Vector search finds documents that *talk about similar things*. Graph search fin
 
 A knowledge graph is a structured representation of entities and their relationships:
 
-```
+```text
 [Entity] --relationship--> [Entity]
 
 [Alice]  --reports_to-->   [Bob]
