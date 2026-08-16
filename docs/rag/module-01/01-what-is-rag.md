@@ -139,6 +139,22 @@ RAG is the right tool when:
 
 ### Decision Flowchart
 
+```mermaid
+flowchart TD
+    A[You need an LLM to answer questions] --> B{Is the knowledge<br/>already in the model?}
+    B -->|Yes| C[Fine-tuning or prompt engineering]
+    B -->|No| D{Is the data structured<br/>with a clear schema?}
+    D -->|Yes| E{Queries are analytical<br/>aggregations, filters?}
+    E -->|Yes| F[SQL / Database query]
+    E -->|No| G[Hybrid: SQL + RAG]
+    D -->|No| H{Data changes<br/>frequently?}
+    H -->|Real-time| I[Live API / Database]
+    H -->|Hours-days OK| J[RAG]
+    H -->|Static| K{Corpus fits in<br/>context window?}
+    K -->|Yes + small| L[Long-context LLM]
+    K -->|No / large| J
+```
+
 ```text
 Does the LLM need external knowledge to answer?
 │

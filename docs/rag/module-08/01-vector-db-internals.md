@@ -93,6 +93,38 @@ Layer 0 (dense):     A B C D E F G H I J K L M N O
 
 **This is like GPS navigation:** start zoomed out (country level), narrow to region, then city, then street. Each layer doubles the resolution.
 
+```mermaid
+graph TD
+    subgraph Layer 2 - Sparse
+        E[Entry Point]
+    end
+    subgraph Layer 1 - Medium
+        N1[Node] --- N2[Node]
+        N2 --- N3[Node]
+        N1 --- N3
+    end
+    subgraph Layer 0 - Dense
+        D1[●] --- D2[●]
+        D2 --- D3[●]
+        D3 --- D4[●]
+        D1 --- D5[●]
+        D5 --- D6[●]
+        D6 --- D4
+        D2 --- D5
+        D3 --- D6
+    end
+    E --> N1
+    E --> N3
+    N1 --> D1
+    N1 --> D2
+    N2 --> D3
+    N2 --> D4
+    N3 --> D5
+    N3 --> D6
+```
+
+Search starts at the entry point on the top layer, greedily descends to the nearest node at each layer, then performs detailed search on layer 0.
+
 #### Build-Time Parameters
 
 | Parameter | What It Controls | Effect of Increasing | Typical Value |

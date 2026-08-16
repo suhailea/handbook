@@ -439,6 +439,22 @@ Need complex routing (dead-letter, priority)?→ RabbitMQ
 └────────────────────────────────────────────────────────────────┘
 ```
 
+```mermaid
+flowchart LR
+    Sources[Document Sources] --> Queue[Message Queue]
+    Queue --> Worker[Parse Worker]
+    Worker --> Chunk[Chunker]
+    Chunk --> Embed[Embedder]
+    Embed --> Index[Vector DB Upsert]
+
+    Worker -->|Parse failure| DLQ[Dead Letter Queue]
+    Embed -->|API error| Retry[Retry Queue]
+    Retry --> Embed
+    Retry -->|Max retries| DLQ
+
+    DLQ --> Alert[Alert + Manual Review]
+```
+
 ### Why Ingestion Must Be Async
 
 Synchronous ingestion (user uploads → wait → response) breaks in production:

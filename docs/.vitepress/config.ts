@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitepress'
+import { withMermaid } from 'vitepress-plugin-mermaid'
 
-export default defineConfig({
+export default withMermaid(defineConfig({
   title: 'Engineering Handbook',
   description: 'Backend engineering explained twice — plain English first, then full technical depth.',
   lang: 'en-US',
@@ -765,4 +766,4 @@ export default defineConfig({
       message: 'Built by Muhammed Suhail EA',
     },
   },
-})
+}))
