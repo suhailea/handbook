@@ -25,5 +25,5 @@ This module covers every production-relevant chunking strategy, how to choose ch
 
 ## Prerequisites
 
-- [Module 3 — Document Parsing](/rag/module-03/) — you need parsed text before you can chunk it
-- [Module 4 — Text Extraction](/rag/module-04/) — understanding what your raw text looks like
+- [Module 4 — Document Parsing](/rag/module-04/) — you need parsed text before you can chunk it
+- [Module 3 — Data Ingestion](/rag/module-03/) — how documents arrive before parsing and chunking

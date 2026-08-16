@@ -5,7 +5,7 @@ outline: deep
 
 # Caching & Freshness
 
-Interview weight: 🔥🔥🔥 | Prerequisites: [Embeddings](/rag/module-03/), [Retrieval](/rag/module-06/), [Ingestion pipeline](/rag/module-04/)
+Interview weight: 🔥🔥🔥 | Prerequisites: [Embeddings](/rag/module-07/), [Retrieval](/rag/module-09/), [Ingestion pipeline](/rag/module-03/)
 
 ## 🗣️ In Plain English
 
@@ -436,7 +436,7 @@ async function handleDocumentDeletion(
 
 ## Related
 
-- [Embeddings deep dive](/rag/module-03/) -- understanding what the embedding cache stores
-- [Retrieval strategies](/rag/module-06/) -- the operations being cached in layer 2
+- [Embeddings deep dive](/rag/module-07/) -- understanding what the embedding cache stores
+- [Retrieval strategies](/rag/module-09/) -- the operations being cached in layer 2
 - [Full system architecture](/rag/module-16/01-system-architecture.md) -- where caching fits in the overall system
 - [Scaling & cost optimization](02-scaling-cost.md) -- caching as the primary cost reduction lever

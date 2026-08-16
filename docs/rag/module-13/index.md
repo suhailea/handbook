@@ -26,6 +26,6 @@ A single end-to-end metric ("was the answer correct?") cannot tell you *which st
 
 ## Prerequisites
 
-- [Retrieval fundamentals](/rag/module-05/) -- understand what retrieval returns
-- [Generation & prompting](/rag/module-08/) -- understand how context becomes answers
+- [Retrieval fundamentals](/rag/module-09/) -- understand what retrieval returns
+- [Generation & prompting](/rag/module-12/) -- understand how context becomes answers
 - Basic statistics (mean, percentiles, ranking)

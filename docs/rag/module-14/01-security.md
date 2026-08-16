@@ -5,7 +5,7 @@ outline: deep
 
 # RAG Security
 
-Interview weight: 🔥🔥🔥 | Prerequisites: [Retrieval fundamentals](/rag/module-05/), [Generation & prompting](/rag/module-08/)
+Interview weight: 🔥🔥🔥 | Prerequisites: [Retrieval fundamentals](/rag/module-09/), [Generation & prompting](/rag/module-12/)
 
 ## 🗣️ In Plain English
 
@@ -503,5 +503,5 @@ The database layer is the correct enforcement point because it operates before t
 ## Related
 
 - [Guardrails](02-guardrails.md) -- runtime protection patterns that complement security controls
-- [Retrieval fundamentals](/rag/module-05/) -- metadata filtering is your primary ACL mechanism
+- [Retrieval fundamentals](/rag/module-09/) -- metadata filtering is your primary ACL mechanism
 - [Document ingestion](/rag/module-03/) -- where PII redaction and document scanning happen

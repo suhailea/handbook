@@ -5,7 +5,7 @@ outline: deep
 
 # Retrieval & Generation Metrics
 
-Interview weight: 🔥🔥🔥 | Prerequisites: [Retrieval fundamentals](/rag/module-05/), basic statistics
+Interview weight: 🔥🔥🔥 | Prerequisites: [Retrieval fundamentals](/rag/module-09/), basic statistics
 
 ## 🗣️ In Plain English
 
@@ -473,5 +473,5 @@ Diagnosis: Check Recall@K. If recall is low, the retriever is not finding the ri
 ## Related
 
 - [Evaluation Frameworks & Datasets](02-frameworks.md) -- how to run these metrics at scale
-- [Retrieval fundamentals](/rag/module-05/) -- the retrieval mechanisms these metrics evaluate
-- [Reranking](/rag/module-06/) -- the primary lever for improving ranking metrics
+- [Retrieval fundamentals](/rag/module-09/) -- the retrieval mechanisms these metrics evaluate
+- [Reranking](/rag/module-11/) -- the primary lever for improving ranking metrics

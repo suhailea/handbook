@@ -5,7 +5,7 @@ outline: deep
 
 # Multimodal RAG
 
-Interview weight: 🔥🔥 | Prerequisites: [Embeddings](/rag/module-04/), [Retrieval fundamentals](/rag/module-05/)
+Interview weight: 🔥🔥 | Prerequisites: [Embeddings](/rag/module-07/), [Retrieval fundamentals](/rag/module-09/)
 
 ## 🗣️ In Plain English
 
@@ -458,6 +458,6 @@ Choose describe-then-embed when: (1) **Content accuracy matters most** -- a rich
 
 ## Related
 
-- [Embeddings](/rag/module-04/) -- the text embedding pipeline that multimodal content feeds into
-- [Chunking strategies](/rag/module-03/) -- how to chunk multimodal documents
+- [Embeddings](/rag/module-07/) -- the text embedding pipeline that multimodal content feeds into
+- [Chunking strategies](/rag/module-05/) -- how to chunk multimodal documents
 - [GraphRAG](02-graphrag.md) -- entities extracted from images and tables can feed knowledge graphs

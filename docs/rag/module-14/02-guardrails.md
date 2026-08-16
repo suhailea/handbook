@@ -5,7 +5,7 @@ outline: deep
 
 # Guardrails
 
-Interview weight: 🔥🔥 | Prerequisites: [RAG Security](01-security.md), [Generation & prompting](/rag/module-08/)
+Interview weight: 🔥🔥 | Prerequisites: [RAG Security](01-security.md), [Generation & prompting](/rag/module-12/)
 
 ## 🗣️ In Plain English
 

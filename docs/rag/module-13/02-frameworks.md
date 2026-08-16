@@ -376,5 +376,5 @@ Blind spots: You will not know if your retriever is **missing relevant documents
 ## Related
 
 - [Retrieval & Generation Metrics](01-metrics.md) -- the metrics these frameworks compute
-- [Reranking](/rag/module-06/) -- a common pipeline change to A/B test with evaluation
-- [Chunking strategies](/rag/module-03/) -- another axis to evaluate
+- [Reranking](/rag/module-11/) -- a common pipeline change to A/B test with evaluation
+- [Chunking strategies](/rag/module-05/) -- another axis to evaluate

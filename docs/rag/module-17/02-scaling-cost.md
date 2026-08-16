@@ -5,7 +5,7 @@ outline: deep
 
 # Scaling & Cost Optimization
 
-Interview weight: 🔥🔥🔥 | Prerequisites: [Ingestion pipeline](/rag/module-04/), [Embeddings](/rag/module-03/), [Vector databases](/rag/module-05/), [Caching & freshness](01-caching-freshness.md)
+Interview weight: 🔥🔥🔥 | Prerequisites: [Ingestion pipeline](/rag/module-03/), [Embeddings](/rag/module-07/), [Vector databases](/rag/module-08/), [Caching & freshness](01-caching-freshness.md)
 
 ## 🗣️ In Plain English
 
@@ -386,5 +386,5 @@ const keepAliveAgent = new Agent({
 - [Caching & freshness](01-caching-freshness.md) -- caching as the primary cost reduction lever
 - [Latency, failure & versioning](03-latency-failure.md) -- latency vs cost tradeoffs
 - [Observability](04-observability.md) -- cost tracking per query
-- [Vector databases](/rag/module-05/) -- index scaling and sharding details
-- [Embeddings](/rag/module-03/) -- understanding embedding costs and batching
+- [Vector databases](/rag/module-08/) -- index scaling and sharding details
+- [Embeddings](/rag/module-07/) -- understanding embedding costs and batching

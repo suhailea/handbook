@@ -7,7 +7,7 @@ outline: deep
 
 **Interview weight:** 🔥🔥🔥 — asked in nearly every RAG design interview. You must know the trade-offs, not just the names.
 
-**Prerequisites:** [Document Parsing](/rag/module-03/), [Text Extraction](/rag/module-04/)
+**Prerequisites:** [Document Parsing](/rag/module-04/), [Data Ingestion](/rag/module-03/)
 
 ## 🗣️ In Plain English
 

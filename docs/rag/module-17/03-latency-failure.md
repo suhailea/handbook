@@ -5,7 +5,7 @@ outline: deep
 
 # Latency Optimization, Failure Handling & Versioning
 
-Interview weight: 🔥🔥🔥 | Prerequisites: [Full system architecture](/rag/module-16/01-system-architecture.md), [Retrieval](/rag/module-06/), [Reranking](/rag/module-07/)
+Interview weight: 🔥🔥🔥 | Prerequisites: [Full system architecture](/rag/module-16/01-system-architecture.md), [Retrieval](/rag/module-09/), [Reranking](/rag/module-11/)
 
 ## 🗣️ In Plain English
 
@@ -581,4 +581,4 @@ function checkCompatibility(
 - [Scaling & cost](02-scaling-cost.md) -- latency vs cost tradeoffs in model selection
 - [Observability](04-observability.md) -- measuring latency per stage and tracking fallback activations
 - [Full system architecture](/rag/module-16/01-system-architecture.md) -- the components whose failures are handled here
-- [Embeddings deep dive](/rag/module-03/) -- understanding why embedding model migration is hard
+- [Embeddings deep dive](/rag/module-07/) -- understanding why embedding model migration is hard

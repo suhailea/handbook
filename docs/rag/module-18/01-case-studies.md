@@ -856,7 +856,7 @@ PDF ──▶ ┌─────────────────────
 
 - [Hybrid Search](../module-09/02-hybrid-search.md) — the retrieval strategy used in most case studies
 - [Security & ACL](../module-14/01-security.md) — deep dive on access control patterns
-- [Evaluation](../module-15/index.md) — how to measure the metrics referenced in each case study
+- [Evaluation](../module-13/index.md) — how to measure the metrics referenced in each case study
 - [Caching & Freshness](../module-17/01-caching-freshness.md) — staleness trade-offs discussed in Case Studies 1 and 3
 - [Reference Implementation](02-implementation.md) — code for the patterns described here
 - [Production Checklist](03-checklist.md) — verify your design covers everything

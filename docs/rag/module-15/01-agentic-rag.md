@@ -5,7 +5,7 @@ outline: deep
 
 # Agentic RAG
 
-Interview weight: 🔥🔥🔥 | Prerequisites: [Retrieval fundamentals](/rag/module-05/), [Generation & prompting](/rag/module-08/)
+Interview weight: 🔥🔥🔥 | Prerequisites: [Retrieval fundamentals](/rag/module-09/), [Generation & prompting](/rag/module-12/)
 
 ## 🗣️ In Plain English
 

@@ -44,4 +44,4 @@ outline: deep
 
 With operations covered, the next module addresses **production architecture patterns** -- putting all operational concerns together into a deployable system with CI/CD, testing, and rollout strategies.
 
-- [Module 18 — Production Readiness](/rag/module-18/) -- CI/CD, testing, deployment patterns
+- [Module 18 — Case Studies & Implementation](/rag/module-18/) -- CI/CD, testing, deployment patterns

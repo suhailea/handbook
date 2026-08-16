@@ -30,6 +30,6 @@ Do not reach for these patterns by default. Start with basic RAG and add complex
 
 ## Prerequisites
 
-- [Retrieval fundamentals](/rag/module-05/) -- understand basic retrieval before adding complexity
-- [Generation & prompting](/rag/module-08/) -- understand how the LLM uses context
+- [Retrieval fundamentals](/rag/module-09/) -- understand basic retrieval before adding complexity
+- [Generation & prompting](/rag/module-12/) -- understand how the LLM uses context
 - [Evaluation](/rag/module-13/) -- you need metrics to justify the added complexity

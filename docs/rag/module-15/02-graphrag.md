@@ -5,7 +5,7 @@ outline: deep
 
 # GraphRAG
 
-Interview weight: 🔥🔥 | Prerequisites: [Retrieval fundamentals](/rag/module-05/), [Agentic RAG](01-agentic-rag.md)
+Interview weight: 🔥🔥 | Prerequisites: [Retrieval fundamentals](/rag/module-09/), [Agentic RAG](01-agentic-rag.md)
 
 ## 🗣️ In Plain English
 
@@ -299,4 +299,4 @@ Graph retrieval solves this by: (1) Identifying "travel policy" as an entity, (2
 
 - [Agentic RAG](01-agentic-rag.md) -- agents can use graph search as one of their tools
 - [Multimodal RAG](03-multimodal.md) -- entities can be extracted from images and tables too
-- [Retrieval fundamentals](/rag/module-05/) -- the vector search that GraphRAG augments
+- [Retrieval fundamentals](/rag/module-09/) -- the vector search that GraphRAG augments

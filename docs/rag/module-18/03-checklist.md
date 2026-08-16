@@ -310,4 +310,4 @@ This is the pre-flight checklist that pilots run before takeoff. No single item 
 - [Reference Implementation](02-implementation.md) — code that implements many of these items
 - [Observability](../module-17/04-observability.md) — deep dive on logging, metrics, and tracing
 - [Security & ACL](../module-14/01-security.md) — detailed security patterns
-- [Evaluation](../module-15/index.md) — how to build the evaluation suite referenced here
+- [Evaluation](../module-13/index.md) — how to build the evaluation suite referenced here

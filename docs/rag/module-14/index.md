@@ -27,6 +27,6 @@ The core principle: **enforce security at the infrastructure layer, not the LLM 
 
 ## Prerequisites
 
-- [Retrieval fundamentals](/rag/module-05/) -- understand metadata filtering
-- [Generation & prompting](/rag/module-08/) -- understand how prompts are constructed
+- [Retrieval fundamentals](/rag/module-09/) -- understand metadata filtering
+- [Generation & prompting](/rag/module-12/) -- understand how prompts are constructed
 - Basic web security concepts (authentication, authorization)

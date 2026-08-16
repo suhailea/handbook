@@ -29,6 +29,6 @@ Running a RAG system in production is where the real engineering lives. Building
 
 ## Prerequisites
 
-- [Retrieval strategies](/rag/module-06/) -- understand what you are caching and optimizing
-- [Ingestion pipeline](/rag/module-04/) -- understand the indexing path that freshness depends on
+- [Retrieval strategies](/rag/module-09/) -- understand what you are caching and optimizing
+- [Ingestion pipeline](/rag/module-03/) -- understand the indexing path that freshness depends on
 - [Full system architecture](/rag/module-16/01-system-architecture.md) -- understand the components you are operating
