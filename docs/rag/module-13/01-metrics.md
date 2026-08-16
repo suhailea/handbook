@@ -157,6 +157,47 @@ IDCG@5 = 7/1 + 3/1.585 + 1/2 + 0/2.322 + 0/2.585
 NDCG@5 = 8.931 / 9.393 = 0.951
 ```
 
+### Worked Example
+
+NDCG@5 by hand. One query, 5 retrieved docs with graded relevance scores: [3, 2, 0, 1, 0].
+
+**Log₂ discount table:**
+
+| Position (i) | log₂(i+1) |
+|:---:|:---:|
+| 1 | log₂(2) = 1.000 |
+| 2 | log₂(3) = 1.585 |
+| 3 | log₂(4) = 2.000 |
+| 4 | log₂(5) = 2.322 |
+| 5 | log₂(6) = 2.585 |
+
+**DCG@5** (using the simpler rel/log₂ formula):
+
+```text
+DCG@5 = rel₁/log₂(2) + rel₂/log₂(3) + rel₃/log₂(4) + rel₄/log₂(5) + rel₅/log₂(6)
+      = 3/1.000 + 2/1.585 + 0/2.000 + 1/2.322 + 0/2.585
+      = 3.000 + 1.262 + 0 + 0.431 + 0
+      = 4.693
+```
+
+**Ideal ranking** (sort by relevance descending): [3, 2, 1, 0, 0]
+
+```text
+IDCG@5 = 3/1.000 + 2/1.585 + 1/2.000 + 0/2.322 + 0/2.585
+       = 3.000 + 1.262 + 0.500 + 0 + 0
+       = 4.762
+```
+
+**NDCG@5:**
+
+```text
+NDCG@5 = DCG / IDCG = 4.693 / 4.762 = 0.986
+```
+
+**Interpretation:** Our ranking is nearly ideal — the only issue is that the relevance-1 document sits at position 4 instead of position 3. Swapping positions 3 and 4 would give a perfect NDCG of 1.0.
+
+---
+
 **What "good" looks like:** NDCG@10 >= 0.80. An NDCG of 1.0 means your ranking is perfect.
 
 **How to improve:**

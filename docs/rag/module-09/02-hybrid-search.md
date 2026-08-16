@@ -136,32 +136,26 @@ RRF_score(doc) = Σ  1 / (k + rank_i(doc))
 
 Where `k` is a constant (typically 60) that dampens the influence of high ranks, and `rank_i(doc)` is the document's position (1-based) in ranker i's result list.
 
-**Worked Example:**
+### Worked Example
 
-Suppose dense retrieval and BM25 each return their top 5:
+Two retrieval systems each return their top 5 documents for the same query. We compute RRF with k=60.
 
-| Rank | Dense Results | BM25 Results |
-|------|--------------|-------------|
-| 1 | Doc A | Doc C |
-| 2 | Doc B | Doc A |
-| 3 | Doc C | Doc E |
-| 4 | Doc D | Doc B |
-| 5 | Doc E | Doc F |
+- **Vector search ranking:** [D3, D1, D7, D5, D2]
+- **BM25 ranking:** [D1, D5, D3, D9, D4]
 
-RRF scores with k=60:
+| Doc | Vector Rank | BM25 Rank | Vector RRF 1/(60+r) | BM25 RRF 1/(60+r) | Total |
+|-----|-------------|-----------|--------------------|--------------------|-------|
+| D1  | 2           | 1         | 1/62 = 0.01613    | 1/61 = 0.01639    | 0.03252 |
+| D3  | 1           | 3         | 1/61 = 0.01639    | 1/63 = 0.01587    | 0.03226 |
+| D5  | 4           | 2         | 1/64 = 0.01563    | 1/62 = 0.01613    | 0.03175 |
+| D7  | 3           | —         | 1/63 = 0.01587    | 0                  | 0.01587 |
+| D2  | 5           | —         | 1/65 = 0.01538    | 0                  | 0.01538 |
+| D9  | —           | 4         | 0                  | 1/64 = 0.01563    | 0.01563 |
+| D4  | —           | 5         | 0                  | 1/65 = 0.01538    | 0.01538 |
 
-| Document | Dense Rank | BM25 Rank | RRF Score |
-|----------|-----------|-----------|-----------|
-| Doc A | 1 | 2 | 1/(60+1) + 1/(60+2) = 0.01639 + 0.01613 = **0.03252** |
-| Doc B | 2 | 4 | 1/(60+2) + 1/(60+4) = 0.01613 + 0.01563 = **0.03176** |
-| Doc C | 3 | 1 | 1/(60+3) + 1/(60+1) = 0.01587 + 0.01639 = **0.03226** |
-| Doc D | 4 | - | 1/(60+4) + 0 = **0.01563** |
-| Doc E | 5 | 3 | 1/(60+5) + 1/(60+3) = 0.01538 + 0.01587 = **0.03125** |
-| Doc F | - | 5 | 0 + 1/(60+5) = **0.01538** |
+**Fused ranking:** D1 (0.03252) > D3 (0.03226) > D5 (0.03175) > D7 (0.01587) > D9 (0.01563) > D2 (0.01538) > D4 (0.01538)
 
-**Final ranking by RRF:** A (0.03252) > C (0.03226) > B (0.03176) > E (0.03125) > D (0.01563) > F (0.01538)
-
-Doc A wins because it appeared highly in both lists. Doc D and F ranked low because they appeared in only one list.
+**Key insight:** D1 wins because it ranked highly in BOTH lists. This is the power of RRF — documents that appear in multiple retrieval systems are boosted. D7 ranked 3rd in vector search but does not appear in BM25 results at all, so it drops below D5 (which appeared in both lists).
 
 ```typescript
 // run: npx tsx rrf-fusion.ts

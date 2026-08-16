@@ -131,6 +131,41 @@ Lower = more similar (it's a distance, not similarity)
 
 **Rule of thumb:** Use cosine similarity unless you have a specific reason not to. If your vectors are normalized (OpenAI, most modern models), use dot product for slightly faster computation with identical results.
 
+### Worked Example
+
+Three-dimensional vectors showing when dot product and cosine similarity disagree on ranking.
+
+```text
+Query:  q = [1, 0, 0]
+Doc A:  a = [3, 0, 0]       (same direction as q, large magnitude)
+Doc B:  b = [0.8, 0.6, 0]   (slightly off-direction, unit magnitude)
+Doc C:  c = [2, 2, 0]       (45° off, large magnitude)
+```
+
+**Dot product:**
+- q . a = 1*3 + 0 + 0 = **3.0**
+- q . b = 1*0.8 + 0*0.6 + 0 = **0.8**
+- q . c = 1*2 + 0*2 + 0 = **2.0**
+
+**Cosine similarity:**
+- |q| = 1,  |a| = 3,  |b| = sqrt(0.64 + 0.36) = 1.0,  |c| = sqrt(4 + 4) = 2.83
+- cos(q, a) = 3 / (1 * 3) = **1.000**
+- cos(q, b) = 0.8 / (1 * 1.0) = **0.800**
+- cos(q, c) = 2 / (1 * 2.83) = **0.707**
+
+**Rankings compared (B vs C):**
+
+| Metric | Ranking | Why |
+|--------|---------|-----|
+| Dot product | A (3.0) > C (2.0) > B (0.8) | C wins over B because its vector is larger |
+| Cosine similarity | A (1.0) > B (0.8) > C (0.707) | B wins over C because it is more aligned with q |
+
+Dot product rewards magnitude; cosine rewards direction. B is more relevant by angle but C's larger magnitude inflates its dot product score.
+
+**On normalized vectors (|v| = 1), dot product = cosine** because the denominator becomes 1. This is why most vector databases normalize embeddings at ingestion — it makes dot product (cheaper to compute) produce identical rankings to cosine.
+
+**pgvector operators:** `<=>` cosine distance, `<#>` negative inner product, `<->` L2 distance.
+
 ---
 
 ### Embedding Dimensions
