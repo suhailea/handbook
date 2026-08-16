@@ -17,6 +17,7 @@ Do not reach for these patterns by default. Start with basic RAG and add complex
 | Questions about relationships between entities | [GraphRAG](02-graphrag.md) |
 | Documents contain images, tables, audio | [Multimodal RAG](03-multimodal.md) |
 | System needs to take actions, not just answer | [MCP (Model Context Protocol) & Human-in-the-Loop](04-mcp-hitl.md) |
+| Retrieval quality is unreliable / needs self-checking | [Corrective & Self-RAG](05-corrective-self-rag.md) |
 
 ## Pages in This Module
 
@@ -26,6 +27,7 @@ Do not reach for these patterns by default. Start with basic RAG and add complex
 | [GraphRAG](02-graphrag.md) | Knowledge graphs, entity extraction, graph + vector hybrid | 🔥🔥 |
 | [Multimodal RAG](03-multimodal.md) | Images, OCR, audio, video, tables | 🔥🔥 |
 | [MCP & Human-in-the-Loop](04-mcp-hitl.md) | Model Context Protocol, approval workflows, escalation | 🔥🔥 |
+| [Corrective & Self-RAG](05-corrective-self-rag.md) | CRAG retrieval evaluation, Self-RAG reflection tokens, self-correcting retrieval | 🔥🔥 |
 | [Summary](summary.md) | Mental models and self-assessment |
 
 ## Prerequisites

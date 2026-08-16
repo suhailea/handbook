@@ -683,6 +683,7 @@ export default defineConfig({
             { text: '15.2 GraphRAG', link: '/rag/module-15/02-graphrag' },
             { text: '15.3 Multimodal RAG', link: '/rag/module-15/03-multimodal' },
             { text: '15.4 MCP & Human-in-the-Loop', link: '/rag/module-15/04-mcp-hitl' },
+            { text: '15.5 Corrective & Self-RAG', link: '/rag/module-15/05-corrective-self-rag' },
             { text: 'Summary', link: '/rag/module-15/summary' },
           ],
         },
