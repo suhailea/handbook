@@ -5,7 +5,7 @@ outline: deep
 
 # Module 10 — Query Processing
 
-This module covers everything that happens to a user's query before it hits the retrieval engine — rewriting, expansion, decomposition, HyDE, classification, and routing. These transformations bridge the gap between how humans ask questions and how retrieval systems find answers.
+This module covers everything that happens to a user's query before it hits the retrieval engine — rewriting, expansion, decomposition, HyDE (Hypothetical Document Embeddings), classification, and routing. These transformations bridge the gap between how humans ask questions and how retrieval systems find answers.
 
 ## Why This Module Matters
 

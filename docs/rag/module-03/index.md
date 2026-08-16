@@ -14,7 +14,7 @@ If Module 2 defined *what* data needs to be in the system and how fresh it must 
 | # | Page | What You Will Learn |
 |---|------|---------------------|
 | 1 | [Ingestion Pipelines](01-ingestion-pipelines.md) | Batch, streaming, incremental, and event-driven patterns. Queue selection. Async processing architecture. |
-| 2 | [Reliability & Monitoring](02-reliability.md) | Idempotency, retries, DLQs, versioning, re-indexing, and the metrics that tell you if ingestion is healthy |
+| 2 | [Reliability & Monitoring](02-reliability.md) | Idempotency, retries, DLQs (dead-letter queues), versioning, re-indexing, and the metrics that tell you if ingestion is healthy |
 | — | [Summary](summary.md) | Mental models and self-assessment checklist |
 
 ## Prerequisites

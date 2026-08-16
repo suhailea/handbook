@@ -20,8 +20,8 @@ A single end-to-end metric ("was the answer correct?") cannot tell you *which st
 
 | Page | Topic | Interview Weight |
 |------|-------|-----------------|
-| [Retrieval & Generation Metrics](01-metrics.md) | Recall@K, MRR, NDCG, Faithfulness, system metrics | 🔥🔥🔥 |
-| [Evaluation Frameworks & Datasets](02-frameworks.md) | RAGAS, LLM-as-judge, human eval, A/B testing | 🔥🔥 |
+| [Retrieval & Generation Metrics](01-metrics.md) | Recall@K, MRR (Mean Reciprocal Rank), NDCG (Normalized Discounted Cumulative Gain), Faithfulness, system metrics | 🔥🔥🔥 |
+| [Evaluation Frameworks & Datasets](02-frameworks.md) | RAGAS (an open-source RAG evaluation framework), LLM-as-judge, human eval, A/B testing | 🔥🔥 |
 | [Summary](summary.md) | Mental models and self-assessment |
 
 ## Prerequisites

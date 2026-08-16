@@ -5,7 +5,7 @@ outline: deep
 
 # Module 9 — Retrieval & Hybrid Search
 
-This module covers the full spectrum of retrieval strategies — from dense vector search to sparse BM25, metadata filtering, hierarchical retrieval, HyDE, and graph traversal — then shows how to combine them with hybrid search and fusion algorithms for production-grade recall.
+This module covers the full spectrum of retrieval strategies — from dense vector search to sparse BM25 (a keyword-ranking algorithm), metadata filtering, hierarchical retrieval, HyDE (Hypothetical Document Embeddings), and graph traversal — then shows how to combine them with hybrid search and fusion algorithms for production-grade recall.
 
 ## Why This Module Matters
 
@@ -16,7 +16,7 @@ Retrieval quality is the ceiling for RAG answer quality. The best LLM in the wor
 | Page | Topic | Interview Weight |
 |------|-------|-----------------|
 | [Retrieval Strategies](01-retrieval-strategies.md) | Dense, sparse, BM25, metadata, hierarchical, HyDE, graph retrieval | 🔥🔥🔥 |
-| [Hybrid Search & Fusion](02-hybrid-search.md) | RRF, weighted fusion, score normalization, production architectures | 🔥🔥🔥 |
+| [Hybrid Search & Fusion](02-hybrid-search.md) | RRF (Reciprocal Rank Fusion), weighted fusion, score normalization, production architectures | 🔥🔥🔥 |
 | [Summary](summary.md) | Mental models and self-assessment |
 
 ## Prerequisites

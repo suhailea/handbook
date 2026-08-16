@@ -16,7 +16,7 @@ Do not reach for these patterns by default. Start with basic RAG and add complex
 | Complex queries need multiple retrieval steps | [Agentic RAG](01-agentic-rag.md) |
 | Questions about relationships between entities | [GraphRAG](02-graphrag.md) |
 | Documents contain images, tables, audio | [Multimodal RAG](03-multimodal.md) |
-| System needs to take actions, not just answer | [MCP & Human-in-the-Loop](04-mcp-hitl.md) |
+| System needs to take actions, not just answer | [MCP (Model Context Protocol) & Human-in-the-Loop](04-mcp-hitl.md) |
 
 ## Pages in This Module
 
