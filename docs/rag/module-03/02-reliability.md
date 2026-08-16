@@ -21,63 +21,67 @@ An idempotent operation produces the same result whether you run it once or ten 
 
 **The content hash pattern:**
 
-```python
-# run: python idempotent_ingestion.py
+```typescript
+// run: npx tsx idempotent_ingestion.ts
 
-import hashlib
-from datetime import datetime, timezone
+import { createHash } from "node:crypto";
 
+interface Chunk {
+  text: string;
+}
 
-def content_hash(text: str) -> str:
-    """Deterministic hash of document content."""
-    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+function contentHash(text: string): string {
+  /** Deterministic hash of document content. */
+  return createHash("sha256").update(text, "utf-8").digest("hex");
+}
 
+async function idempotentUpsert(
+  docId: string,
+  content: string,
+  vectorDb: any,
+  embedder: (texts: string[]) => Promise<number[][]>,
+  chunker: (content: string) => Chunk[],
+): Promise<"indexed" | "skipped" | "updated"> {
+  /**
+   * Upsert with content-hash deduplication.
+   * Returns: 'indexed', 'skipped' (already exists), or 'updated'
+   */
+  const newHash = contentHash(content);
 
-def idempotent_upsert(
-    doc_id: str,
-    content: str,
-    vector_db,
-    embedder,
-    chunker,
-) -> str:
-    """Upsert with content-hash deduplication.
+  // Check if this exact content is already indexed
+  const existing = await vectorDb.getMetadata({
+    filter: { doc_id: docId },
+    fields: ["content_hash"],
+  });
 
-    Returns: 'indexed', 'skipped' (already exists), or 'updated'
-    """
-    new_hash = content_hash(content)
+  if (existing && existing.content_hash === newHash) {
+    return "skipped"; // Exact same content, no work needed
+  }
 
-    # Check if this exact content is already indexed
-    existing = vector_db.get_metadata(
-        filter={"doc_id": doc_id},
-        fields=["content_hash"],
-    )
+  const action: "indexed" | "updated" = existing ? "updated" : "indexed";
 
-    if existing and existing["content_hash"] == new_hash:
-        return "skipped"  # Exact same content, no work needed
+  // Delete old chunks for this doc (if any)
+  await vectorDb.delete({ filter: { doc_id: docId } });
 
-    action = "updated" if existing else "indexed"
+  // Process and insert new chunks
+  const chunks = chunker(content);
+  const embeddings = await embedder(chunks.map((c) => c.text));
 
-    # Delete old chunks for this doc (if any)
-    vector_db.delete(filter={"doc_id": doc_id})
+  await vectorDb.upsert({
+    ids: chunks.map((_, i) => `${docId}::chunk::${i}`),
+    embeddings,
+    documents: chunks.map((c) => c.text),
+    metadatas: chunks.map((_, i) => ({
+      doc_id: docId,
+      content_hash: newHash,
+      chunk_index: i,
+      total_chunks: chunks.length,
+      indexed_at: new Date().toISOString(),
+    })),
+  });
 
-    # Process and insert new chunks
-    chunks = chunker(content)
-    embeddings = embedder([c.text for c in chunks])
-
-    vector_db.upsert(
-        ids=[f"{doc_id}::chunk::{i}" for i in range(len(chunks))],
-        embeddings=embeddings,
-        documents=[c.text for c in chunks],
-        metadatas=[{
-            "doc_id": doc_id,
-            "content_hash": new_hash,
-            "chunk_index": i,
-            "total_chunks": len(chunks),
-            "indexed_at": datetime.now(timezone.utc).isoformat(),
-        } for i in range(len(chunks))],
-    )
-
-    return action
+  return action;
+}
 ```
 
 **Why content hash, not document ID?** A document can be updated (same ID, different content). The content hash detects actual changes. If the content is identical, skip re-embedding — it wastes money and produces identical vectors.
@@ -93,74 +97,78 @@ Not all failures are equal. The retry strategy must match the failure type:
 | **Partial** | Embedded 8/10 chunks, then API error | Yes | Resume from checkpoint, not restart |
 | **Resource** | Out of memory on large PDF | Maybe | Retry with smaller batch or more memory |
 
-```python
-# run: python retry_strategy.py
+```typescript
+// run: npx tsx retry_strategy.ts
 
-import asyncio
-import random
-from functools import wraps
-from typing import TypeVar, Callable, Any
+function withRetry<T>(
+  options: {
+    maxRetries?: number;
+    baseDelay?: number;
+    maxDelay?: number;
+    retryableErrors?: (err: unknown) => boolean;
+  } = {},
+) {
+  /** Decorator factory for exponential backoff with jitter. */
+  const {
+    maxRetries = 3,
+    baseDelay = 1.0,
+    maxDelay = 60.0,
+    retryableErrors = (err) =>
+      err instanceof Error &&
+      ("code" in err || err.message.includes("timeout") || err.message.includes("ECONNRESET")),
+  } = options;
 
-T = TypeVar("T")
+  return function decorator(
+    fn: (...args: any[]) => Promise<T>,
+  ): (...args: any[]) => Promise<T> {
+    return async function wrapper(...args: any[]): Promise<T> {
+      let lastError: unknown = null;
 
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+          return await fn(...args);
+        } catch (err) {
+          lastError = err;
+          if (!retryableErrors(err) || attempt === maxRetries) break;
 
-def with_retry(
-    max_retries: int = 3,
-    base_delay: float = 1.0,
-    max_delay: float = 60.0,
-    retryable_exceptions: tuple[type[Exception], ...] = (
-        ConnectionError,
-        TimeoutError,
-    ),
-):
-    """Decorator for exponential backoff with jitter."""
+          // Exponential backoff: 1s, 2s, 4s, 8s...
+          const delay = Math.min(baseDelay * 2 ** attempt, maxDelay);
+          // Add jitter: +/- 25%
+          const jitter = delay * 0.25 * (2 * Math.random() - 1);
+          const actualDelay = delay + jitter;
 
-    def decorator(func: Callable[..., T]) -> Callable[..., T]:
-        @wraps(func)
-        async def wrapper(*args: Any, **kwargs: Any) -> T:
-            last_exception: Exception | None = None
+          console.log(
+            `Attempt ${attempt + 1} failed: ${err}. Retrying in ${actualDelay.toFixed(1)}s`,
+          );
+          await new Promise((r) => setTimeout(r, actualDelay * 1000));
+        }
+      }
 
-            for attempt in range(max_retries + 1):
-                try:
-                    return await func(*args, **kwargs)
-                except retryable_exceptions as e:
-                    last_exception = e
-                    if attempt == max_retries:
-                        break
+      throw lastError;
+    };
+  };
+}
 
-                    # Exponential backoff: 1s, 2s, 4s, 8s...
-                    delay = min(base_delay * (2 ** attempt), max_delay)
-                    # Add jitter: +/- 25%
-                    jitter = delay * 0.25 * (2 * random.random() - 1)
-                    actual_delay = delay + jitter
+class RateLimitError extends Error {
+  retryAfter: number;
+  constructor(retryAfter = 60.0) {
+    super("Rate limit hit");
+    this.retryAfter = retryAfter;
+  }
+}
 
-                    print(
-                        f"Attempt {attempt + 1} failed: {e}. "
-                        f"Retrying in {actual_delay:.1f}s"
-                    )
-                    await asyncio.sleep(actual_delay)
-
-            raise last_exception  # type: ignore[misc]
-
-        return wrapper  # type: ignore[return-value]
-    return decorator
-
-
-class RateLimitError(Exception):
-    """Embedding API rate limit hit."""
-    def __init__(self, retry_after: float = 60.0):
-        self.retry_after = retry_after
-
-
-@with_retry(
-    max_retries=5,
-    base_delay=2.0,
-    retryable_exceptions=(ConnectionError, TimeoutError, RateLimitError),
-)
-async def embed_with_retry(texts: list[str]) -> list[list[float]]:
-    """Embed texts with automatic retry on transient failures."""
-    response = await embedding_api.embed(texts)
-    return response.embeddings
+const embedWithRetry = withRetry<number[][]>({
+  maxRetries: 5,
+  baseDelay: 2.0,
+  retryableErrors: (err) =>
+    err instanceof RateLimitError ||
+    err instanceof TypeError ||
+    (err instanceof Error && err.message.includes("timeout")),
+})(async function embedWithRetry(texts: string[]): Promise<number[][]> {
+  /** Embed texts with automatic retry on transient failures. */
+  const response = await embeddingApi.embed(texts);
+  return response.embeddings;
+});
 ```
 
 **Why jitter matters:** Without jitter, all workers that hit a rate limit at the same time will retry at the same time, causing a "thundering herd" that hits the rate limit again. Jitter spreads retries across time.
@@ -182,87 +190,86 @@ DLQ Handling:
                                      or ──► Delete (permanent failure)
 ```
 
-```python
-# run: python dlq_handler.py
+```typescript
+// run: npx tsx dlq_handler.ts
 
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from enum import Enum
+type FailureReason =
+  | "parse_error"       // Corrupted or unsupported file
+  | "embed_error"       // Embedding API failure
+  | "vector_db_error"   // Vector DB write failure
+  | "timeout"           // Processing took too long
+  | "out_of_memory"     // File too large for worker memory
+  | "unknown";
 
+interface DLQEntry {
+  docId: string;
+  s3Path: string;
+  failureReason: FailureReason;
+  errorMessage: string;
+  attempts: number;
+  firstFailedAt: Date;
+  lastFailedAt: Date;
+  metadata: Record<string, unknown>;
+}
 
-class FailureReason(Enum):
-    PARSE_ERROR = "parse_error"           # Corrupted or unsupported file
-    EMBED_ERROR = "embed_error"           # Embedding API failure
-    VECTOR_DB_ERROR = "vector_db_error"   # Vector DB write failure
-    TIMEOUT = "timeout"                   # Processing took too long
-    OOM = "out_of_memory"                 # File too large for worker memory
-    UNKNOWN = "unknown"
+class DeadLetterQueue {
+  /** Dead letter queue with inspection and retry capabilities. */
+  private storage: any;
 
+  constructor(storage: any) {
+    this.storage = storage;
+  }
 
-@dataclass
-class DLQEntry:
-    doc_id: str
-    s3_path: str
-    failure_reason: FailureReason
-    error_message: str
-    attempts: int
-    first_failed_at: datetime
-    last_failed_at: datetime
-    metadata: dict = field(default_factory=dict)
+  async add(entry: DLQEntry): Promise<void> {
+    /** Add a failed document to the DLQ. */
+    await this.storage.put(entry.docId, entry);
+    // Alert if DLQ is growing
+    const dlqSize = await this.storage.count();
+    if (dlqSize > 100) {
+      await this.alert(
+        `DLQ size is ${dlqSize}. Latest failure: ${entry.failureReason}`,
+      );
+    }
+  }
 
+  async inspect(reason?: FailureReason): Promise<DLQEntry[]> {
+    /** List DLQ entries, optionally filtered by failure reason. */
+    let entries: DLQEntry[] = await this.storage.list();
+    if (reason) {
+      entries = entries.filter((e) => e.failureReason === reason);
+    }
+    return entries;
+  }
 
-class DeadLetterQueue:
-    """Dead letter queue with inspection and retry capabilities."""
+  async retry(docId: string, queue: any): Promise<void> {
+    /** Move a DLQ entry back to the main processing queue. */
+    const entry: DLQEntry | null = await this.storage.get(docId);
+    if (entry) {
+      await queue.add("process_document", {
+        docId: entry.docId,
+        s3Path: entry.s3Path,
+      });
+      await this.storage.delete(docId);
+    }
+  }
 
-    def __init__(self, storage):
-        self.storage = storage
+  async retryAll(reason: FailureReason, queue: any): Promise<number> {
+    /**
+     * Retry all DLQ entries with a specific failure reason.
+     * Useful after fixing a systemic issue (e.g., embedding API
+     * was down, now it's back).
+     */
+    const entries = await this.inspect(reason);
+    for (const entry of entries) {
+      await this.retry(entry.docId, queue);
+    }
+    return entries.length;
+  }
 
-    async def add(self, entry: DLQEntry) -> None:
-        """Add a failed document to the DLQ."""
-        await self.storage.put(entry.doc_id, entry)
-        # Alert if DLQ is growing
-        dlq_size = await self.storage.count()
-        if dlq_size > 100:
-            await self.alert(
-                f"DLQ size is {dlq_size}. "
-                f"Latest failure: {entry.failure_reason.value}"
-            )
-
-    async def inspect(
-        self,
-        reason: FailureReason | None = None,
-    ) -> list[DLQEntry]:
-        """List DLQ entries, optionally filtered by failure reason."""
-        entries = await self.storage.list()
-        if reason:
-            entries = [e for e in entries if e.failure_reason == reason]
-        return entries
-
-    async def retry(self, doc_id: str, queue) -> None:
-        """Move a DLQ entry back to the main processing queue."""
-        entry = await self.storage.get(doc_id)
-        if entry:
-            await queue.enqueue(
-                "process_document",
-                doc_id=entry.doc_id,
-                s3_path=entry.s3_path,
-            )
-            await self.storage.delete(doc_id)
-
-    async def retry_all(
-        self,
-        reason: FailureReason,
-        queue,
-    ) -> int:
-        """Retry all DLQ entries with a specific failure reason.
-
-        Useful after fixing a systemic issue (e.g., embedding API
-        was down, now it's back).
-        """
-        entries = await self.inspect(reason=reason)
-        for entry in entries:
-            await self.retry(entry.doc_id, queue)
-        return len(entries)
+  private async alert(message: string): Promise<void> {
+    console.warn(`[DLQ ALERT] ${message}`);
+  }
+}
 ```
 
 ### Document Versioning
@@ -279,52 +286,58 @@ Documents change. The versioning strategy determines how updates and deletes are
 
 **Recommended for most cases: replace-on-update with content hashing.** On update, delete all chunks with the document's ID, then insert new chunks. The content hash skips re-processing if nothing changed.
 
-```python
-# Document update flow
+```typescript
+// Document update flow
 
-async def handle_document_update(
-    doc_id: str,
-    new_content: str,
-    vector_db,
-    embedder,
-    chunker,
-) -> dict[str, str]:
-    """Handle a document update: delete old chunks, insert new."""
-    new_hash = content_hash(new_content)
+interface Chunk {
+  text: string;
+}
 
-    # Check if content actually changed
-    existing = await vector_db.get_metadata(
-        filter={"doc_id": doc_id},
-        fields=["content_hash"],
-    )
+async function handleDocumentUpdate(
+  docId: string,
+  newContent: string,
+  vectorDb: any,
+  embedder: (texts: string[]) => Promise<number[][]>,
+  chunker: (content: string) => Chunk[],
+): Promise<Record<string, string | number>> {
+  /** Handle a document update: delete old chunks, insert new. */
+  const newHash = contentHash(newContent);
 
-    if existing and existing.get("content_hash") == new_hash:
-        return {"action": "skipped", "reason": "content_unchanged"}
+  // Check if content actually changed
+  const existing = await vectorDb.getMetadata({
+    filter: { doc_id: docId },
+    fields: ["content_hash"],
+  });
 
-    # Delete old chunks atomically
-    deleted_count = await vector_db.delete(filter={"doc_id": doc_id})
+  if (existing && existing.content_hash === newHash) {
+    return { action: "skipped", reason: "content_unchanged" };
+  }
 
-    # Insert new chunks
-    chunks = chunker(new_content)
-    embeddings = await embedder([c.text for c in chunks])
-    await vector_db.upsert(
-        ids=[f"{doc_id}::chunk::{i}" for i in range(len(chunks))],
-        embeddings=embeddings,
-        documents=[c.text for c in chunks],
-        metadatas=[{
-            "doc_id": doc_id,
-            "content_hash": new_hash,
-            "chunk_index": i,
-            "version": (existing.get("version", 0) + 1) if existing else 1,
-            "indexed_at": datetime.now(timezone.utc).isoformat(),
-        } for i in range(len(chunks))],
-    )
+  // Delete old chunks atomically
+  const deletedCount = await vectorDb.delete({ filter: { doc_id: docId } });
 
-    return {
-        "action": "updated",
-        "old_chunks_deleted": deleted_count,
-        "new_chunks_inserted": len(chunks),
-    }
+  // Insert new chunks
+  const chunks = chunker(newContent);
+  const embeddings = await embedder(chunks.map((c) => c.text));
+  await vectorDb.upsert({
+    ids: chunks.map((_, i) => `${docId}::chunk::${i}`),
+    embeddings,
+    documents: chunks.map((c) => c.text),
+    metadatas: chunks.map((_, i) => ({
+      doc_id: docId,
+      content_hash: newHash,
+      chunk_index: i,
+      version: existing ? (existing.version ?? 0) + 1 : 1,
+      indexed_at: new Date().toISOString(),
+    })),
+  });
+
+  return {
+    action: "updated",
+    old_chunks_deleted: deletedCount,
+    new_chunks_inserted: chunks.length,
+  };
+}
 ```
 
 ### Re-Indexing Strategies
@@ -355,70 +368,83 @@ Phase 3: Delete old index
   [collection-v2] ◄── queries go here (alias: "production")
 ```
 
-```python
-# Blue-green re-index
+```typescript
+// run: npx tsx blue_green_reindex.ts
+// Blue-green re-index
 
-async def blue_green_reindex(
-    vector_db,
-    source,
-    embedder,
-    chunker,
-    current_collection: str = "docs-v1",
-    new_collection: str = "docs-v2",
-) -> dict:
-    """Zero-downtime re-index using blue-green swap."""
+interface Chunk {
+  text: string;
+}
 
-    # 1. Create new collection with updated config
-    await vector_db.create_collection(
-        name=new_collection,
-        embedding_dimension=1536,  # might be different with new model
-    )
+interface DocSource {
+  id: string;
+  content: string;
+}
 
-    # 2. Re-index all documents into new collection
-    all_docs = await source.list_all()
-    errors = []
+async function blueGreenReindex(
+  vectorDb: any,
+  source: any,
+  embedder: (texts: string[]) => Promise<number[][]>,
+  chunker: (content: string) => Chunk[],
+  currentCollection = "docs-v1",
+  newCollection = "docs-v2",
+): Promise<Record<string, unknown>> {
+  /** Zero-downtime re-index using blue-green swap. */
 
-    for doc in all_docs:
-        try:
-            chunks = chunker(doc.content)
-            embeddings = await embedder([c.text for c in chunks])
-            await vector_db.upsert(
-                collection=new_collection,
-                ids=[f"{doc.id}::chunk::{i}" for i in range(len(chunks))],
-                embeddings=embeddings,
-                documents=[c.text for c in chunks],
-                metadatas=[{"doc_id": doc.id, "chunk_index": i}
-                           for i in range(len(chunks))],
-            )
-        except Exception as e:
-            errors.append({"doc_id": doc.id, "error": str(e)})
+  // 1. Create new collection with updated config
+  await vectorDb.createCollection({
+    name: newCollection,
+    embeddingDimension: 1536, // might be different with new model
+  });
 
-    # 3. Verify new index (run test queries, compare results)
-    validation_passed = await validate_index(new_collection)
+  // 2. Re-index all documents into new collection
+  const allDocs: DocSource[] = await source.listAll();
+  const errors: { docId: string; error: string }[] = [];
 
-    if not validation_passed or len(errors) > len(all_docs) * 0.01:
-        # More than 1% errors or validation failed — abort
-        await vector_db.delete_collection(new_collection)
-        raise RuntimeError(
-            f"Re-index failed: {len(errors)} errors, "
-            f"validation={'passed' if validation_passed else 'FAILED'}"
-        )
-
-    # 4. Swap the alias (atomic — queries switch instantly)
-    await vector_db.update_alias(
-        alias="production",
-        collection=new_collection,
-    )
-
-    # 5. Keep old collection for rollback (delete after 24h)
-    # await vector_db.delete_collection(current_collection)  # later
-
-    return {
-        "documents_indexed": len(all_docs) - len(errors),
-        "errors": len(errors),
-        "old_collection": current_collection,
-        "new_collection": new_collection,
+  for (const doc of allDocs) {
+    try {
+      const chunks = chunker(doc.content);
+      const embeddings = await embedder(chunks.map((c) => c.text));
+      await vectorDb.upsert({
+        collection: newCollection,
+        ids: chunks.map((_, i) => `${doc.id}::chunk::${i}`),
+        embeddings,
+        documents: chunks.map((c) => c.text),
+        metadatas: chunks.map((_, i) => ({ doc_id: doc.id, chunk_index: i })),
+      });
+    } catch (e) {
+      errors.push({ docId: doc.id, error: String(e) });
     }
+  }
+
+  // 3. Verify new index (run test queries, compare results)
+  const validationPassed = await validateIndex(newCollection);
+
+  if (!validationPassed || errors.length > allDocs.length * 0.01) {
+    // More than 1% errors or validation failed — abort
+    await vectorDb.deleteCollection(newCollection);
+    throw new Error(
+      `Re-index failed: ${errors.length} errors, ` +
+      `validation=${validationPassed ? "passed" : "FAILED"}`,
+    );
+  }
+
+  // 4. Swap the alias (atomic — queries switch instantly)
+  await vectorDb.updateAlias({
+    alias: "production",
+    collection: newCollection,
+  });
+
+  // 5. Keep old collection for rollback (delete after 24h)
+  // await vectorDb.deleteCollection(currentCollection); // later
+
+  return {
+    documents_indexed: allDocs.length - errors.length,
+    errors: errors.length,
+    old_collection: currentCollection,
+    new_collection: newCollection,
+  };
+}
 ```
 
 ### Monitoring: The Metrics That Matter
@@ -435,92 +461,96 @@ async def blue_green_reindex(
 | **Index size** | How many vectors in the DB? | Unexpected growth or shrinkage |
 | **Content hash collision** | Are duplicates being detected? | Collision rate too high (hash bug) or too low (dedup not working) |
 
-```python
-# run: python monitoring.py
+```typescript
+// run: npx tsx monitoring.ts
 
-import time
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+class IngestionMetrics {
+  /** Metrics collected during document processing. */
+  docId: string;
+  startedAt: number;
 
+  parseDurationMs = 0;
+  chunkDurationMs = 0;
+  embedDurationMs = 0;
+  upsertDurationMs = 0;
+  totalDurationMs = 0;
 
-@dataclass
-class IngestionMetrics:
-    """Metrics collected during document processing."""
-    doc_id: str
-    started_at: float = field(default_factory=time.monotonic)
+  chunkCount = 0;
+  tokenCount = 0;
+  status = "processing";
+  error: string | null = null;
 
-    parse_duration_ms: float = 0
-    chunk_duration_ms: float = 0
-    embed_duration_ms: float = 0
-    upsert_duration_ms: float = 0
-    total_duration_ms: float = 0
+  constructor(docId: string) {
+    this.docId = docId;
+    this.startedAt = performance.now();
+  }
 
-    chunk_count: int = 0
-    token_count: int = 0
-    status: str = "processing"
-    error: str | None = None
+  recordStage(stage: "parse" | "chunk" | "embed" | "upsert", durationMs: number): void {
+    (this as any)[`${stage}DurationMs`] = durationMs;
+  }
 
-    def record_stage(self, stage: str, duration_ms: float) -> None:
-        setattr(self, f"{stage}_duration_ms", duration_ms)
+  finalize(status = "success", error: string | null = null): void {
+    this.totalDurationMs = performance.now() - this.startedAt;
+    this.status = status;
+    this.error = error;
+  }
 
-    def finalize(self, status: str = "success", error: str | None = None) -> None:
-        self.total_duration_ms = (time.monotonic() - self.started_at) * 1000
-        self.status = status
-        self.error = error
+  toLogDict(): Record<string, unknown> {
+    /** Structured log entry for monitoring. */
+    return {
+      event: "document_ingested",
+      doc_id: this.docId,
+      status: this.status,
+      total_duration_ms: Math.round(this.totalDurationMs * 10) / 10,
+      parse_ms: Math.round(this.parseDurationMs * 10) / 10,
+      chunk_ms: Math.round(this.chunkDurationMs * 10) / 10,
+      embed_ms: Math.round(this.embedDurationMs * 10) / 10,
+      upsert_ms: Math.round(this.upsertDurationMs * 10) / 10,
+      chunks: this.chunkCount,
+      tokens: this.tokenCount,
+      error: this.error,
+      timestamp: new Date().toISOString(),
+    };
+  }
+}
 
-    def to_log_dict(self) -> dict:
-        """Structured log entry for monitoring."""
-        return {
-            "event": "document_ingested",
-            "doc_id": self.doc_id,
-            "status": self.status,
-            "total_duration_ms": round(self.total_duration_ms, 1),
-            "parse_ms": round(self.parse_duration_ms, 1),
-            "chunk_ms": round(self.chunk_duration_ms, 1),
-            "embed_ms": round(self.embed_duration_ms, 1),
-            "upsert_ms": round(self.upsert_duration_ms, 1),
-            "chunks": self.chunk_count,
-            "tokens": self.token_count,
-            "error": self.error,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-        }
+// Usage in the worker:
+async function processWithMetrics(docId: string, content: string): Promise<void> {
+  const metrics = new IngestionMetrics(docId);
 
+  try {
+    let t0 = performance.now();
+    const parsed = parse(content);
+    metrics.recordStage("parse", performance.now() - t0);
 
-# Usage in the worker:
-async def process_with_metrics(doc_id: str, content: str):
-    metrics = IngestionMetrics(doc_id=doc_id)
+    t0 = performance.now();
+    const chunks = chunk(parsed);
+    metrics.recordStage("chunk", performance.now() - t0);
+    metrics.chunkCount = chunks.length;
 
-    try:
-        t0 = time.monotonic()
-        parsed = parse(content)
-        metrics.record_stage("parse", (time.monotonic() - t0) * 1000)
+    t0 = performance.now();
+    const embeddings = await embed(chunks);
+    metrics.recordStage("embed", performance.now() - t0);
 
-        t0 = time.monotonic()
-        chunks = chunk(parsed)
-        metrics.record_stage("chunk", (time.monotonic() - t0) * 1000)
-        metrics.chunk_count = len(chunks)
+    t0 = performance.now();
+    await vectorDb.upsert(chunks, embeddings);
+    metrics.recordStage("upsert", performance.now() - t0);
 
-        t0 = time.monotonic()
-        embeddings = await embed(chunks)
-        metrics.record_stage("embed", (time.monotonic() - t0) * 1000)
+    metrics.finalize("success");
 
-        t0 = time.monotonic()
-        await vector_db.upsert(chunks, embeddings)
-        metrics.record_stage("upsert", (time.monotonic() - t0) * 1000)
+  } catch (e) {
+    metrics.finalize("error", String(e));
+    throw e;
 
-        metrics.finalize(status="success")
-
-    except Exception as e:
-        metrics.finalize(status="error", error=str(e))
-        raise
-
-    finally:
-        # Emit structured log (picked up by monitoring system)
-        logger.info(metrics.to_log_dict())
-        # Emit Prometheus metrics
-        ingestion_duration.observe(metrics.total_duration_ms / 1000)
-        ingestion_chunks.observe(metrics.chunk_count)
-        ingestion_errors.labels(stage=metrics.status).inc()
+  } finally {
+    // Emit structured log (picked up by monitoring system)
+    logger.info(metrics.toLogDict());
+    // Emit Prometheus metrics
+    ingestionDuration.observe(metrics.totalDurationMs / 1000);
+    ingestionChunks.observe(metrics.chunkCount);
+    ingestionErrors.labels({ stage: metrics.status }).inc();
+  }
+}
 ```
 
 ### Backfilling: Adding a New Field or New Model

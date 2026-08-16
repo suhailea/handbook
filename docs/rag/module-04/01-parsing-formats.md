@@ -7,6 +7,10 @@ outline: deep
 
 **Interview weight:** 🔥🔥 | **Prerequisites:** [Ingestion Pipelines](../module-03/01-ingestion-pipelines.md) | **Builds toward:** [CSV, Excel & Structured Data](02-csv-excel.md), Chunking Strategies (Module 5)
 
+::: warning Why Python Here
+Document parsing examples use Python because the ecosystem tooling (PyMuPDF, pdfplumber, unstructured, Tesseract bindings) is overwhelmingly Python-native. In production, TypeScript services typically call a Python parsing microservice — see [Microservices & Async Processing](/rag/module-16/02-microservices).
+:::
+
 ## 🗣️ In Plain English
 
 ::: tip In Plain English

@@ -190,54 +190,54 @@ This is the most important mental model in RAG:
 
 If the retriever returns irrelevant chunks, the LLM will either hallucinate or produce a vague non-answer. No amount of prompt engineering fixes bad retrieval. This is why production RAG engineering is 80% retrieval optimization and 20% generation tuning.
 
-```python
-# run: python demo_basic_rag.py
-# Requires: pip install openai chromadb
+```typescript
+// run: npx tsx demo_basic_rag.ts
+// Requires: npm install chromadb openai
 
-from openai import OpenAI
-import chromadb
+import { ChromaClient } from "chromadb";
+import OpenAI from "openai";
 
-client = OpenAI()
-chroma = chromadb.Client()
-collection = chroma.create_collection("demo")
+const client = new OpenAI();
+const chroma = new ChromaClient();
+const collection = await chroma.createCollection({ name: "demo" });
 
-# Offline: ingest documents
-documents = [
-    "The refund policy allows returns within 30 days of purchase.",
-    "Premium members get free shipping on all orders over $50.",
-    "Our customer support hours are 9 AM to 6 PM EST, Monday to Friday.",
-    "Warranty covers manufacturing defects for 12 months from purchase date.",
-]
+// Offline: ingest documents
+const documents = [
+  "The refund policy allows returns within 30 days of purchase.",
+  "Premium members get free shipping on all orders over $50.",
+  "Our customer support hours are 9 AM to 6 PM EST, Monday to Friday.",
+  "Warranty covers manufacturing defects for 12 months from purchase date.",
+];
 
-collection.add(
-    documents=documents,
-    ids=[f"doc-{i}" for i in range(len(documents))],
-)
+await collection.add({
+  documents,
+  ids: documents.map((_, i) => `doc-${i}`),
+});
 
-# Online: query
-query = "How long do I have to return an item?"
+// Online: query
+const query = "How long do I have to return an item?";
 
-results = collection.query(query_texts=[query], n_results=2)
-retrieved_chunks = results["documents"][0]
+const results = await collection.query({ queryTexts: [query], nResults: 2 });
+const retrievedChunks = results.documents[0];
 
-prompt = f"""Answer the question based ONLY on the following context.
+const prompt = `Answer the question based ONLY on the following context.
 If the context doesn't contain the answer, say "I don't have that information."
 
 Context:
-{chr(10).join(f'- {chunk}' for chunk in retrieved_chunks)}
+${retrievedChunks.map((chunk) => `- ${chunk}`).join("\n")}
 
-Question: {query}
-"""
+Question: ${query}
+`;
 
-response = client.chat.completions.create(
-    model="gpt-4o-mini",
-    messages=[{"role": "user", "content": prompt}],
-    temperature=0,
-)
+const response = await client.chat.completions.create({
+  model: "gpt-4o-mini",
+  messages: [{ role: "user", content: prompt }],
+  temperature: 0,
+});
 
-print(f"Query: {query}")
-print(f"Retrieved: {retrieved_chunks}")
-print(f"Answer: {response.choices[0].message.content}")
+console.log(`Query: ${query}`);
+console.log(`Retrieved: ${JSON.stringify(retrievedChunks)}`);
+console.log(`Answer: ${response.choices[0].message.content}`);
 ```
 
 ## 💥 Where It Bites (Production Lens)

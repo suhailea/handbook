@@ -34,24 +34,24 @@ Fine-tuning modifies the model's weights. RAG modifies the model's input. This d
 
 **When to combine them:** Fine-tune for output format and tone, use RAG for factual grounding. Example: a legal AI fine-tuned to write in formal legal prose, with RAG providing case law and statutes.
 
-```python
-# Conceptual: RAG adds knowledge, fine-tuning adds behavior
+```typescript
+// Conceptual: RAG adds knowledge, fine-tuning adds behavior
 
-# RAG approach: "What is our refund policy?"
-context = retrieve("refund policy")  # → "30-day return window..."
-answer = llm(f"Based on: {context}\nAnswer: What is our refund policy?")
-# Output: "Our refund policy allows returns within 30 days."
+// RAG approach: "What is our refund policy?"
+const context = retrieve("refund policy"); // → "30-day return window..."
+const answer1 = llm(`Based on: ${context}\nAnswer: What is our refund policy?`);
+// Output: "Our refund policy allows returns within 30 days."
 
-# Fine-tuning approach: "Write a customer email about refund policy"
-# Model was fine-tuned on 500 examples of company email style
-answer = fine_tuned_llm("Write a customer email about refund policy")
-# Output: "Dear valued customer, Thank you for reaching out..."
-# (correct style, but may hallucinate policy details without RAG)
+// Fine-tuning approach: "Write a customer email about refund policy"
+// Model was fine-tuned on 500 examples of company email style
+const answer2 = fineTunedLlm("Write a customer email about refund policy");
+// Output: "Dear valued customer, Thank you for reaching out..."
+// (correct style, but may hallucinate policy details without RAG)
 
-# Combined: RAG + Fine-tuned model
-context = retrieve("refund policy")
-answer = fine_tuned_llm(f"Based on: {context}\nWrite a customer email about refund policy")
-# Output: correct style AND correct facts
+// Combined: RAG + Fine-tuned model
+const context2 = retrieve("refund policy");
+const answer3 = fineTunedLlm(`Based on: ${context2}\nWrite a customer email about refund policy`);
+// Output: correct style AND correct facts
 ```
 
 ### RAG vs Long-Context LLMs
@@ -129,31 +129,39 @@ RAG is 153x cheaper at this scale.
 | Semi-structured (JSON, logs) | Depends on query type | Filtering → SQL; semantic search → RAG |
 | Mixed | Hybrid (SQL + RAG) | Route based on query intent |
 
-```python
-# run: python demo_routing.py (conceptual - shows query routing logic)
+```typescript
+// run: npx tsx demo_routing.ts (conceptual - shows query routing logic)
 
-def route_query(query: str, classifier_result: dict) -> str:
-    """Route to the right backend based on query type."""
+interface ClassifierResult {
+  type: "analytical" | "factual_lookup" | "hybrid";
+}
 
-    if classifier_result["type"] == "analytical":
-        # "What is the average order value this month?"
-        return execute_sql(nl_to_sql(query))
+function routeQuery(query: string, classifierResult: ClassifierResult): string {
+  if (classifierResult.type === "analytical") {
+    // "What is the average order value this month?"
+    return executeSql(nlToSql(query));
+  }
 
-    elif classifier_result["type"] == "factual_lookup":
-        # "What is our refund policy?"
-        chunks = vector_search(query)
-        return llm_generate(query, chunks)
+  if (classifierResult.type === "factual_lookup") {
+    // "What is our refund policy?"
+    const chunks = vectorSearch(query);
+    return llmGenerate(query, chunks);
+  }
 
-    elif classifier_result["type"] == "hybrid":
-        # "Summarize complaints from customers who spent over $1000"
-        high_spenders = execute_sql(
-            "SELECT customer_id FROM orders "
-            "GROUP BY customer_id HAVING SUM(total) > 1000"
-        )
-        complaints = vector_search(
-            query, filter={"customer_id": {"$in": high_spenders}}
-        )
-        return llm_generate(query, complaints)
+  if (classifierResult.type === "hybrid") {
+    // "Summarize complaints from customers who spent over $1000"
+    const highSpenders = executeSql(
+      "SELECT customer_id FROM orders " +
+      "GROUP BY customer_id HAVING SUM(total) > 1000"
+    );
+    const complaints = vectorSearch(
+      query, { filter: { customer_id: { $in: highSpenders } } }
+    );
+    return llmGenerate(query, complaints);
+  }
+
+  throw new Error(`Unknown query type: ${classifierResult.type}`);
+}
 ```
 
 ### RAG vs Agents (and Agentic RAG)

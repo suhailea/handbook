@@ -171,93 +171,92 @@ HIPAA Compliance Required?
 
 **Quick cost estimation formula:**
 
-```python
-# run: python cost_estimate.py
+```typescript
+// run: npx tsx cost_estimate.ts
 
-def estimate_monthly_cost(
-    corpus_tokens: int,
-    queries_per_day: int,
-    context_tokens_per_query: int = 3000,
-    output_tokens_per_query: int = 500,
-    embedding_price_per_m: float = 0.02,   # text-embedding-3-small
-    llm_input_price_per_m: float = 2.50,   # gpt-4o
-    llm_output_price_per_m: float = 10.00,
-    vector_db_monthly: float = 100.0,
-    reindex_frequency_per_month: int = 1,
-) -> dict[str, float]:
-    """Estimate monthly cost for a RAG system."""
+interface CostEstimate {
+  embedding_ingestion: number;
+  embedding_queries: number;
+  llm_input: number;
+  llm_output: number;
+  vector_db: number;
+  total_monthly: number;
+}
 
-    # One-time (amortized monthly) embedding cost
-    embedding_cost = (
-        corpus_tokens / 1_000_000
-        * embedding_price_per_m
-        * reindex_frequency_per_month
-    )
+function estimateMonthlyCost(options: {
+  corpusTokens: number;
+  queriesPerDay: number;
+  contextTokensPerQuery?: number;
+  outputTokensPerQuery?: number;
+  embeddingPricePerM?: number;
+  llmInputPricePerM?: number;
+  llmOutputPricePerM?: number;
+  vectorDbMonthly?: number;
+  reindexFrequencyPerMonth?: number;
+}): CostEstimate {
+  const {
+    corpusTokens,
+    queriesPerDay,
+    contextTokensPerQuery = 3000,
+    outputTokensPerQuery = 500,
+    embeddingPricePerM = 0.02,   // text-embedding-3-small
+    llmInputPricePerM = 2.50,    // gpt-4o
+    llmOutputPricePerM = 10.00,
+    vectorDbMonthly = 100.0,
+    reindexFrequencyPerMonth = 1,
+  } = options;
 
-    # Query embedding cost (negligible but included)
-    query_embedding_cost = (
-        queries_per_day * 30  # monthly queries
-        * 50  # ~50 tokens per query
-        / 1_000_000
-        * embedding_price_per_m
-    )
+  // One-time (amortized monthly) embedding cost
+  const embeddingCost =
+    (corpusTokens / 1_000_000) * embeddingPricePerM * reindexFrequencyPerMonth;
 
-    # LLM cost
-    monthly_queries = queries_per_day * 30
-    llm_input_cost = (
-        monthly_queries
-        * context_tokens_per_query
-        / 1_000_000
-        * llm_input_price_per_m
-    )
-    llm_output_cost = (
-        monthly_queries
-        * output_tokens_per_query
-        / 1_000_000
-        * llm_output_price_per_m
-    )
+  // Query embedding cost (negligible but included)
+  const queryEmbeddingCost =
+    ((queriesPerDay * 30 * 50) / 1_000_000) * embeddingPricePerM;
 
-    total = (
-        embedding_cost
-        + query_embedding_cost
-        + llm_input_cost
-        + llm_output_cost
-        + vector_db_monthly
-    )
+  // LLM cost
+  const monthlyQueries = queriesPerDay * 30;
+  const llmInputCost =
+    (monthlyQueries * contextTokensPerQuery) / 1_000_000 * llmInputPricePerM;
+  const llmOutputCost =
+    (monthlyQueries * outputTokensPerQuery) / 1_000_000 * llmOutputPricePerM;
 
-    return {
-        "embedding_ingestion": round(embedding_cost, 2),
-        "embedding_queries": round(query_embedding_cost, 2),
-        "llm_input": round(llm_input_cost, 2),
-        "llm_output": round(llm_output_cost, 2),
-        "vector_db": vector_db_monthly,
-        "total_monthly": round(total, 2),
-    }
+  const total =
+    embeddingCost + queryEmbeddingCost + llmInputCost + llmOutputCost + vectorDbMonthly;
 
+  return {
+    embedding_ingestion: Math.round(embeddingCost * 100) / 100,
+    embedding_queries: Math.round(queryEmbeddingCost * 100) / 100,
+    llm_input: Math.round(llmInputCost * 100) / 100,
+    llm_output: Math.round(llmOutputCost * 100) / 100,
+    vector_db: vectorDbMonthly,
+    total_monthly: Math.round(total * 100) / 100,
+  };
+}
 
-# Example: Enterprise knowledge base
-enterprise = estimate_monthly_cost(
-    corpus_tokens=50_000_000,   # 50M tokens (~25K pages)
-    queries_per_day=1000,
-)
-print("Enterprise KB:", enterprise)
+// Example: Enterprise knowledge base
+const enterprise = estimateMonthlyCost({
+  corpusTokens: 50_000_000,   // 50M tokens (~25K pages)
+  queriesPerDay: 1000,
+});
+console.log("Enterprise KB:", enterprise);
 
-# Example: Customer support bot
-support = estimate_monthly_cost(
-    corpus_tokens=5_000_000,    # 5M tokens (~2.5K pages)
-    queries_per_day=5000,
-)
-print("Support bot:", support)
+// Example: Customer support bot
+const support = estimateMonthlyCost({
+  corpusTokens: 5_000_000,    // 5M tokens (~2.5K pages)
+  queriesPerDay: 5000,
+});
+console.log("Support bot:", support);
 
-# Example: Legal search
-legal = estimate_monthly_cost(
-    corpus_tokens=500_000_000,  # 500M tokens (~250K pages)
-    queries_per_day=200,
-    llm_input_price_per_m=3.00,   # Claude Sonnet
-    llm_output_price_per_m=15.00,
-    vector_db_monthly=500.0,      # larger index
-)
-print("Legal search:", legal)
+// Example: Legal search
+const legal = estimateMonthlyCost({
+  corpusTokens: 500_000_000,  // 500M tokens (~250K pages)
+  queriesPerDay: 200,
+  llmInputPricePerM: 3.00,    // Claude Sonnet
+  llmOutputPricePerM: 15.00,
+  vectorDbMonthly: 500.0,     // larger index
+});
+console.log("Legal search:", legal);
 ```
 
 ### 8. Availability & Disaster Recovery
@@ -513,96 +512,98 @@ print("Legal search:", legal)
 | **Budget** <$1K/month | Smallest models, aggressive caching, serverless | — |
 | **Budget** >$10K/month | — | Best models, full pipeline, dedicated infra |
 
-```python
-# run: python requirements_to_architecture.py
-# Conceptual: how requirements map to architecture decisions
+```typescript
+// run: npx tsx requirements_to_architecture.ts
+// Conceptual: how requirements map to architecture decisions
 
-from dataclasses import dataclass
+interface RAGRequirements {
+  docCount: number;
+  totalTokens: number;
+  queriesPerDay: number;
+  peakQps: number;
+  p95LatencyMs: number;
+  freshnessMinutes: number;
+  hallucinationTolerance: "high" | "medium" | "low" | "zero";
+  multiTenant: boolean;
+  compliance: string[];  // ["HIPAA", "SOC2", "GDPR"]
+  monthlyBudget: number;
+}
 
+function recommendArchitecture(req: RAGRequirements): Record<string, string> {
+  const arch: Record<string, string> = {};
 
-@dataclass
-class RAGRequirements:
-    doc_count: int
-    total_tokens: int
-    queries_per_day: int
-    peak_qps: int
-    p95_latency_ms: int
-    freshness_minutes: int
-    hallucination_tolerance: str  # "high", "medium", "low", "zero"
-    multi_tenant: bool
-    compliance: list[str]  # ["HIPAA", "SOC2", "GDPR"]
-    monthly_budget: int
+  // Vector DB
+  if (req.docCount < 1_000) {
+    arch.vector_db = "In-memory FAISS or ChromaDB";
+  } else if (req.docCount < 1_000_000) {
+    arch.vector_db = "Managed Qdrant Cloud or Pinecone";
+  } else {
+    arch.vector_db = "Distributed Qdrant/Milvus cluster";
+  }
 
+  // Ingestion
+  if (req.freshnessMinutes > 1440) {  // > 1 day
+    arch.ingestion = "Daily batch cron";
+  } else if (req.freshnessMinutes > 60) {
+    arch.ingestion = "Event-driven (webhook → queue → worker)";
+  } else {
+    arch.ingestion = "Streaming (Kafka → consumer → embed → index)";
+  }
 
-def recommend_architecture(req: RAGRequirements) -> dict[str, str]:
-    """Map requirements to architecture recommendations."""
-    arch: dict[str, str] = {}
+  // LLM
+  if (req.compliance.includes("HIPAA")) {
+    arch.llm = "Azure OpenAI (with BAA) or self-hosted (vLLM)";
+    arch.embeddings = "Self-hosted sentence-transformers";
+  } else if (req.monthlyBudget < 1000) {
+    arch.llm = "gpt-4o-mini or claude-3.5-haiku";
+    arch.embeddings = "text-embedding-3-small";
+  } else {
+    arch.llm = "gpt-4o or claude-sonnet";
+    arch.embeddings = "text-embedding-3-large";
+  }
 
-    # Vector DB
-    if req.doc_count < 1_000:
-        arch["vector_db"] = "In-memory FAISS or ChromaDB"
-    elif req.doc_count < 1_000_000:
-        arch["vector_db"] = "Managed Qdrant Cloud or Pinecone"
-    else:
-        arch["vector_db"] = "Distributed Qdrant/Milvus cluster"
+  // Caching
+  if (req.peakQps > 50) {
+    arch.caching = "Redis cache for frequent queries + LLM responses";
+  } else {
+    arch.caching = "Optional — in-memory LRU may suffice";
+  }
 
-    # Ingestion
-    if req.freshness_minutes > 1440:  # > 1 day
-        arch["ingestion"] = "Daily batch cron"
-    elif req.freshness_minutes > 60:
-        arch["ingestion"] = "Event-driven (webhook → queue → worker)"
-    else:
-        arch["ingestion"] = "Streaming (Kafka → consumer → embed → index)"
+  // Search strategy
+  if (req.hallucinationTolerance === "low" || req.hallucinationTolerance === "zero") {
+    arch.search = "Hybrid (BM25 + dense) + cross-encoder reranking";
+  } else {
+    arch.search = "Dense vector search, reranking optional";
+  }
 
-    # LLM
-    if "HIPAA" in req.compliance:
-        arch["llm"] = "Azure OpenAI (with BAA) or self-hosted (vLLM)"
-        arch["embeddings"] = "Self-hosted sentence-transformers"
-    elif req.monthly_budget < 1000:
-        arch["llm"] = "gpt-4o-mini or claude-3.5-haiku"
-        arch["embeddings"] = "text-embedding-3-small"
-    else:
-        arch["llm"] = "gpt-4o or claude-sonnet"
-        arch["embeddings"] = "text-embedding-3-large"
+  // Security
+  if (req.multiTenant) {
+    arch.security = "Tenant ID on every chunk, query-time metadata filter";
+  } else {
+    arch.security = "Standard auth, no per-doc filtering";
+  }
 
-    # Caching
-    if req.peak_qps > 50:
-        arch["caching"] = "Redis cache for frequent queries + LLM responses"
-    else:
-        arch["caching"] = "Optional — in-memory LRU may suffice"
+  return arch;
+}
 
-    # Search strategy
-    if req.hallucination_tolerance in ("low", "zero"):
-        arch["search"] = "Hybrid (BM25 + dense) + cross-encoder reranking"
-    else:
-        arch["search"] = "Dense vector search, reranking optional"
+// Example: Enterprise KB
+const enterprise: RAGRequirements = {
+  docCount: 25_000,
+  totalTokens: 50_000_000,
+  queriesPerDay: 1_000,
+  peakQps: 5,
+  p95LatencyMs: 4000,
+  freshnessMinutes: 60,
+  hallucinationTolerance: "low",
+  multiTenant: false,
+  compliance: ["SOC2"],
+  monthlyBudget: 2000,
+};
 
-    # Security
-    if req.multi_tenant:
-        arch["security"] = "Tenant ID on every chunk, query-time metadata filter"
-    else:
-        arch["security"] = "Standard auth, no per-doc filtering"
-
-    return arch
-
-
-# Example: Enterprise KB
-enterprise = RAGRequirements(
-    doc_count=25_000,
-    total_tokens=50_000_000,
-    queries_per_day=1_000,
-    peak_qps=5,
-    p95_latency_ms=4000,
-    freshness_minutes=60,
-    hallucination_tolerance="low",
-    multi_tenant=False,
-    compliance=["SOC2"],
-    monthly_budget=2000,
-)
-
-print("Enterprise KB Architecture:")
-for component, recommendation in recommend_architecture(enterprise).items():
-    print(f"  {component}: {recommendation}")
+console.log("Enterprise KB Architecture:");
+for (const [component, recommendation] of Object.entries(recommendArchitecture(enterprise))) {
+  console.log(`  ${component}: ${recommendation}`);
+}
 ```
 
 ## 💥 Where It Bites (Production Lens)

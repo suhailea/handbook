@@ -48,78 +48,90 @@ Batch Ingestion
                                    └───────────┘
 ```
 
-```python
-# run: python batch_ingestion.py
-# Conceptual batch ingestion pipeline
+```typescript
+// run: npx tsx batch_ingestion.ts
+// Conceptual batch ingestion pipeline
 
-import hashlib
-from datetime import datetime, timezone
-from pathlib import Path
-from dataclasses import dataclass
+import { createHash } from "node:crypto";
+import { readdir, readFile, stat } from "node:fs/promises";
+import { join, resolve } from "node:path";
 
+interface Document {
+  id: string;
+  content: string;
+  source: string;
+  contentHash: string;
+  lastModified: Date;
+}
 
-@dataclass
-class Document:
-    id: str
-    content: str
-    source: str
-    content_hash: str
-    last_modified: datetime
+interface Chunk {
+  text: string;
+}
 
+function computeHash(content: string): string {
+  /** Content hash for deduplication and change detection. */
+  return createHash("sha256").update(content).digest("hex");
+}
 
-def compute_hash(content: str) -> str:
-    """Content hash for deduplication and change detection."""
-    return hashlib.sha256(content.encode()).hexdigest()
+async function batchIngest(
+  sourceDir: string,
+  vectorDb: any,   // your vector DB client
+  embedder: (texts: string[]) => Promise<number[][]>,
+  chunker: (content: string, metadata: Record<string, string>) => Chunk[],
+): Promise<{ processed: number; skipped: number; errors: number }> {
+  /** Full batch ingestion with change detection. */
+  const stats = { processed: 0, skipped: 0, errors: 0 };
 
+  async function walkDir(dir: string): Promise<string[]> {
+    const entries = await readdir(dir, { withFileTypes: true });
+    const files: string[] = [];
+    for (const entry of entries) {
+      const fullPath = join(dir, entry.name);
+      if (entry.isDirectory()) files.push(...await walkDir(fullPath));
+      else files.push(fullPath);
+    }
+    return files;
+  }
 
-def batch_ingest(
-    source_dir: Path,
-    vector_db,  # your vector DB client
-    embedder,   # your embedding function
-    chunker,    # your chunking function
-) -> dict[str, int]:
-    """Full batch ingestion with change detection."""
-    stats = {"processed": 0, "skipped": 0, "errors": 0}
+  const filePaths = await walkDir(resolve(sourceDir));
 
-    for file_path in source_dir.rglob("*"):
-        if not file_path.is_file():
-            continue
+  for (const filePath of filePaths) {
+    try {
+      const content = await readFile(filePath, "utf-8");
+      const contentHash = computeHash(content);
 
-        try:
-            content = file_path.read_text()
-            content_hash = compute_hash(content)
+      // Skip if already indexed with same hash
+      const existing = await vectorDb.getBySource(filePath);
+      if (existing && existing.contentHash === contentHash) {
+        stats.skipped += 1;
+        continue;
+      }
 
-            # Skip if already indexed with same hash
-            existing = vector_db.get_by_source(str(file_path))
-            if existing and existing.content_hash == content_hash:
-                stats["skipped"] += 1
-                continue
+      // Parse → Chunk → Embed → Upsert
+      const chunks = chunker(content, { source: filePath });
+      const embeddings = await embedder(chunks.map((c) => c.text));
 
-            # Parse → Chunk → Embed → Upsert
-            chunks = chunker(content, metadata={"source": str(file_path)})
-            embeddings = embedder([c.text for c in chunks])
+      await vectorDb.upsert({
+        ids: chunks.map((_, i) => `${filePath}::${i}`),
+        embeddings,
+        documents: chunks.map((c) => c.text),
+        metadatas: chunks.map((_, i) => ({
+          source: filePath,
+          chunk_index: i,
+          content_hash: contentHash,
+          ingested_at: new Date().toISOString(),
+        })),
+      });
+      stats.processed += 1;
 
-            vector_db.upsert(
-                ids=[f"{file_path}::{i}" for i in range(len(chunks))],
-                embeddings=embeddings,
-                documents=[c.text for c in chunks],
-                metadatas=[
-                    {
-                        "source": str(file_path),
-                        "chunk_index": i,
-                        "content_hash": content_hash,
-                        "ingested_at": datetime.now(timezone.utc).isoformat(),
-                    }
-                    for i in range(len(chunks))
-                ],
-            )
-            stats["processed"] += 1
+    } catch (e) {
+      console.error(`Error processing ${filePath}: ${e}`);
+      stats.errors += 1;
+    }
+  }
 
-        except Exception as e:
-            print(f"Error processing {file_path}: {e}")
-            stats["errors"] += 1
-
-    return stats
+  return stats;
+}
 ```
 
 **When to use:** Corpus changes slowly (daily or less), full re-index is acceptable, simplicity is preferred over freshness.
@@ -147,79 +159,86 @@ Incremental Ingestion
                            chunks    + upsert  from index
 ```
 
-```python
-# run: python incremental_ingestion.py
+```typescript
+// run: npx tsx incremental_ingestion.ts
 
-from datetime import datetime, timezone
-from dataclasses import dataclass
+interface ChangeSet {
+  added: string[];      // new document IDs
+  modified: string[];   // changed document IDs
+  deleted: string[];    // removed document IDs
+}
 
+interface Chunk {
+  text: string;
+}
 
-@dataclass
-class ChangeSet:
-    added: list[str]      # new document IDs
-    modified: list[str]   # changed document IDs
-    deleted: list[str]    # removed document IDs
+function detectChanges(
+  source: any,
+  lastSyncTimestamp: Date,
+): ChangeSet {
+  /** Detect what changed since last sync. */
+  // Option 1: Use source API's change feed
+  // (Confluence, Google Drive, SharePoint all have delta APIs)
+  const changes = source.getChangesSince(lastSyncTimestamp);
 
+  // Option 2: Compare content hashes
+  // const currentHashes = new Map(source.listAll().map(doc => [doc.id, hash(doc)]));
+  // const indexedHashes = vectorDb.getAllHashes();
+  // const added = [...currentHashes.keys()].filter(id => !indexedHashes.has(id));
+  // const deleted = [...indexedHashes.keys()].filter(id => !currentHashes.has(id));
+  // const modified = [...currentHashes.keys()].filter(id =>
+  //   indexedHashes.has(id) && currentHashes.get(id) !== indexedHashes.get(id));
 
-def detect_changes(
-    source,
-    last_sync_timestamp: datetime,
-) -> ChangeSet:
-    """Detect what changed since last sync."""
-    # Option 1: Use source API's change feed
-    # (Confluence, Google Drive, SharePoint all have delta APIs)
-    changes = source.get_changes_since(last_sync_timestamp)
+  return {
+    added: changes.createdIds,
+    modified: changes.updatedIds,
+    deleted: changes.deletedIds,
+  };
+}
 
-    # Option 2: Compare content hashes
-    # current_hashes = {doc.id: hash(doc) for doc in source.list_all()}
-    # indexed_hashes = vector_db.get_all_hashes()
-    # added = set(current_hashes) - set(indexed_hashes)
-    # deleted = set(indexed_hashes) - set(current_hashes)
-    # modified = {id for id in current_hashes & indexed_hashes
-    #             if current_hashes[id] != indexed_hashes[id]}
+async function incrementalIngest(
+  source: any,
+  vectorDb: any,
+  embedder: (texts: string[]) => Promise<number[][]>,
+  chunker: (content: string) => Chunk[],
+): Promise<{ added: number; modified: number; deleted: number }> {
+  /** Process only changed documents. */
+  const lastSync = await vectorDb.getMetadata("last_sync_timestamp");
+  const changes = detectChanges(source, lastSync);
 
-    return ChangeSet(
-        added=changes.created_ids,
-        modified=changes.updated_ids,
-        deleted=changes.deleted_ids,
-    )
+  // Process additions and modifications (same logic)
+  for (const docId of [...changes.added, ...changes.modified]) {
+    const doc = await source.getDocument(docId);
+    // Delete old chunks for this doc (if modified)
+    await vectorDb.delete({ filter: { source_doc_id: docId } });
+    // Re-chunk, re-embed, insert
+    const chunks = chunker(doc.content);
+    const embeddings = await embedder(chunks.map((c) => c.text));
+    await vectorDb.upsert({
+      ids: chunks.map((_, i) => `${docId}::${i}`),
+      embeddings,
+      documents: chunks.map((c) => c.text),
+      metadatas: chunks.map(() => ({ source_doc_id: docId })),
+    });
+  }
 
+  // Process deletions
+  for (const docId of changes.deleted) {
+    await vectorDb.delete({ filter: { source_doc_id: docId } });
+  }
 
-def incremental_ingest(source, vector_db, embedder, chunker):
-    """Process only changed documents."""
-    last_sync = vector_db.get_metadata("last_sync_timestamp")
-    changes = detect_changes(source, last_sync)
+  // Update sync timestamp
+  await vectorDb.setMetadata(
+    "last_sync_timestamp",
+    new Date().toISOString(),
+  );
 
-    # Process additions and modifications (same logic)
-    for doc_id in changes.added + changes.modified:
-        doc = source.get_document(doc_id)
-        # Delete old chunks for this doc (if modified)
-        vector_db.delete(filter={"source_doc_id": doc_id})
-        # Re-chunk, re-embed, insert
-        chunks = chunker(doc.content)
-        embeddings = embedder([c.text for c in chunks])
-        vector_db.upsert(
-            ids=[f"{doc_id}::{i}" for i in range(len(chunks))],
-            embeddings=embeddings,
-            documents=[c.text for c in chunks],
-            metadatas=[{"source_doc_id": doc_id} for _ in chunks],
-        )
-
-    # Process deletions
-    for doc_id in changes.deleted:
-        vector_db.delete(filter={"source_doc_id": doc_id})
-
-    # Update sync timestamp
-    vector_db.set_metadata(
-        "last_sync_timestamp",
-        datetime.now(timezone.utc).isoformat(),
-    )
-
-    return {
-        "added": len(changes.added),
-        "modified": len(changes.modified),
-        "deleted": len(changes.deleted),
-    }
+  return {
+    added: changes.added.length,
+    modified: changes.modified.length,
+    deleted: changes.deleted.length,
+  };
+}
 ```
 
 ### Pattern 3: Event-Driven Ingestion
@@ -242,105 +261,116 @@ Event-Driven Ingestion
 
 This is the production baseline for most RAG systems. The queue decouples event producers from processing, provides backpressure, and enables retries.
 
-```python
-# run: uvicorn ingestion_api:app --reload
-# Requires: pip install fastapi celery redis
+```typescript
+// run: npx tsx ingestion_api.ts
+// Requires: npm install bullmq ioredis express multer
 
-from fastapi import FastAPI, UploadFile, BackgroundTasks
-from celery import Celery
-import hashlib
+import { createHash } from "node:crypto";
+import { Queue, Worker, Job } from "bullmq";
+import express from "express";
+import multer from "multer";
 
-app = FastAPI()
+const app = express();
+const upload = multer({ storage: multer.memoryStorage() });
 
-# Celery for async task processing
-celery_app = Celery(
-    "ingestion",
-    broker="redis://localhost:6379/0",
-    backend="redis://localhost:6379/1",
-)
+// BullMQ for async task processing
+const ingestionQueue = new Queue("ingestion", {
+  connection: { host: "localhost", port: 6379 },
+});
 
+// Worker: processes documents from the queue
+const worker = new Worker(
+  "ingestion",
+  async (job: Job<{ docId: string; s3Path: string; contentHash: string }>) => {
+    const { docId, s3Path, contentHash } = job.data;
 
-@celery_app.task(
-    bind=True,
-    max_retries=3,
-    default_retry_delay=60,  # 60s between retries
-    acks_late=True,          # acknowledge after processing (at-least-once)
-)
-def process_document(self, doc_id: str, s3_path: str, content_hash: str):
-    """Async document processing task."""
-    try:
-        # 1. Download from S3
-        content = download_from_s3(s3_path)
+    // 1. Download from S3
+    const content = await downloadFromS3(s3Path);
 
-        # 2. Verify hash (idempotency check)
-        actual_hash = hashlib.sha256(content.encode()).hexdigest()
-        if actual_hash != content_hash:
-            raise ValueError("Content hash mismatch — file changed during processing")
-
-        # 3. Check if already processed (dedup)
-        existing = vector_db.get_by_hash(content_hash)
-        if existing:
-            return {"status": "skipped", "reason": "already_indexed"}
-
-        # 4. Parse based on file type
-        parsed = parse_document(content, s3_path)
-
-        # 5. Chunk
-        chunks = chunk_document(parsed)
-
-        # 6. Embed
-        embeddings = embed_chunks([c.text for c in chunks])
-
-        # 7. Upsert to vector DB
-        vector_db.upsert(
-            ids=[f"{doc_id}::{i}" for i in range(len(chunks))],
-            embeddings=embeddings,
-            documents=[c.text for c in chunks],
-            metadatas=[{
-                "doc_id": doc_id,
-                "s3_path": s3_path,
-                "content_hash": content_hash,
-                "chunk_index": i,
-            } for i in range(len(chunks))],
-        )
-
-        return {"status": "success", "chunks": len(chunks)}
-
-    except Exception as exc:
-        # Retry with exponential backoff
-        raise self.retry(exc=exc, countdown=60 * (2 ** self.request.retries))
-
-
-@app.post("/ingest")
-async def ingest_document(file: UploadFile):
-    """API endpoint that queues document for async processing."""
-    content = await file.read()
-    content_hash = hashlib.sha256(content).hexdigest()
-    doc_id = f"doc-{content_hash[:12]}"
-
-    # Upload to S3 (durable storage before processing)
-    s3_path = f"ingestion/{doc_id}/{file.filename}"
-    upload_to_s3(content, s3_path)
-
-    # Queue the processing task
-    task = process_document.delay(doc_id, s3_path, content_hash)
-
-    return {
-        "doc_id": doc_id,
-        "task_id": task.id,
-        "status": "queued",
+    // 2. Verify hash (idempotency check)
+    const actualHash = createHash("sha256").update(content).digest("hex");
+    if (actualHash !== contentHash) {
+      throw new Error("Content hash mismatch — file changed during processing");
     }
 
-
-@app.get("/ingest/{task_id}/status")
-async def get_ingestion_status(task_id: str):
-    """Check processing status."""
-    result = celery_app.AsyncResult(task_id)
-    return {
-        "task_id": task_id,
-        "status": result.status,
-        "result": result.result if result.ready() else None,
+    // 3. Check if already processed (dedup)
+    const existing = await vectorDb.getByHash(contentHash);
+    if (existing) {
+      return { status: "skipped", reason: "already_indexed" };
     }
+
+    // 4. Parse based on file type
+    const parsed = parseDocument(content, s3Path);
+
+    // 5. Chunk
+    const chunks = chunkDocument(parsed);
+
+    // 6. Embed
+    const embeddings = await embedChunks(chunks.map((c) => c.text));
+
+    // 7. Upsert to vector DB
+    await vectorDb.upsert({
+      ids: chunks.map((_, i) => `${docId}::${i}`),
+      embeddings,
+      documents: chunks.map((c) => c.text),
+      metadatas: chunks.map((_, i) => ({
+        doc_id: docId,
+        s3_path: s3Path,
+        content_hash: contentHash,
+        chunk_index: i,
+      })),
+    });
+
+    return { status: "success", chunks: chunks.length };
+  },
+  {
+    connection: { host: "localhost", port: 6379 },
+    concurrency: 5,
+  },
+);
+
+// Configure retries with exponential backoff
+worker.on("failed", (job, err) => {
+  console.error(`Job ${job?.id} failed: ${err.message}`);
+});
+
+app.post("/ingest", upload.single("file"), async (req, res) => {
+  /** API endpoint that queues document for async processing. */
+  const file = req.file!;
+  const contentHash = createHash("sha256").update(file.buffer).digest("hex");
+  const docId = `doc-${contentHash.slice(0, 12)}`;
+
+  // Upload to S3 (durable storage before processing)
+  const s3Path = `ingestion/${docId}/${file.originalname}`;
+  await uploadToS3(file.buffer, s3Path);
+
+  // Queue the processing task
+  const job = await ingestionQueue.add("process_document", {
+    docId,
+    s3Path,
+    contentHash,
+  }, {
+    attempts: 4,
+    backoff: { type: "exponential", delay: 60_000 },
+  });
+
+  res.json({ doc_id: docId, task_id: job.id, status: "queued" });
+});
+
+app.get("/ingest/:taskId/status", async (req, res) => {
+  /** Check processing status. */
+  const job = await ingestionQueue.getJob(req.params.taskId);
+  if (!job) return res.status(404).json({ error: "Job not found" });
+
+  const state = await job.getState();
+  res.json({
+    task_id: job.id,
+    status: state,
+    result: state === "completed" ? job.returnvalue : null,
+  });
+});
+
+app.listen(3000, () => console.log("Ingestion API on :3000"));
 ```
 
 ### Pattern 4: Streaming Ingestion
@@ -467,31 +497,31 @@ Synchronous ingestion (user uploads → wait → response) breaks in production:
 | **Cost** | API server holds connection open, wasting compute | API server responds immediately, workers scale independently |
 | **Observability** | Failure logged as HTTP error somewhere | Job status trackable, DLQ inspectable, metrics per stage |
 
-```python
-# WRONG: Synchronous ingestion in the API handler
-@app.post("/upload")
-async def upload_sync(file: UploadFile):
-    content = await file.read()
-    chunks = chunk(parse(content))         # Could take 30s for large PDF
-    embeddings = embed(chunks)              # Could fail (rate limit)
-    vector_db.upsert(embeddings)            # Could be slow
-    return {"status": "indexed"}            # User waited for all of this
+```typescript
+// WRONG: Synchronous ingestion in the API handler
+app.post("/upload", upload.single("file"), async (req, res) => {
+  const content = req.file!.buffer;
+  const chunks = chunk(parse(content));         // Could take 30s for large PDF
+  const embeddings = await embed(chunks);       // Could fail (rate limit)
+  await vectorDb.upsert(embeddings);            // Could be slow
+  res.json({ status: "indexed" });              // User waited for all of this
+});
 
 
-# RIGHT: Async ingestion with queue
-@app.post("/upload")
-async def upload_async(file: UploadFile):
-    content = await file.read()
-    s3_path = upload_to_s3(content)         # Durable storage first
-    task_id = queue.enqueue(                # Queue for async processing
-        "process_document",
-        s3_path=s3_path,
-    )
-    return {                                # Respond immediately
-        "task_id": task_id,
-        "status": "queued",
-        "status_url": f"/tasks/{task_id}",
-    }
+// RIGHT: Async ingestion with queue
+app.post("/upload", upload.single("file"), async (req, res) => {
+  const content = req.file!.buffer;
+  const s3Path = await uploadToS3(content);     // Durable storage first
+  const job = await queue.add(                  // Queue for async processing
+    "process_document",
+    { s3Path },
+  );
+  res.json({                                    // Respond immediately
+    task_id: job.id,
+    status: "queued",
+    status_url: `/tasks/${job.id}`,
+  });
+});
 ```
 
 ### Scaling Ingestion Workers
@@ -504,37 +534,47 @@ async def upload_async(file: UploadFile):
 | **Parallel parsing** | Parsing (especially OCR) is slow | Process multiple documents concurrently |
 | **Rate limiting** | Embedding API has rate limits | Token bucket on the worker side |
 
-```python
-# Batched embedding for throughput
-# Instead of embedding one chunk at a time:
+```typescript
+// run: npx tsx embed_in_batches.ts
+// Batched embedding for throughput
+// Instead of embedding one chunk at a time:
 
-import asyncio
-from itertools import batched  # Python 3.12+
+async function embedInBatches(
+  chunks: string[],
+  batchSize = 100,
+  maxConcurrent = 5,
+): Promise<number[][]> {
+  /** Embed chunks in batches with concurrency control. */
+  const allEmbeddings: number[][] = [];
 
+  // Split into batches
+  const batches: string[][] = [];
+  for (let i = 0; i < chunks.length; i += batchSize) {
+    batches.push(chunks.slice(i, i + batchSize));
+  }
 
-async def embed_in_batches(
-    chunks: list[str],
-    batch_size: int = 100,
-    max_concurrent: int = 5,
-) -> list[list[float]]:
-    """Embed chunks in batches with concurrency control."""
-    semaphore = asyncio.Semaphore(max_concurrent)
-    all_embeddings: list[list[float]] = []
+  // Process with concurrency limit
+  let running = 0;
+  let index = 0;
 
-    async def embed_batch(batch: tuple[str, ...]) -> list[list[float]]:
-        async with semaphore:
-            return await embedding_api.embed(list(batch))
+  async function processBatch(batch: string[]): Promise<number[][]> {
+    return embeddingApi.embed(batch);
+  }
 
-    tasks = [
-        embed_batch(batch)
-        for batch in batched(chunks, batch_size)
-    ]
+  // Simple semaphore-based concurrency control
+  const results: number[][][] = [];
+  for (let i = 0; i < batches.length; i += maxConcurrent) {
+    const slice = batches.slice(i, i + maxConcurrent);
+    const batchResults = await Promise.all(slice.map(processBatch));
+    results.push(...batchResults);
+  }
 
-    results = await asyncio.gather(*tasks)
-    for batch_result in results:
-        all_embeddings.extend(batch_result)
+  for (const batchResult of results) {
+    allEmbeddings.push(...batchResult);
+  }
 
-    return all_embeddings
+  return allEmbeddings;
+}
 ```
 
 ## 💥 Where It Bites (Production Lens)

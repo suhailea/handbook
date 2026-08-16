@@ -7,6 +7,8 @@ outline: deep
 
 Interview weight: 🔥🔥 | Prerequisites: [Case Studies](01-case-studies.md), [Modules 1--17](../index.md) | Stack: Python, FastAPI, PostgreSQL + pgvector, Redis, LangChain/LangGraph, Docker
 
+This reference implementation uses the Python/FastAPI stack — the dominant choice for RAG backends. For the TypeScript equivalent, substitute NestJS or Next.js API routes, pgvector via `pgvector` npm package, and BullMQ for queue processing.
+
 ## 🗣️ In Plain English
 
 ::: tip In Plain English
