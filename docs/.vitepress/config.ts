@@ -27,6 +27,7 @@ export default withMermaid(defineConfig({
       { text: 'System Design', link: '/system-design/', activeMatch: '/system-design/' },
       { text: 'Python', link: '/python/', activeMatch: '/python/' },
       { text: 'RAG', link: '/rag/', activeMatch: '/rag/' },
+      { text: 'AI Engineering', link: '/ai-engineering/', activeMatch: '/ai-engineering/' },
       { text: 'Interview Prep', link: '/interview/', activeMatch: '/interview/' },
     ],
 
@@ -736,6 +737,75 @@ export default withMermaid(defineConfig({
             { text: '100 RAG Interview Questions', link: '/rag/questions' },
             { text: 'Interview Answer Framework', link: '/rag/interview-framework' },
             { text: 'RAG Crash Sheet', link: '/rag/crash-sheet' },
+          ],
+        },
+      ],
+
+      // ── Track 8: AI Engineering ──
+      '/ai-engineering/': [
+        {
+          text: 'AI Engineering',
+          items: [{ text: 'Overview', link: '/ai-engineering/' }],
+        },
+        {
+          text: 'Module 1 — LLMs & Prompting',
+          collapsed: false,
+          items: [
+            { text: 'Overview', link: '/ai-engineering/module-01/' },
+            { text: '1.1 LLMs & Tokens', link: '/ai-engineering/module-01/01-llms-and-tokens' },
+            { text: '1.2 Prompt Engineering', link: '/ai-engineering/module-01/02-prompt-engineering' },
+            { text: '1.3 Context Engineering', link: '/ai-engineering/module-01/03-context-engineering' },
+            { text: 'Summary', link: '/ai-engineering/module-01/summary' },
+          ],
+        },
+        {
+          text: 'Module 2 — Agents',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/ai-engineering/module-02/' },
+            { text: '2.1 The Agent Loop', link: '/ai-engineering/module-02/01-agent-loop' },
+            { text: '2.2 Tools & Tool Calling', link: '/ai-engineering/module-02/02-tools-and-tool-calling' },
+            { text: '2.3 Agent Memory', link: '/ai-engineering/module-02/03-agent-memory' },
+            { text: '2.4 Planning & Reflection', link: '/ai-engineering/module-02/04-planning-and-reflection' },
+            { text: '2.5 The Agent Harness', link: '/ai-engineering/module-02/05-agent-harness' },
+            { text: '2.6 Multi-Agent Systems', link: '/ai-engineering/module-02/06-multi-agent' },
+            { text: '2.7 MCP', link: '/ai-engineering/module-02/07-mcp' },
+            { text: 'Summary', link: '/ai-engineering/module-02/summary' },
+          ],
+        },
+        {
+          text: 'Module 3 — Model Serving',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/ai-engineering/module-03/' },
+            { text: '3.1 Cloud vs Local vs Self-Hosted', link: '/ai-engineering/module-03/01-model-serving-overview' },
+            { text: '3.2 GGUF & Local LLMs', link: '/ai-engineering/module-03/02-gguf-and-local-llms' },
+            { text: '3.3 vLLM', link: '/ai-engineering/module-03/03-vllm' },
+            { text: '3.4 KV Cache', link: '/ai-engineering/module-03/04-kv-cache' },
+            { text: '3.5 Quantization', link: '/ai-engineering/module-03/05-quantization' },
+            { text: 'Summary', link: '/ai-engineering/module-03/summary' },
+          ],
+        },
+        {
+          text: 'Module 4 — Fine-Tuning',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/ai-engineering/module-04/' },
+            { text: '4.1 Fine-Tuning Overview', link: '/ai-engineering/module-04/01-fine-tuning-overview' },
+            { text: '4.2 LoRA & QLoRA', link: '/ai-engineering/module-04/02-lora-qlora' },
+            { text: '4.3 When to Fine-Tune', link: '/ai-engineering/module-04/03-when-to-fine-tune' },
+            { text: 'Summary', link: '/ai-engineering/module-04/summary' },
+          ],
+        },
+        {
+          text: 'Module 5 — Production',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/ai-engineering/module-05/' },
+            { text: '5.1 Agent Observability', link: '/ai-engineering/module-05/01-agent-observability' },
+            { text: '5.2 Agent Evaluation', link: '/ai-engineering/module-05/02-agent-evaluation' },
+            { text: '5.3 Guardrails', link: '/ai-engineering/module-05/03-guardrails' },
+            { text: 'Summary', link: '/ai-engineering/module-05/summary' },
           ],
         },
       ],
