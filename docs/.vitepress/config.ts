@@ -748,6 +748,18 @@ export default withMermaid(defineConfig({
           items: [{ text: 'Overview', link: '/ai-engineering/' }],
         },
         {
+          text: 'Module 0 — ML Foundations',
+          collapsed: false,
+          items: [
+            { text: 'Overview', link: '/ai-engineering/module-00/' },
+            { text: '0.1 How Transformers Work', link: '/ai-engineering/module-00/01-how-transformers-work' },
+            { text: '0.2 Training vs Inference', link: '/ai-engineering/module-00/02-training-vs-inference' },
+            { text: '0.3 Embeddings', link: '/ai-engineering/module-00/03-embeddings' },
+            { text: '0.4 RLHF & Alignment', link: '/ai-engineering/module-00/04-rlhf' },
+            { text: 'Summary', link: '/ai-engineering/module-00/summary' },
+          ],
+        },
+        {
           text: 'Module 1 — LLMs & Prompting',
           collapsed: false,
           items: [
