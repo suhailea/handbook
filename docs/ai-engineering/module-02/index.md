@@ -20,4 +20,5 @@ That turns a simple chatbot into an agent.
 5. [The Agent Harness — The Runtime Around Your Agent](./05-agent-harness) — what manages the loop
 6. [Multi-Agent Systems — When One Agent Isn't Enough](./06-multi-agent) — orchestrators and specialists
 7. [MCP — Model Context Protocol](./07-mcp) — a standard for tool connectivity
-8. [Summary](./summary) — 6 mental models to take forward
+8. [A2A — Agent-to-Agent Protocol](./08-a2a) — how agents talk to other agents
+9. [Summary](./summary) — 6 mental models to take forward

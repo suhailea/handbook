@@ -20,4 +20,5 @@ This module covers those decisions.
 3. [vLLM — High-Throughput Model Serving](./03-vllm) — production inference for multiple users
 4. [KV Cache — Why Inference Is Expensive (and How to Cheat)](./04-kv-cache) — prompt caching, cost reduction
 5. [Quantization — Making Models Smaller Without Breaking Them](./05-quantization) — FP16, INT8, INT4
-6. [Summary](./summary) — 5 mental models to take forward
+6. [Semantic Caching — Caching by Meaning, Not by Text](./06-semantic-caching) — skip the LLM entirely for repeated questions
+7. [Summary](./summary) — 5 mental models to take forward
