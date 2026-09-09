@@ -5,24 +5,34 @@ outline: deep
 
 # AI Engineering
 
-We're building **TaskFlow's customer support agent** — together, from scratch.
+This track covers the full spectrum of AI engineering — from the mathematical foundations of machine learning through production LLM systems, infrastructure, security, and domain-specific AI in energy trading.
 
-By the end of this track you will have hit every real decision an AI engineer faces: choosing a model, writing prompts that don't hallucinate, giving the agent tools to look up real data, making it remember past conversations, deciding whether to fine-tune or just prompt better, running it without sending customer data to a third party, and knowing when it breaks.
+It is split into two arcs:
 
-This isn't a survey of AI concepts. It's the story of building one thing, and learning why each piece exists.
+**Arc 1 — Building AI Systems (Modules 0–5):** Start here if you want to build LLM-powered products. We build **TaskFlow's customer support agent** from scratch, hitting every real decision an AI engineer faces: choosing a model, writing prompts that don't hallucinate, giving the agent tools and memory, running it without sending customer data to a third party, and knowing when it breaks.
+
+**Arc 2 — Engineering Depth (Modules 6–12):** Go deeper into the foundations and production concerns that separate senior AI engineers from prompt engineers. Covers ML fundamentals, deep learning, enterprise architecture, LLMOps, cloud infrastructure, security, and domain-specific AI.
 
 ## Who this is for
 
 Backend engineers who can already build APIs and want to understand how to build AI systems that actually work in production — not just demos.
 
-## The 5 Modules
+## All 13 Modules
 
-| Module | What we're solving |
-|--------|--------------------|
-| [Module 1 — LLMs & Prompting](/ai-engineering/module-01/) | What are we actually calling? How does prompting work? |
-| [Module 2 — Agents](/ai-engineering/module-02/) | How do we give the model agency — tools, memory, plans? |
-| [Module 3 — Model Serving](/ai-engineering/module-03/) | What if we can't send data to OpenAI? |
-| [Module 4 — Fine-Tuning](/ai-engineering/module-04/) | When do we need to train the model itself? |
-| [Module 5 — Production](/ai-engineering/module-05/) | Is it working? Is it safe? How do we know? |
+| Module | Arc | What you'll learn |
+|--------|-----|-------------------|
+| [Module 0 — ML Foundations](/ai-engineering/module-00/) | 1 | How Transformers work, training vs inference, embeddings, RLHF |
+| [Module 1 — LLMs & Prompting](/ai-engineering/module-01/) | 1 | What are we actually calling? How does prompting work? |
+| [Module 2 — Agents](/ai-engineering/module-02/) | 1 | Tools, memory, planning, reflection, multi-agent, MCP |
+| [Module 3 — Model Serving](/ai-engineering/module-03/) | 1 | Cloud vs local vs self-hosted; vLLM, KV cache, quantization |
+| [Module 4 — Fine-Tuning](/ai-engineering/module-04/) | 1 | LoRA, QLoRA, when to fine-tune vs prompt |
+| [Module 5 — Production](/ai-engineering/module-05/) | 1 | Observability, evaluation, guardrails |
+| [Module 6 — ML Foundations & Statistics](/ai-engineering/module-06/) | 2 | Supervised/unsupervised, algorithms, statistics, linear algebra, metrics, optimization |
+| [Module 7 — Deep Learning & NLP](/ai-engineering/module-07/) | 2 | Neural networks, CNNs/RNNs/LSTMs, NLP fundamentals |
+| [Module 8 — AI Architecture](/ai-engineering/module-08/) | 2 | System patterns, enterprise AI stack, data architecture |
+| [Module 9 — LLMOps & Evaluation](/ai-engineering/module-09/) | 2 | RAG metrics, production metrics, evaluation pipelines, prompt versioning |
+| [Module 10 — AI Infrastructure & Cloud](/ai-engineering/module-10/) | 2 | Docker, Kubernetes, AKS & Azure OpenAI, GPU infrastructure |
+| [Module 11 — Security & Responsible AI](/ai-engineering/module-11/) | 2 | Prompt injection, agent security, bias, fairness, GDPR |
+| [Module 12 — Energy Trading AI](/ai-engineering/module-12/) | 2 | Energy markets, AI trading architecture, LLM + quant models |
 
-Start with Module 1 and follow the story forward.
+Start with Module 1 and follow Arc 1 end-to-end, then continue into Arc 2 for production depth.

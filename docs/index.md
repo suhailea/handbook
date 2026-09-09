@@ -32,6 +32,9 @@ features:
   - title: Production RAG
     details: 18 modules — from chunking and embeddings to reranking, security, scaling, and 10 full case studies. Production-ready architecture.
     link: /rag/
+  - title: AI Engineering
+    details: 13 modules — ML foundations, deep learning, enterprise AI architecture, LLMOps, GPU infrastructure, security, and domain-specific AI in energy trading.
+    link: /ai-engineering/
   - title: Interview Prep
     details: Crash sheets, a full question bank, and worked design walkthroughs.
     link: /interview/
@@ -48,7 +51,7 @@ Below those, you'll find **Where It Bites** (production failure modes) and **Che
 
 This is not a reference manual and not a beginner tutorial. It's a handbook that gives you both *intuition* and *internals* on the same page.
 
-## The Seven Tracks
+## The Eight Tracks
 
 | Track | Focus | Pages |
 |-------|-------|-------|
@@ -58,4 +61,5 @@ This is not a reference manual and not a beginner tutorial. It's a handbook that
 | [System Design](/system-design/) | Queues, microservices, load balancing, caching, scaling | 14 |
 | [Python](/python/) | 13 modules — CPython internals, data structures, concurrency, type hints, FastAPI | 75 |
 | [Production RAG](/rag/) | 18 modules — end-to-end RAG: ingestion, chunking, retrieval, reranking, security, scaling | 50+ |
+| [AI Engineering](/ai-engineering/) | 13 modules — ML foundations through enterprise AI architecture, LLMOps, GPU infra, security, and energy trading AI | 45+ |
 | [Interview Prep](/interview/) | Crash sheets, question bank, design walkthroughs | 8 |
