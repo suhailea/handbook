@@ -283,4 +283,4 @@ Always present a conservative, base, and optimistic scenario. Never present only
 - [The AI Decision Framework](./01-ai-decision-framework) — deciding whether to build at all
 - [AI Strategy for Engineers](./03-ai-strategy) — the organizational context
 - [LLMOps](../module-09/04-llmops) — the operational pipeline behind these metrics
-- [Agent Evaluation](../module-05/02-agent-evaluation) — evaluation frameworks and golden datasets
+- [Evaluation Pipeline](../module-09/03-evaluation-pipeline) — evaluation frameworks and golden datasets

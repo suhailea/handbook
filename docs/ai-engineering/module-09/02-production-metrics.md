@@ -7,9 +7,7 @@ outline: deep
 
 🔥🔥🔥 Interview weight | Prerequisites: [8.2 Enterprise AI Architecture](../module-08/02-enterprise-ai-architecture)
 
-## 🗣️ In Plain English
-
-::: tip In Plain English
+::: tip Plain English
 Production AI systems fail in ways that are invisible without the right measurements. Your AI might technically return an answer for every request — but if it's taking 30 seconds, costing $5 per conversation, or refusing 20% of legitimate queries, you have serious problems that your uptime dashboard won't tell you.
 
 Traditional web services care about: is it up, is it fast, are there errors? AI systems add three more dimensions.
@@ -25,9 +23,7 @@ Traditional web services care about: is it up, is it fast, are there errors? AI 
 These metrics tell you different things. Latency tells you about speed. Cost tells you about efficiency. Success rate tells you about capability. Quality metrics tell you about accuracy. You need all of them.
 :::
 
-## ⚙️ Under the Hood
-
-### Latency Metrics for AI Systems
+## Latency Metrics for AI Systems
 
 AI latency has more dimensions than traditional API latency:
 
@@ -105,7 +101,7 @@ async function streamWithMetrics(prompt: string): Promise<AILatencyMetrics> {
 | Background agent task | N/A | < 60s |
 | Real-time voice | < 300ms | < 2s |
 
-### Token Usage and Cost Tracking
+## Token Usage and Cost Tracking
 
 ```typescript
 // run: npx tsx token_cost_tracking.ts
@@ -180,7 +176,7 @@ if (cost > MAX_COST_PER_REQUEST) {
 }
 ```
 
-### Error Rate and Success Rate
+## Error Rate and Success Rate
 
 AI systems need two error rate concepts:
 
@@ -238,7 +234,75 @@ function guardrailBlockRate(results: AIRequestResult[]): number {
 }
 ```
 
-### Dashboard Metrics: What to Track
+## Tracing Agent Runs
+
+Latency and cost numbers tell you *that* something went wrong. Traces tell you *what*.
+
+A web API failure is easy: one request, one log line, one stack trace. An agent run is a loop — several LLM calls, several tool calls, decisions branching off each other. When a user says "it gave me wrong advice," an aggregate metric cannot answer the question. You need the run itself.
+
+For every agent run, capture three levels:
+
+**Each LLM call** — input messages (system prompt, history, tool results), the output, model name, input and output token counts, latency, cost.
+
+**Each tool call** — tool name, arguments, return value, latency, success or failure.
+
+**The run overall** — total tokens, total cost, wall-clock latency, loop iterations, final outcome (answered, escalated, failed), and the correlation IDs: user, session, run.
+
+A traced TaskFlow run looks like this:
+
+```
+Run ID: run_abc123   User: user_4821   Session: sess_xyz
+
+Step 1 (LLM call)  — 450ms, 1,200 tokens
+  Input:  [system prompt, user message]
+  Output: tool_call(lookup_ticket, {id: "4821"})
+
+Step 2 (Tool call) — 85ms
+  Tool:   lookup_ticket
+  Args:   {id: "4821"}
+  Result: {status: "open", priority: "high", assigned: null}
+
+Step 3 (LLM call)  — 380ms, 1,400 tokens
+  Input:  [system prompt, user message, tool result]
+  Output: "Your ticket is open and high priority..."
+
+Total: 915ms, 2,600 tokens, $0.004
+```
+
+Without that trace, the complaint is a mystery. With it, you can see exactly what the model received and what it said — and the bug is usually visible on inspection.
+
+Emit each step as a structured event so the trace is queryable, not just readable:
+
+```json
+{
+  "event": "llm_call",
+  "run_id": "run_abc123",
+  "session_id": "sess_xyz",
+  "user_id": "user_4821",
+  "step": 1,
+  "model": "gpt-4o",
+  "input_tokens": 1200,
+  "output_tokens": 45,
+  "latency_ms": 450,
+  "cost_usd": 0.002
+}
+```
+
+Now "show me every run for this user in the last 7 days" and "which runs exceeded 5 seconds" are queries rather than investigations.
+
+## Choosing a tracing stack
+
+| Option | Fits when | Cost |
+|---|---|---|
+| **LangSmith** | You're already in the LangChain/LangGraph ecosystem; want traces, evals and datasets in one place | Hosted; data leaves your infrastructure |
+| **LangFuse** | You want framework-agnostic tracing, or must self-host for privacy | Open source; self-hosting is real ops work |
+| **Custom structured logs** | You have an existing stack (Datadog, Grafana, CloudWatch) and no third-party data allowance | Most setup; zero new data dependencies |
+
+TaskFlow's enterprise tier can't send customer data to third-party tools, so we emit structured JSON into the existing logging pipeline and query it there. For the self-serve tier, a hosted tracer would have been faster to stand up.
+
+The decision is rarely about features. It's about whether prompt and response content is allowed to leave your infrastructure — and that's a compliance answer, not an engineering one.
+
+## Dashboard Metrics: What to Track
 
 ```typescript
 // run: npx tsx dashboard_metrics.ts
@@ -304,7 +368,7 @@ function checkAlerts(metrics: AIMetricsDashboard): string[] {
 }
 ```
 
-### Prompt Cache Hit Rate
+## Prompt Cache Hit Rate
 
 Many LLM providers (OpenAI, Anthropic) cache the prefix of repeated prompts. This reduces latency and cost significantly:
 
@@ -333,8 +397,6 @@ console.log(`Savings per request from prompt cache: $${cachedCostSavings.toFixed
 // At 100K requests/day: 100_000 * cachedCostSavings = significant savings
 ```
 
-## 💥 Where It Bites (Production Lens)
-
 ::: warning Where It Bites
 **TTFT is high because retrieval is synchronous:** A RAG system retrieves documents synchronously before calling the LLM. The user sees nothing for 3 seconds (retrieval: 1.5s + LLM start: 1.5s) before streaming begins. Fix: start the LLM call with a placeholder context as soon as the query arrives, then update it when retrieval completes (requires a more complex orchestration); or parallelize retrieval and prompt construction; or use streaming retrieval if supported by the vector DB.
 
@@ -344,8 +406,6 @@ console.log(`Savings per request from prompt cache: $${cachedCostSavings.toFixed
 
 **Average latency misleads:** Average latency is 2.5 seconds. p99 latency is 45 seconds. 1% of users wait 45+ seconds and abandon. Average looks fine, but 1% of your highest-value users (often enterprise accounts with complex queries) are having a terrible experience. Always monitor percentiles (p50, p95, p99). Alert on p99, not average.
 :::
-
-## 🎯 Checkpoint
 
 ::: details Question 1 — TTFT optimization
 **Q:** Your RAG system has a TTFT of 4 seconds. Describe three architectural changes you could make to reduce it to under 1 second, and what tradeoffs each involves.
@@ -357,6 +417,14 @@ console.log(`Savings per request from prompt cache: $${cachedCostSavings.toFixed
 **Q:** You're managing a multi-tenant AI platform. Tenant A has 10 users and spent $8,000 last month. Tenant B has 200 users and spent $1,200. What does this tell you, and what actions do you take?
 
 **A:** Tenant A averages $800/user/month vs Tenant B's $6/user/month — a 133× difference. Possible causes: (1) Tenant A uses agents with many LLM calls; Tenant B uses simple chatbot. (2) Tenant A sends very long contexts (large document processing); Tenant B sends short queries. (3) Tenant A's prompt is inefficient (redundant system prompt content); Tenant B's is optimized. (4) Tenant A could be misusing the platform (bulk automation). Actions: (a) Break down Tenant A's cost by feature, model, average input tokens per request. (b) If long contexts: audit their system prompt for redundancy; implement prompt compression. (c) If many agent calls: check for inefficient tool loops; increase iteration limits only if legitimate. (d) If bulk automation beyond their tier: throttle and discuss pricing. (e) Set per-tenant monthly budget alerts so you know before month-end. (f) Consider tiered pricing based on token consumption rather than user count for heavy users.
+:::
+
+::: details Question 3 — Debugging a bad answer in production
+**Q:** A user reports that your agent gave them wrong advice yesterday. Walk through how you'd diagnose it.
+
+**A:** With tracing: (1) Find the run by correlation ID, or by user plus time window. (2) Replay the trace and read the *input* to each LLM call — not just the outputs. The failure is usually visible here: a stale tool result, missing context, a truncated history. (3) Check whether the model received what a human would have needed to answer correctly. If it didn't, the bug is in your context assembly, not the model. (4) Inspect tool call arguments and returns — a tool that returned plausible-but-wrong data produces a confident wrong answer, and the model is not at fault. (5) If context and tools both look right, re-run the identical input manually. If it reproduces, it's a model reasoning failure and belongs in the golden dataset. If it doesn't reproduce, you have nondeterminism — check temperature and any retrieval that isn't pinned.
+
+Without tracing you're asking the user to reproduce it and guessing at inputs. The distinction between "context bug" and "model bug" is the one that matters most, and it is only observable from the input side of each call.
 :::
 
 ## Key Mental Models

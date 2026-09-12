@@ -7,9 +7,7 @@ outline: deep
 
 🔥🔥🔥 Interview weight | Prerequisites: [9.1 RAG Evaluation Metrics](./01-rag-evaluation-metrics), [9.2 Production Metrics](./02-production-metrics)
 
-## 🗣️ In Plain English
-
-::: tip In Plain English
+::: tip Plain English
 In traditional software, you have unit tests and integration tests. They run on every code change. If a test fails, the deployment is blocked.
 
 In AI systems, the equivalent is an **evaluation pipeline** — but it's much harder to build. Unlike unit tests where the expected output is deterministic, an LLM might give a slightly different answer every run, and both might be correct. You need to judge quality, not just correctness.
@@ -25,9 +23,7 @@ Three concepts form the backbone of AI evaluation:
 Together, these form a pipeline that runs automatically on every change, provides a quality gate before deployment, and monitors degradation in production. Think of it as CI/CD for AI quality.
 :::
 
-## ⚙️ Under the Hood
-
-### Golden Dataset Construction
+## Golden Dataset Construction
 
 A golden dataset is a set of `(input, expected_output, metadata)` tuples that represent the evaluation cases for your system.
 
@@ -108,7 +104,7 @@ print(f"Golden dataset: {len(GOLDEN_DATASET)} examples")
 - Multi-language if your system serves multiple languages
 - Human verification: at least 2 reviewers per example for critical cases
 
-### Automated Evaluation with LLM-as-Judge
+## Automated Evaluation with LLM-as-Judge
 
 ```python
 # run: python evaluation_runner.py
@@ -240,7 +236,7 @@ def run_evaluation_suite(
     }
 ```
 
-### Regression Testing as CI Gate
+## Regression Testing as CI Gate
 
 ```typescript
 // run: npx tsx eval_ci_gate.ts
@@ -293,7 +289,47 @@ async function evaluationGate(
 }
 ```
 
-### Red Teaming
+## Why Agent Evaluation Is Harder Than It Looks
+
+Three properties make agent output resist the measurement techniques that work elsewhere.
+
+**There is usually no ground truth.** "What's a good response to a frustrated customer about a billing error?" has a range of good answers and a range of bad ones, with no single correct string to diff against. Reference-based metrics assume a right answer exists.
+
+**Context changes the verdict.** A response that is ideal for a first-week user is condescending to a power user who knows the product better than the agent does. The same text scores differently depending on who received it.
+
+**Fluency and accuracy are independent.** A hallucinated answer delivered confidently reads better than a correct answer delivered with appropriate hedging. Any metric that rewards surface quality will systematically prefer the hallucination.
+
+This is why agent evaluation uses three techniques together rather than picking one.
+
+## Human Review and Judge Calibration
+
+LLM-as-Judge scales; humans don't. But an uncalibrated judge scales the wrong answer just as efficiently as the right one.
+
+Sample a small fraction of real conversations — TaskFlow uses 2% — and have a human score them on the same rubric the judge uses. This serves two purposes:
+
+**Calibration.** Before trusting a judge at scale, run 100 examples past both it and a human. If they disagree on more than roughly 15–20% of cases, you don't have an evaluation system, you have a second source of noise. Re-check this quarterly; judge behaviour drifts when you change the judge model.
+
+**Catching what automation misses.** Humans notice responses that are technically correct but dismissive, or answers that are accurate while missing the emotional subtext of an angry customer. These never show up in a rubric score, and they are exactly what generates escalations.
+
+## Quality Metrics vs Outcome Metrics
+
+The most common evaluation mistake is measuring only the response, never the result.
+
+| Metric | What it measures | How to get it |
+|---|---|---|
+| Task completion rate | Did the user's problem actually get solved? | Survey, or track whether they return with the same issue |
+| Escalation rate | How often the agent gives up | Log every escalation |
+| Escalation accuracy | When it escalated, was that correct? | Human review of escalated tickets |
+| CSAT | Did the user feel helped? | Post-conversation survey |
+| First-contact resolution | Solved without human follow-up? | Link support tickets to conversations |
+
+TaskFlow's primary metric is first-contact resolution — did the problem get solved without a human. It's tracked weekly, and it's the number that moved when the agent improved.
+
+::: warning Watch out
+Optimizing quality scores without outcome metrics will walk you into a well-measured failure. The agent produces beautifully written, highly rated responses that don't solve anyone's problem, and every dashboard stays green. Always pair a quality metric with an outcome metric that can contradict it.
+:::
+
+## Red Teaming
 
 Red teaming is systematic adversarial testing:
 
@@ -385,7 +421,7 @@ for category, attacks in RED_TEAM_TESTS.items():
             print(f"  Reason: {result['reasoning']}")
 ```
 
-### Tracing for Evaluation
+## Tracing for Evaluation
 
 Every evaluation needs a trace to understand WHY it passed or failed:
 
@@ -440,8 +476,6 @@ async function evaluateWithTrace(
 }
 ```
 
-## 💥 Where It Bites (Production Lens)
-
 ::: warning Where It Bites
 **LLM judge lenient drift:** The same judge LLM is used for evaluation over 6 months. Due to model updates (GPT-4o improved), the judge becomes more lenient — it gives higher scores for the same quality responses. Eval scores appear to improve when they haven't actually changed. Fix: periodically calibrate your judge against human-annotated samples; fix the judge model version to avoid unintended drift; include anchor examples (known-quality responses) in every eval run and check that their scores are stable.
 
@@ -451,8 +485,6 @@ async function evaluateWithTrace(
 
 **Evaluation too slow to run in CI:** The full evaluation suite (500 examples × LLM judge) takes 45 minutes and costs $30 per run. Engineers skip running it. Fix: build a "fast eval" tier (50 critical examples, no LLM judge — just rule-based checks) for every commit; run the full eval on merge to main; use parallel execution to reduce wall time; optimize for the most common failure modes first.
 :::
-
-## 🎯 Checkpoint
 
 ::: details Question 1 — Evaluation pipeline design
 **Q:** Design an evaluation pipeline for an AI agent that processes customer support tickets end-to-end (reads ticket → looks up account → decides action → responds). What metrics do you track and how?
@@ -464,6 +496,14 @@ async function evaluateWithTrace(
 **Q:** You notice that your LLM judge consistently rates shorter, more confident answers higher than longer, more nuanced answers, even when the nuanced answers are more accurate. How do you detect and mitigate this bias?
 
 **A:** Detection: (1) Compute correlation between answer_length and judge_score across 100+ examples — a strong negative correlation indicates length bias. (2) Create paired test cases where you deliberately shorten a good answer and lengthen a bad answer; if the judge preferences flip, there's bias. (3) Measure inter-annotator agreement between LLM judge and human judges on a shared sample; systematically review cases where they disagree most. Mitigation: (1) Update the judge prompt to include explicit instructions: "Do not penalize longer answers for length. Evaluate accuracy and completeness, not brevity." (2) Score dimensions separately (correctness, faithfulness, relevance) rather than overall quality — length bias tends to affect overall holistic scores more than dimension-specific scores. (3) Calibrate on a human-labeled anchor set: adjust score thresholds so that the judge's distribution matches human quality distribution. (4) Use multiple judges (different models/prompts) and average to reduce single-judge idiosyncrasies.
+:::
+
+::: details Question 3 — Is this regression real, or just different?
+**Q:** A new prompt version produces noticeably different agent responses. How do you establish whether it's worse, rather than merely changed?
+
+**A:** Three layers, cheapest first. (1) **Golden dataset** — run both versions against the fixed set. A case the old version passed and the new one fails is a regression, full stop; that's the clearest signal available and it's cheap. (2) **Pairwise judging** — show the judge both responses for the same input and ask which is better, rather than scoring each in isolation. A/B comparison is markedly more reliable than absolute scoring, because the judge no longer has to hold a consistent internal scale across runs. (3) **Shadow deployment** — run both against real traffic without showing users the second output, then compare score distributions after ~1,000 conversations. Real inputs surface failure modes your golden set doesn't contain.
+
+The framing matters: different is not worse, and prompt changes legitimately shift style. What you're looking for is movement in outcome metrics — escalation rate, first-contact resolution — over a week of shadow traffic. That's the closest thing to ground truth available before you commit.
 :::
 
 ## Key Mental Models

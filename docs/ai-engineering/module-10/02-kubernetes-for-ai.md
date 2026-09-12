@@ -494,4 +494,4 @@ data:
 
 - [10.3 AKS and Azure](./03-aks-and-azure) — running these K8s workloads on Azure
 - [10.1 Docker for AI](./01-docker-for-ai) — the containers that run in these pods
-- [Module 5.1 Agent Observability](/ai-engineering/module-05/01-agent-observability) — observability for pods serving AI workloads
+- [Module 9.2 Production Metrics](/ai-engineering/module-09/02-production-metrics) — tracing and metrics for pods serving AI workloads

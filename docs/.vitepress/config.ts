@@ -812,17 +812,6 @@ export default withMermaid(defineConfig({
           ],
         },
         {
-          text: 'Module 5 — Production',
-          collapsed: true,
-          items: [
-            { text: 'Overview', link: '/ai-engineering/module-05/' },
-            { text: '5.1 Agent Observability', link: '/ai-engineering/module-05/01-agent-observability' },
-            { text: '5.2 Agent Evaluation', link: '/ai-engineering/module-05/02-agent-evaluation' },
-            { text: '5.3 Guardrails', link: '/ai-engineering/module-05/03-guardrails' },
-            { text: 'Summary', link: '/ai-engineering/module-05/summary' },
-          ],
-        },
-        {
           text: 'Module 6 — ML Fundamentals & Statistics',
           collapsed: true,
           items: [

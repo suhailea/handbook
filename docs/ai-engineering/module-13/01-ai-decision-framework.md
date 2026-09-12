@@ -199,5 +199,5 @@ Fine-tuning is expensive (data collection, training compute, ongoing maintenance
 
 - [Fine-Tuning Overview](../module-04/01-fine-tuning-overview) — when fine-tuning is actually warranted
 - [AI Metrics & ROI](./02-ai-metrics-roi) — how to measure whether the AI project succeeded
-- [Guardrails](../module-05/03-guardrails) — handling the risk when AI gets it wrong
-- [Agent Evaluation](../module-05/02-agent-evaluation) — building the evaluation pipeline
+- [AI Security & Guardrails](../module-11/01-ai-security) — handling the risk when AI gets it wrong
+- [Evaluation Pipeline](../module-09/03-evaluation-pipeline) — building the evaluation pipeline
