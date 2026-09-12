@@ -1,93 +1,63 @@
 ---
-title: Planning & Reflection — Thinking Before Acting
+title: Planning & Reflection
 outline: deep
 ---
 
-# Planning & Reflection — Thinking Before Acting
+# Planning & Reflection
 
-Our agent kept taking wrong first steps on complex tickets. It would look up the wrong thing, get stuck, and give up. We added planning. It got dramatically better.
+Give an agent a hard multi-step ticket and it can charge straight into the first tool call that seems relevant, then get stuck when that path doesn't pan out. Planning and reflection are what let it think before, and check after.
 
 ::: tip Plain English
-Imagine an intern who, the moment a task lands in their inbox, immediately starts working — without reading it fully or thinking about what they actually need to do. They look busy, but they often do the wrong thing first and have to backtrack.
-
-Planning is what you add to stop that. Before the agent takes any action, it thinks out loud: "What is this person actually asking? What do I need to know to answer it? What's the right order of steps?"
-
-This sounds obvious — it's what humans do automatically. But models don't do it by default. They're trained to be helpful immediately. Sometimes being helpful means thinking first.
+Most people don't solve a hard problem in one pass — they sketch a rough plan, try a step, notice it's not working, and adjust. An agent that only reacts turn-by-turn skips the sketching and the noticing. Planning is giving it room to sketch; reflection is giving it room to notice.
 :::
 
-## ReAct — Reasoning and Acting together
+## Two techniques, one purpose
 
-ReAct is the most common pattern for adding planning to agents. The name stands for **Re**asoning + **Act**ing. The idea: before each action, the model writes out its reasoning. This forces it to think before it acts.
-
-A ReAct-style agent might produce:
+**ReAct (Reason + Act)** interleaves explicit reasoning with each action, rather than jumping straight to a tool call:
 
 ```
-Thought: The user is asking about ticket #4821 and seems frustrated.
-         I should look up the ticket first to understand the current state
-         before saying anything.
-
-Action: lookup_ticket(ticket_id="4821")
-
-Observation: { status: "open", priority: "high", last_update: "3 days ago",
-               assigned_to: null }
-
-Thought: The ticket is open, high priority, and unassigned for 3 days.
-         That's why the user is frustrated. I should escalate this
-         rather than just give a status update.
-
-Action: escalate_to_human(ticket_id="4821", reason="High priority, unassigned 3 days")
+Thought: The user wants a refund but their plan is annual, not monthly.
+         I need to check the annual refund policy before acting.
+Action:  search_policy("annual plan refund")
+Observation: Annual refunds are prorated after 30 days.
+Thought: They're at day 45, so this is a prorated refund, not full.
+Action:  calculate_refund(plan="annual", days_used=45)
 ```
 
-The "Thought" steps aren't shown to the user — they're internal reasoning the model does before each action. But they dramatically improve the quality of the actions it takes.
+The visible "Thought" step is not decoration — it materially improves reliability on multi-step tasks, because the model commits to reasoning before committing to an action, rather than pattern-matching straight to a plausible-looking tool call.
 
-## Chain-of-thought
+**Reflection** adds a self-check after producing a draft answer, before it goes to the user: does this actually address what was asked, is anything unverified, does it contradict something learned earlier in the run. This costs an extra LLM call, so it's worth reserving for high-stakes or complex responses, not every turn.
 
-Chain-of-thought (CoT) is simpler than ReAct: you tell the model to think step-by-step before answering, even when no tools are involved.
+## When to add each
 
-```
-Before giving your answer, briefly think through:
-- What is the user actually asking?
-- What do I know that's relevant?
-- Is there anything I'm unsure about that I should flag?
-
-Then give your answer.
-```
-
-For complex support questions — diagnosing a technical issue, figuring out why a feature isn't working — this produces noticeably better responses than just asking for an answer directly.
-
-## Self-reflection
-
-After generating a response, the agent checks its own work:
-
-```
-Draft response: "Your export should work if you go to File > Export > CSV."
-
-Reflection: Wait — this user is on the mobile app. File > Export is a
-            desktop-only menu. My answer is wrong for their context.
-
-Revised response: "On mobile, export works differently — you'll find it under..."
-```
-
-This is expensive (it's an extra LLM call), but for high-stakes responses — complex technical troubleshooting, anything the agent isn't confident about — it's worth it.
-
-## When planning helps vs when it's overkill
-
-| Situation | Use planning? |
-|-----------|--------------|
-| Simple Q&A ("How do I reset my password?") | No — adds latency for no gain |
-| Multi-step troubleshooting | Yes — ReAct or CoT |
-| Complex ticket requiring multiple tool calls | Yes — ReAct |
-| Deciding whether to escalate | Light CoT |
-| Routing a message to the right department | No — use a classifier, not a planner |
+| Technique | Add it when |
+|---|---|
+| ReAct-style reasoning | Multi-step tasks where the right tool isn't obvious upfront |
+| Upfront planning | The task has a known structure (e.g. "checklist" tasks) |
+| Reflection pass | High-stakes or long responses where an error is costly |
+| Neither | Simple single-tool lookups — the overhead isn't worth it |
 
 ::: warning Watch out
-Planning adds tokens and latency. Every "Thought" step is tokens the model generates before doing anything useful. For a support agent handling high volume, adding ReAct to every simple question doubles your costs with no quality benefit.
-
-The fix: **conditional planning**. Classify the request first (simple/complex). Simple requests get a direct response. Complex requests go through the ReAct loop. A small, fast classifier making this routing decision is much cheaper than making all requests think out loud.
+Planning and reflection both add latency and cost — each is roughly one more model call. Applying them to every turn of a simple agent is the most common over-engineering mistake in this area. Reserve them for tasks that are actually hard; a ticket status lookup doesn't need a plan.
 :::
 
-::: details Interview Question — ReAct vs chain-of-thought
-**Q:** What's the difference between ReAct and chain-of-thought prompting? When would you use each?
-
-**A:** Chain-of-thought is about reasoning quality for a single LLM call — you're asking the model to show its work before giving an answer. No tools, no loop. It improves accuracy on reasoning tasks by forcing intermediate steps. ReAct combines reasoning with action — the model alternates between thinking and calling tools, with each observation feeding back into the next thought. Use CoT for single-call reasoning tasks where quality matters. Use ReAct when the agent needs to plan a sequence of tool calls, adapt based on results, and handle multi-step problems where the next step depends on what you learned in the previous one. For TaskFlow, we use CoT for generating complex responses and ReAct for the multi-tool diagnostic flows.
+::: details Interview Question — When ReAct helps and when it doesn't
+**Q:** Would you add ReAct-style reasoning to every agent turn?
+**A:** No. It helps most on tasks with real branching — where the right tool depends on information not yet known. For a single deterministic lookup, the reasoning step is pure overhead: extra tokens, extra latency, no change in outcome. Measure task complexity, not just "agents are supposed to reason."
 :::
+
+::: details Interview Question — Catching a bad answer before it ships
+**Q:** How would you use reflection to reduce wrong answers without doubling every response's latency?
+**A:** Apply it conditionally, not universally — trigger a reflection pass only for responses above a length or stakes threshold (financial figures, policy claims, escalation decisions), and skip it for routine acknowledgments. That keeps the added cost proportional to the risk.
+:::
+
+## Key Mental Models
+
+**Reasoning before acting reduces wrong turns, at a cost.** It's a trade, not a free upgrade.
+
+**Match the technique to the task's actual difficulty.** Most turns in a working agent are simple and don't need either.
+
+## Related
+
+- [2.1 The Agent Loop](./01-agent-loop) — where a reasoning step sits inside Think
+- [2.5 The Agent Harness](./05-agent-harness) — where to gate reflection by stakes

@@ -13,7 +13,7 @@ This module is deliberately short. Retrieval is a large enough subject to have i
 
 ## Pages in this module
 
-1. [When You Need Retrieval](./01-when-you-need-retrieval) — 🚧 Planned — the adaptation ladder: prompt → context → RAG → fine-tune, and where each runs out
+1. [When You Need Retrieval](./01-when-you-need-retrieval) — the adaptation ladder: prompt → context → RAG → fine-tune, and where each runs out
 
 ## Then go to the RAG track
 

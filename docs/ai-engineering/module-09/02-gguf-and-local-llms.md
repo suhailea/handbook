@@ -1,85 +1,60 @@
 ---
-title: GGUF & Local LLMs — Running Models on Your Machine
+title: GGUF & Local LLMs
 outline: deep
 ---
 
-# GGUF & Local LLMs — Running Models on Your Machine
+# GGUF & Local LLMs
 
-We tested a local Llama 3 model for internal tools. The format the model came in was a `.gguf` file. What even is that?
+Once self-hosting is the right call, you need a model file format and a runtime that can actually run on the hardware you have. GGUF is the format that made running LLMs on ordinary machines — laptops, single GPUs, even CPUs — practical.
 
 ::: tip Plain English
-A model is just a huge file — billions of numbers that represent what the model "knows." Like how a song can be stored as an MP3 or a FLAC file, a model can be stored in different formats. The format affects how big the file is, how fast it loads, and what software can read it.
-
-GGUF is a format invented for running models efficiently on regular computers — laptops, desktops, machines without expensive AI-specific GPUs. It's optimized to be small and fast on the hardware most developers actually have.
-
-llama.cpp is the engine that reads GGUF files and runs the model. Ollama is a friendly wrapper around llama.cpp that makes it feel like Docker — pull a model, run it, get an API.
+A model trained by a lab exists as huge floating-point weight files, sized for a data center's GPU cluster. GGUF is a packaging format designed to run those same models on far more ordinary hardware — compressed, single-file, and readable by lightweight runtimes without the heavy dependency stack a training environment needs.
 :::
 
-## What GGUF is
+## What GGUF actually is
 
-GGUF (originally GGML Unified Format) is a binary file format for storing large language models. It was created by the llama.cpp project and is specifically designed for:
-
-- Efficient loading on CPUs and Apple Silicon (M1/M2/M3)
-- Memory-mapped access (the file doesn't all load into RAM at once)
-- Including everything in one file — model weights, tokenizer, metadata
-
-When you download a Llama 3 model from Hugging Face for local use, you download a `.gguf` file.
-
-## GGUF quantization names decoded
-
-GGUF files come in different sizes because of quantization (covered in more depth on the [next page](./04-quantization)):
-
-| Name | What it means | Size (8B model) | Quality |
-|------|---------------|-----------------|---------|
-| Q2_K | 2-bit quantized | ~3GB | Noticeably worse |
-| Q4_K_M | 4-bit, K-quant, Medium | ~5GB | Good for most uses |
-| Q5_K_M | 5-bit, K-quant, Medium | ~6GB | Better quality |
-| Q8_0 | 8-bit | ~9GB | Near-full quality |
-| F16 | Full 16-bit | ~16GB | Full quality |
-
-The pattern: `Q{bits}_K_M` means 4-bit, K-quant method (smarter than basic quantization), Medium size variant. For most uses, `Q4_K_M` is the sweet spot — small enough to run on a MacBook Pro, good enough for real tasks.
-
-## llama.cpp and Ollama
-
-**llama.cpp** is the C++ library that runs GGUF models. It's what does the actual computation. You can use it directly, but it's low-level.
-
-**Ollama** wraps llama.cpp in a developer-friendly interface:
+A binary file format bundling model weights, metadata (architecture, tokenizer), and quantization info into one portable file. Runtimes like `llama.cpp` and `ollama` read GGUF files directly, without needing the full Python/PyTorch stack a model was trained in — which is a large part of why it's approachable for local use.
 
 ```bash
-# Pull a model (like docker pull)
-ollama pull llama3
-
-# Run it interactively
-ollama run llama3
-
-# Or call its API (OpenAI-compatible)
-curl http://localhost:11434/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -d '{"model": "llama3", "messages": [{"role": "user", "content": "Hello"}]}'
+# ollama makes this close to one command
+ollama pull llama3.2:8b
+ollama run llama3.2:8b "Summarize this ticket: ..."
 ```
 
-Ollama exposes an OpenAI-compatible API. Your agent code doesn't need to know it's talking to a local model vs OpenAI — just change the base URL.
+## Where this fits, realistically
 
-## When local LLMs make sense
+| Use case | Fit |
+|---|---|
+| Prototyping without API costs | Good |
+| Offline / air-gapped environments | Good — sometimes the only option |
+| Privacy-sensitive dev/test | Good |
+| Production, high-concurrency serving | Poor — [vLLM](./03-vllm) is built for that |
+| Frontier-quality reasoning | Poor — open local models trail closed frontier models |
 
-::: tip Use local LLMs when
-- **Development** — no API costs, no rate limits, works offline
-- **Internal tools** where latency is acceptable (a 5-second response is fine for a developer productivity tool)
-- **Air-gapped environments** — secure facilities, offline systems
-- **Privacy-first prototypes** — test before committing to cloud or GPU infrastructure
-- **Experimentation** — try different models quickly without paying per token
+`llama.cpp`-based runtimes are optimized for running on limited hardware, not for serving many concurrent users efficiently — that's a different problem with a different tool ([vLLM](./03-vllm)). Reaching for `ollama` in a production API path is a common mismatch: right tool for a laptop, wrong tool for concurrent production traffic.
+
+::: warning Watch out
+GGUF and quantization ([9.4](./04-quantization)) are often bundled together, but they're separate concerns — GGUF is the *container format*, quantization is a *compression technique* applied to the weights inside it. A GGUF file can hold weights at various quantization levels, and the level chosen is what actually trades quality for size and speed, not the format itself.
 :::
 
-::: warning When NOT to use local LLMs
-- **Production with multiple concurrent users** — a single llama.cpp instance handles one request at a time on CPU. 10 concurrent users means 10x the wait time.
-- **When quality matters** — even a well-quantized 8B model is meaningfully worse than GPT-4o or Llama 3 70B on complex reasoning.
-- **Latency-sensitive applications** — CPU inference takes seconds. Cloud APIs take milliseconds.
+::: details Interview Question — GGUF for local dev vs production serving
+**Q:** A team is happily using `ollama` with a GGUF model for local development. Should they use the same setup in production?
+**A:** Generally no. `ollama` and `llama.cpp`-based runtimes are optimized for single-user, resource-constrained use — great for a laptop or offline environment. Production serving with real concurrency needs a throughput-optimized server like vLLM, which handles batching and memory management for many simultaneous requests in a way these tools aren't designed for. Keep GGUF/ollama for dev, switch runtimes for production load.
 :::
 
-For TaskFlow: we used Ollama during development so engineers weren't burning API credits every time they tested a prompt change. Production runs on the cloud API (or self-hosted vLLM for enterprise).
-
-::: details Interview Question — Ollama vs OpenAI API
-**Q:** When would you use Ollama over the OpenAI API in a production setting?
-
-**A:** In very few production scenarios. Ollama is excellent for development, internal tools, and fully offline environments. For production, the main case for Ollama is an air-gapped environment where no external API call is possible — but even there, you'd typically want vLLM instead of llama.cpp for throughput. The practical comparison: Ollama (llama.cpp) handles one request at a time on CPU, produces responses in seconds, and runs quantized small models. vLLM handles hundreds of concurrent requests on GPU, produces responses in milliseconds, and can run full-quality large models. If you need production serving, use vLLM. If you need a quick local model for development or a single-user internal tool, Ollama is perfect.
+::: details Interview Question — GGUF vs quantization, precisely
+**Q:** Explain the relationship between GGUF and quantization.
+**A:** GGUF is a file format — a container holding weights, tokenizer, and architecture metadata in one portable file. Quantization is a separate technique that reduces the numerical precision of the weights themselves (e.g., 16-bit down to 4-bit) to shrink size and speed up inference. A GGUF file is typically quantized, but the two are independently variable — you choose a quantization level, and GGUF is just how that quantized model gets packaged and distributed.
 :::
+
+## Key Mental Models
+
+**GGUF made local LLM inference practical on ordinary hardware.** It's the format, not the speed technique.
+
+**Local runtimes are for dev and single-user cases, not production concurrency.** Production serving needs a different tool entirely.
+
+## Related
+
+- [9.1 Model Serving Overview](./01-model-serving-overview) — when self-hosting is the right call at all
+- [9.3 vLLM](./03-vllm) — the production-concurrency alternative
+- [9.4 Quantization](./04-quantization) — the compression technique GGUF files carry

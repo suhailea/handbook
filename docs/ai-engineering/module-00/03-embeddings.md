@@ -1,64 +1,70 @@
 ---
-title: Embeddings — Turning Words Into Numbers the Model Can Reason With
+title: Embeddings
 outline: deep
 ---
 
-# Embeddings — Turning Words Into Numbers the Model Can Reason With
+# Embeddings
 
-When we added semantic search to TaskFlow's support system, we needed it to understand that "my subscription expired" and "my account is cancelled" mean roughly the same thing — even though they share zero words. Classic keyword search fails here. Embeddings are how we solved it.
+RAG, semantic search, and semantic caching all rest on one idea: turning text into a list of numbers such that similar meaning ends up as similar numbers. That's an embedding, and everything built on top of it is really just doing arithmetic on meaning.
 
-## What an embedding actually is
-
-Every word, sentence, or document can be represented as a list of numbers — a **vector**. The trick is that this list isn't arbitrary. It's computed by a neural network trained to put similar meanings close together in the mathematical space those numbers define.
-
-Think of it like a map, but for meaning. Cities geographically close to each other tend to be culturally, climatically, and economically similar too — proximity encodes real relationships. An embedding space works the same way: texts with similar meanings end up near each other, and texts with different meanings end up far apart.
-
-So "subscription expired" and "account cancelled" end up close together in this space, even though they use different words, because they encode the same user situation. A keyword search can't see that. An embedding-based search can.
-
-## The famous example that makes it click
-
-Here's the one that tends to stop people: if you take the embedding vector for "King", subtract the vector for "Man", and add the vector for "Woman", you get a vector very close to "Queen."
-
-That's not a trick or a coincidence — it's the system working as intended. The embedding space has learned that the relationship between "King" and "Queen" is the same as the relationship between "Man" and "Woman." Gender is encoded as a direction in the space. Royalty is encoded as another direction. The arithmetic works because the geometry reflects real semantic structure.
-
-This is why embeddings aren't just "words turned into numbers." They're words turned into numbers *in a way that preserves and exposes meaning*.
-
-## Embedding models vs language models
-
-This is a distinction that trips up a lot of engineers.
-
-A **language model** (GPT-4, Claude, Llama) generates text. You give it a prompt, it gives you back words, one token at a time. It's expensive per query, slow at scale, and sized for generation.
-
-An **embedding model** (OpenAI's text-embedding-3-small, Cohere Embed, sentence-transformers) does something entirely different: you give it text, it gives you back a fixed-size list of numbers. No text generation. No token-by-token output. Just a vector. It's fast, cheap, and purpose-built for search and similarity.
-
-The practical rule: use embedding models for retrieval, use language models for generation. In a RAG system, you use both — embeddings to find the relevant documents, a language model to synthesize the answer.
-
-## What the numbers actually mean (and don't)
-
-A typical embedding from OpenAI's text-embedding-3-small is a list of 1,536 numbers. Each number is a float between -1 and 1. No single number means anything on its own — meaning lives in the relationships between vectors (distances and angles), not in individual values.
-
-More dimensions generally means more nuance. A 256-dimension embedding can distinguish broad topics; a 3,072-dimension embedding can distinguish subtle stylistic differences. But more dimensions also means more storage, more memory during retrieval, and slower similarity searches. You pick based on what your use case actually needs.
-
-::: tip When you use embeddings in practice
-Every RAG system follows the same pattern: at index time, you chunk your documents and generate an embedding for each chunk, storing them in a vector database (Pinecone, Qdrant, pgvector). At query time, you embed the user's question using the same model, then find the stored vectors closest to it. Those closest chunks are your retrieved context. The language model never sees your whole document library — just the relevant chunks the embeddings surfaced.
+::: tip Plain English
+Imagine plotting every word or sentence as a point in space, positioned so that similar meanings land near each other — "dog" and "puppy" close together, "dog" and "spreadsheet" far apart. An embedding is exactly that point's coordinates, except the space has hundreds or thousands of dimensions instead of two. "Similarity" becomes something you can actually calculate: how close two points are.
 :::
 
-## The gotcha engineers hit
+## What you're actually getting back
 
-Embeddings are model-specific. An embedding from OpenAI's model and an embedding from Cohere's model live in completely different spaces — you cannot mix them, compare them, or store them interchangeably. If you switch embedding models, you need to re-embed your entire document store. Plan for this before you go to production with a large corpus.
+Call an embedding model with text, get back a fixed-length vector of numbers — typically 384 to 3,072 dimensions depending on the model. The vector by itself means nothing to a human; what matters is its relationship to other vectors.
 
----
+```
+embed("How do I cancel my subscription?")
+  → [0.021, -0.183, 0.442, ..., 0.019]   (1,536 numbers)
 
-::: details Interview Question — What's the difference between an embedding model and a language model?
+embed("What's the process to end my plan?")
+  → [0.019, -0.176, 0.438, ..., 0.024]   (very close to the vector above)
 
-**Q:** A colleague suggests using GPT-4 for semantic search — just ask it "does this document match this query?" for each document. What's wrong with this approach, and what would you use instead?
+embed("What's the weather today?")
+  → [-0.402, 0.118, -0.056, ..., 0.301]  (far from both)
+```
 
-**A:** The approach works in principle but doesn't scale. For a corpus of 10,000 documents, you'd make 10,000 API calls per query, each incurring latency and token cost for a full LLM forward pass. It would be slow (seconds to minutes per query) and expensive.
+Similarity is computed with cosine similarity — the angle between two vectors, not their raw distance, because it captures "pointing the same direction" (same meaning) regardless of magnitude. Nearly 1.0 means near-identical meaning; near 0 means unrelated.
 
-The right tool is an embedding model. At index time, you embed all 10,000 documents once and store the vectors. At query time, you embed only the query (one fast call) and run approximate nearest-neighbor search over the stored vectors — this takes milliseconds. The embedding model doesn't generate text; it encodes meaning into a fixed-size vector. Similarity search over vectors is a solved, fast problem. The language model only gets involved after retrieval, to synthesize an answer from the top-k retrieved chunks. Separation of concerns: embedding model for retrieval, language model for generation.
+## Where this actually shows up in your stack
 
+**RAG retrieval** — embed the user's query, embed every document chunk in advance, find the chunks whose vectors are closest to the query's. This is the entire retrieval mechanism underneath the term "vector search."
+
+**Semantic caching** ([3.6](/ai-engineering/module-03/06-semantic-caching)) — embed an incoming question, check if a sufficiently similar question was answered before, skip the model call entirely if so.
+
+**Classification and routing** — embed a ticket, compare it to embeddings of known categories, route by nearest match — often cheaper and more consistent than an LLM call for simple routing.
+
+| Task | Uses embeddings for |
+|---|---|
+| RAG retrieval | Finding relevant document chunks |
+| Semantic caching | Matching near-duplicate questions |
+| Deduplication | Finding near-identical content |
+| Clustering / routing | Grouping similar items without an LLM call |
+
+::: warning Watch out
+Embedding models are not interchangeable — vectors from two different embedding models live in unrelated spaces, so comparing an embedding from Model A against one from Model B produces meaningless similarity scores. If you switch embedding models, you must re-embed your entire document store, not just new content going forward.
 :::
 
----
+::: details Interview Question — Why cosine similarity, not Euclidean distance?
+**Q:** Why do embedding-based systems typically use cosine similarity rather than plain distance between vectors?
+**A:** Cosine similarity measures the angle between two vectors, which captures directional alignment — "pointing the same way in meaning-space" — independent of vector magnitude. Two vectors can have different lengths (which can result from factors like text length or normalization differences) but still represent very similar meaning; Euclidean distance would penalize that magnitude difference even when the direction, which is what actually encodes meaning, is nearly identical.
+:::
 
-[← 0.2 Training vs Inference](/ai-engineering/module-00/02-training-vs-inference) · [Next: 0.4 RLHF & Alignment →](/ai-engineering/module-00/04-rlhf)
+::: details Interview Question — Migrating embedding models
+**Q:** You want to switch your RAG system from one embedding model to a newer, better one. What's involved beyond changing the API call?
+**A:** Every existing document embedding must be regenerated with the new model — old and new embeddings aren't comparable, so mixing them silently breaks retrieval with no obvious error, just quietly worse results. For a large document store this is a real migration: re-embed everything, likely re-index the vector database, and validate retrieval quality against a test set before cutting over, rather than switching live.
+:::
+
+## Key Mental Models
+
+**Embeddings turn "similar meaning" into "nearby vectors."** Every semantic search feature is built on that translation.
+
+**Vectors from different models aren't comparable.** A model change means a full re-embedding, not an incremental one.
+
+## Related
+
+- [0.1 How Transformers Work](./01-how-transformers-work) — the attention mechanism that produces these representations
+- [3.6 Semantic Caching](/ai-engineering/module-03/06-semantic-caching) — embeddings used to skip model calls
+- [ML 1.5 Linear Algebra for AI](/ml-foundations/module-01/05-linear-algebra-for-ai) — the vector math underneath

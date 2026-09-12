@@ -776,7 +776,12 @@ export default withMermaid(defineConfig({
         },
       ],
       '/ai-engineering/': [
-        { text: 'AI Engineering', items: [{ text: 'Overview', link: '/ai-engineering/' }] },
+        { text: 'AI Engineering', items: [
+            { text: 'Overview', link: '/ai-engineering/' },
+            { text: '60 Interview Questions', link: '/ai-engineering/questions' },
+            { text: 'Crash Sheet', link: '/ai-engineering/crash-sheet' },
+            { text: 'Interview Framework', link: '/ai-engineering/interview-framework' },
+          ] },
         { text: 'Module 0 — Mental Models', collapsed: false, items: [
             { text: 'Overview', link: '/ai-engineering/module-00/' },
             { text: '0.1 How Transformers Work', link: '/ai-engineering/module-00/01-how-transformers-work' },
@@ -811,7 +816,7 @@ export default withMermaid(defineConfig({
             { text: '3.6 Semantic Caching', link: '/ai-engineering/module-03/06-semantic-caching' } ] },
         { text: 'Module 4 — RAG, The Bridge', collapsed: true, items: [
             { text: 'Overview', link: '/ai-engineering/module-04/' },
-            { text: '4.1 When You Need Retrieval 🚧', link: '/ai-engineering/module-04/01-when-you-need-retrieval' } ] },
+            { text: '4.1 When You Need Retrieval', link: '/ai-engineering/module-04/01-when-you-need-retrieval' } ] },
         { text: 'Module 5 — Evaluation', collapsed: true, items: [
             { text: 'Overview', link: '/ai-engineering/module-05/' },
             { text: '5.1 Metrics', link: '/ai-engineering/module-05/01-metrics' },

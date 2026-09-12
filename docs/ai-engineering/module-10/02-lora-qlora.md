@@ -1,84 +1,61 @@
 ---
-title: LoRA & QLoRA — Fine-Tuning Without the GPU Bill
+title: LoRA & QLoRA
 outline: deep
 ---
 
-# LoRA & QLoRA — Fine-Tuning Without the GPU Bill
+# LoRA & QLoRA
 
-Full fine-tuning Llama 3 8B required 80GB of VRAM. LoRA let us do it on a single 24GB GPU.
+Full fine-tuning updates every weight in a model — for a large model, that's an enormous amount of GPU memory and compute, out of reach for most teams. LoRA is why fine-tuning became practical on ordinary hardware.
 
 ::: tip Plain English
-Imagine you've hired a world-class consultant. You don't want to replace their entire knowledge base — that would take years. Instead, you give them a small overlay: a few extra pages of notes that adjust how they apply their existing expertise to your specific situation.
-
-LoRA (Low-Rank Adaptation) is that overlay. Instead of updating every single parameter in the model (there are billions), LoRA adds a small set of new trainable parameters — a tiny "adapter" — on top of the frozen original model.
-
-You train just the adapter. The original model weights don't change. The adapter is small, cheap to train, and can be swapped in and out. You can have multiple adapters for different tasks and switch between them without reloading the base model.
+Full fine-tuning is renovating an entire building. LoRA is adding a small, targeted addition instead — you leave the original structure completely untouched and attach a small, trainable piece that adjusts behavior. Far cheaper, much faster to build, and if it doesn't work out, you just remove the addition — the original building was never touched.
 :::
 
-## How LoRA works (without the math)
+## How it actually works
 
-A model layer is essentially a large matrix of numbers — billions across all layers. Updating all of these during fine-tuning is expensive: it requires storing the gradients for every weight, which costs as much memory as the model itself.
+Instead of updating the full weight matrices, LoRA freezes the entire pretrained model and injects small, trainable low-rank matrices alongside the original weights. Only those small matrices get trained — typically under 1% of the total parameter count.
 
-LoRA's insight: for most fine-tuning tasks, you don't need to update all those weights independently. The changes needed can be captured by adding two small matrices (low-rank approximations) to each layer. Instead of updating a 4096×4096 matrix (16M parameters), you add two matrices of size 4096×8 and 8×4096 (65k parameters). You train those.
+```
+Full fine-tuning:  update ALL weights (billions of parameters) — expensive, needs a lot of GPU memory
+LoRA:              freeze original weights, train small adapter matrices (millions of parameters)
+                   → far less memory, faster training, original model stays untouched
+```
 
-Result: the trainable parameters go from billions to millions. Memory requirement drops dramatically.
+**QLoRA** adds quantization on top: the frozen base model is loaded in reduced precision (typically 4-bit), while the small LoRA adapters still train at higher precision. This is what makes fine-tuning feasible on a single consumer-grade GPU rather than requiring a data center.
 
-## What you get from LoRA
+## Why "the original stays untouched" matters practically
 
-The output of LoRA fine-tuning is an **adapter file** — a small file (usually 10–200MB) that contains just the learned adjustments. The base model (which might be 15GB) stays unchanged.
-
-To deploy:
-- Load the base model once
-- Load the adapter on top
-- Inference proceeds as if it were a fine-tuned model
-
-You can maintain multiple adapters for different purposes (one for response formatting, one for our billing specialist, one for technical support) and load whichever is appropriate per request. This is called multi-LoRA serving.
-
-## QLoRA — even smaller
-
-QLoRA combines LoRA with quantization. The base model is loaded in 4-bit quantized format (very low memory), and LoRA adapters are trained in 16-bit on top of it.
-
-This lets you fine-tune models that you couldn't even fit in GPU memory in full precision:
-
-| Setup | VRAM needed for Llama 3 8B fine-tune |
-|-------|--------------------------------------|
-| Full fine-tuning (FP16) | ~80GB |
-| LoRA (FP16 base) | ~24GB |
-| QLoRA (4-bit base + LoRA) | ~12GB |
-
-With QLoRA, you can fine-tune a 13B model on a single 24GB GPU. A 70B model is feasible on two 24GB GPUs.
-
-The quality tradeoff: QLoRA is very slightly below full LoRA, which is slightly below full fine-tuning. For most tasks, the difference is negligible.
-
-## LoRA vs full fine-tuning
+Because the base weights are frozen, you can train multiple LoRA adapters for different tasks against the *same* base model, and swap between them without reloading the whole model — one base model, several lightweight task-specific adapters, loaded independently. This is a meaningfully different deployment shape than full fine-tuning, where each fine-tuned variant is a separate full-size model.
 
 | | Full fine-tuning | LoRA | QLoRA |
 |---|---|---|---|
-| VRAM (8B model) | ~80GB | ~24GB | ~12GB |
-| Training time | Slow | Faster | Fastest |
-| Quality | Best | Very close | Slightly below LoRA |
-| Flexibility | New model entirely | Adapter (swappable) | Adapter (swappable) |
-| Use when | You have the resources and need maximum quality | Most fine-tuning use cases | Limited GPU, similar quality to LoRA |
+| Trainable parameters | 100% | Often <1% | Often <1% |
+| GPU memory needed | Very high | Much lower | Lowest — fits on one consumer GPU |
+| Multiple task variants | Separate full models each | Swap lightweight adapters | Swap lightweight adapters |
+| Training speed | Slow | Faster | Faster |
 
-## When to use LoRA vs full fine-tuning
-
-::: tip Use LoRA/QLoRA when
-- You don't have access to 4x A100s (most teams)
-- You need multiple task-specific adapters from one base model
-- You're experimenting and want to iterate quickly
-- Budget is a constraint — LoRA is 5–10x cheaper to train
+::: warning Watch out
+LoRA's efficiency comes with a real trade: because only a small adapter is trained, it's not always sufficient for tasks needing deep behavioral change — it excels at style, tone, and format shifts, and is weaker for tasks that need the model to reason fundamentally differently. If LoRA-tuned results plateau below what the task needs, that's a signal to reconsider whether fine-tuning is even the right layer, not necessarily to jump straight to full fine-tuning.
 :::
 
-::: tip Use full fine-tuning when
-- You have the compute and need maximum possible quality
-- You're preparing a production model that will be served at scale (merge the adapter, no overhead)
-- The task requires very deep behavioral changes that LoRA struggles with
+::: details Interview Question — Why LoRA made fine-tuning accessible
+**Q:** Explain why LoRA reduced the resource requirements for fine-tuning so dramatically.
+**A:** Full fine-tuning requires storing gradients and optimizer state for every parameter in the model, which for a multi-billion-parameter model demands enormous GPU memory. LoRA freezes the original weights entirely and only trains small, low-rank adapter matrices injected alongside them — often under 1% of total parameters — so the memory and compute needed scales with the tiny adapter, not the full model. QLoRA compounds this by also loading the frozen base model in 4-bit precision, which is why fine-tuning that once needed a GPU cluster can now run on a single consumer GPU.
 :::
 
-For TaskFlow: we used QLoRA to train a billing intent classifier on top of a 7B model. Training took 4 hours on a single A10G GPU (rented for $1.50/hr = $6 total). The resulting adapter is 40MB and loads in under a second on top of the base model.
-
-::: details Interview Question — LoRA mechanics
-**Q:** Explain what LoRA does and why it reduces memory requirements during fine-tuning.
-
-**A:** LoRA adds pairs of small trainable matrices (low-rank decomposition) to each attention layer of a frozen base model. Instead of computing gradients for billions of base model parameters, you only compute gradients for the much smaller LoRA matrices — typically reducing trainable parameters by 100–10,000x. This matters for memory because optimizer states (Adam stores two momentum values per trainable parameter) are the main fine-tuning memory cost. Fewer trainable parameters = much smaller optimizer state = fits in GPU memory. During inference, the LoRA matrices can be merged into the base model weights (adding their contribution back in) so there's zero inference overhead. Or they can be kept separate as an adapter, which allows swapping between different LoRA adapters without reloading the base model.
+::: details Interview Question — LoRA adapters vs separate fine-tuned models
+**Q:** A product needs fine-tuned behavior for three different customer segments. How does LoRA change the deployment approach compared to full fine-tuning?
+**A:** With full fine-tuning, each segment needs its own complete fine-tuned model — three full-size models to store and serve. With LoRA, you keep one shared base model and train three small, separate adapters, one per segment, then swap the active adapter per request without reloading the base model. This is both cheaper to store and faster to switch between than maintaining three independent full models.
 :::
+
+## Key Mental Models
+
+**LoRA trains a small addition, not the whole model.** The original weights stay frozen and untouched.
+
+**One base model can serve many task-specific adapters.** That's a fundamentally lighter deployment shape than full fine-tuning.
+
+## Related
+
+- [10.1 Fine-Tuning Overview](./01-fine-tuning-overview) — the broader decision this technique serves
+- [9.4 Quantization](/ai-engineering/module-09/04-quantization) — the technique QLoRA borrows for the frozen base
+- [10.3 When to Fine-Tune](./03-when-to-fine-tune) — deciding if you need this at all

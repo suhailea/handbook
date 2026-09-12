@@ -1,106 +1,61 @@
 ---
-title: LLMs & Tokens — What You're Actually Calling
+title: LLMs & Tokens
 outline: deep
 ---
 
-# LLMs & Tokens — What You're Actually Calling
+# LLMs & Tokens
 
-We just signed up for the OpenAI API. We're about to send our first message to build TaskFlow's support agent. But before we do — what exactly happens when we send that request?
+Every API call is priced, limited, and sometimes broken by tokens — not words, not characters. Get an intuition for tokens and half of what confuses people about context windows, pricing, and truncation stops being mysterious.
 
 ::: tip Plain English
-An LLM is an extremely sophisticated autocomplete. It has read most of the text on the internet, and it's very good at predicting what word comes next given what came before.
-
-That's genuinely all it is. There's no understanding, no memory between conversations, no reasoning in the human sense. Just: "Given everything I've seen before, what is the most likely next word?"
-
-The magic is that when you train on enough text, "predict the next word really well" ends up producing something that can answer questions, write code, and hold a conversation — because human text is structured that way.
-
-**A token is not a word.** It's roughly a syllable or a few characters. "TaskFlow" is 2 tokens. "I" is 1 token. "unprecedented" is 3 tokens. Models don't read words — they read tokens. This matters because you pay per token and the model has a maximum number of tokens it can process at once.
-
-**The context window is the model's working memory.** Everything you send in a request — your instructions, the conversation history, any documents — has to fit in the context window. When the conversation gets long enough that it doesn't fit, you have to throw old messages away. The model has no memory of what didn't fit.
+A token is roughly a word-piece — "unbelievable" might split into "un", "believ", "able". Common English words are usually one token; rare words, code, and non-English text often split into more pieces than you'd expect from their length. The model doesn't see words at all — it sees a sequence of these pieces, and everything about cost and context limits is counted in them, not in characters.
 :::
 
-## What's actually in a model call
+## Why this trips people up
 
-When you call the API, you send:
+**Non-English costs more.** The same sentence in Arabic or Japanese can take 2–3× the tokens of its English equivalent, because tokenizers are trained predominantly on English text. This matters directly for TaskFlow's UAE customer base — a support conversation in Arabic costs measurably more per exchange than the same conversation in English.
 
-1. **A system prompt** — your standing instructions ("You are a helpful TaskFlow support agent...")
-2. **The conversation history** — all previous messages, in order
-3. **The user's current message**
+**Code is token-dense.** Punctuation-heavy, non-natural-language text tokenizes less efficiently than prose. A code review agent burns through context faster than a support agent for the same character count.
 
-The model reads all of this together and produces a response. It has no other context — no database, no files, no previous sessions. Just what you send.
+**Context windows are token limits, not word limits.** "200K context" means 200,000 tokens — commonly 120,000–150,000 English words, but much less for code or non-English content.
 
 ```
-[system: "You are TaskFlow support..."]
-[user: "How do I export my tasks?"]
-[assistant: "You can export by going to..."]
-[user: "What about recurring tasks?"]   ← model sees ALL of the above
+"unbelievable"           → ["un", "believ", "able"]        3 tokens
+"the cat sat"             → ["the", " cat", " sat"]         3 tokens
+"مرحبا كيف حالك"          → often 2-3x the token count of an equivalent English phrase
 ```
 
-## Tokens in practice
+## What actually depends on this
 
-Here's a rough feel for token counts:
-
-| Text | Approximate tokens |
-|------|-------------------|
-| "Hi" | 1 |
-| "How do I reset my password?" | 7 |
-| A typical system prompt | 200–500 |
-| A full support ticket | 300–800 |
-| GPT-4o context window | 128,000 |
-| Claude 3.5 Sonnet context window | 200,000 |
-
-The cost implication: if you stuff your system prompt with 10,000 tokens of documentation "just in case", you're paying for those tokens on every single request.
-
-## Temperature and top-p
-
-Two parameters control how "creative" the model is:
-
-**Temperature** controls randomness. At `temperature: 0`, the model always picks the highest-probability next token — completely deterministic. At `temperature: 1`, it samples more freely from likely options. At `temperature: 2`, it gets weird.
-
-For a support agent, you want low temperature (`0.1`–`0.3`). You want consistent, predictable answers — not creative ones.
-
-**Top-p** (nucleus sampling) is a different knob for the same idea. Instead of scaling all probabilities, it only samples from the most likely tokens that together make up `p` probability mass. `top_p: 0.9` means "only pick from tokens that together account for 90% of the probability."
+| Depends on tokens | Why |
+|---|---|
+| Pricing | Billed per input and output token, not per request |
+| Context window | Literally a token count ceiling |
+| Latency | Roughly proportional to tokens processed and generated |
+| Truncation | When you hit the limit, oldest tokens get cut, not oldest "messages" cleanly |
 
 ::: warning Watch out
-Don't adjust both temperature and top-p at the same time. Pick one. Most teams just use temperature and leave top-p at its default (1.0).
+Don't estimate token counts from character length — it drifts, especially across languages and for code. Use the actual tokenizer (`tiktoken` for OpenAI models, or the provider's usage response) rather than a rule of thumb like "4 characters per token," which is only roughly true for English prose and wrong enough elsewhere to cause real budgeting errors.
 :::
 
-## Small model vs large model
-
-| | Small models (GPT-4o-mini, Haiku) | Large models (GPT-4o, Sonnet, Opus) |
-|---|---|---|
-| Cost | 10–50x cheaper | Expensive at scale |
-| Speed | Fast (200–500ms) | Slower (1–3s typical) |
-| Quality | Good for simple tasks | Better at complex reasoning |
-| Context handling | Sometimes loses track in long contexts | Better at long-context tasks |
-| Best for | Classification, simple Q&A, formatting | Complex support tickets, multi-step reasoning |
-
-**When to use GPT-4-class:** reasoning over a complex support ticket, deciding whether to escalate, generating a detailed response that cites specific documentation.
-
-**When to use smaller models:** classifying the intent of a message ("is this billing or technical?"), formatting output, simple lookups and confirmations.
-
-For TaskFlow's agent, we'll use a large model for the main response and a small model for routing and classification.
-
-::: details Interview Question — Temperature vs top-p
-**Q:** What's the difference between temperature and top-p? When would you use each?
-
-**A:** Both control output randomness but work differently. Temperature scales the probability distribution of all tokens — low temperature makes the highest-probability token much more dominant, high temperature flattens the distribution. Top-p (nucleus sampling) ignores tokens outside the top-p cumulative probability mass entirely, then samples from the remainder.
-
-In practice: temperature is simpler and more intuitive to tune. Top-p is better if you want to avoid very low-probability "weird" tokens while still allowing creativity. For production support agents, low temperature (`0.1`–`0.2`) is usually right — you want consistency, not creativity. OpenAI's own guidance says don't set both; adjust one and leave the other at its default.
+::: details Interview Question — Why does the same question cost more in one language than another?
+**Q:** A support agent costs noticeably more per conversation for Arabic-speaking users than English-speaking ones, with similar conversation length. Why?
+**A:** Tokenizers are trained on corpora dominated by English, so English text tokenizes more efficiently — fewer tokens per character. The same semantic content in Arabic (or most non-Latin-script languages) needs more tokens to represent, which directly increases both input and output cost per conversation even though nothing else about the interaction changed.
 :::
 
-## When to use which model size
-
-::: tip When to use large models
-- The task requires multi-step reasoning
-- The context is long and the model needs to track multiple things
-- The response quality directly affects user satisfaction
-- You're doing it rarely enough that cost doesn't matter
+::: details Interview Question — Debugging unexpected truncation
+**Q:** A long conversation suddenly loses early context mid-session. What's happening?
+**A:** The conversation exceeded the model's token-count context window, and either the provider or your own truncation logic dropped the oldest tokens to fit. This isn't a bug in the traditional sense — it's the system doing exactly what a fixed context window requires. The fix is proactive context management (see [Agent Memory](/ai-engineering/module-02/03-agent-memory)) — summarizing or windowing before you hit the limit, not reacting after truncation already happened silently.
 :::
 
-::: tip When to use small models
-- You're doing it at high volume (classification, routing)
-- The task is simple and well-defined
-- Latency matters more than maximum quality
-- You can validate the output with a quick check
-:::
+## Key Mental Models
+
+**Tokens, not words or characters, are the real unit.** Pricing, limits, and truncation all operate on tokens.
+
+**Language and content type change the exchange rate.** English prose is the cheapest case; code and non-Latin scripts cost more per character of meaning.
+
+## Related
+
+- [0.1 How Transformers Work](/ai-engineering/module-00/01-how-transformers-work) — why context length is quadratically expensive
+- [3.4 Cost & Token Accounting](/ai-engineering/module-03/04-cost-and-token-accounting) — turning token counts into a cost model
+- [1.3 Context Engineering](./03-context-engineering) — deciding what tokens are worth spending on

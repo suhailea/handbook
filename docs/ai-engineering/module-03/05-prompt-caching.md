@@ -1,11 +1,11 @@
 ---
-title: Prompt Caching & the KV Cache — Why Inference Is Expensive (and How to Cheat)
+title: Prompt Caching & the KV Cache
 outline: deep
 ---
 
-# KV Cache — Why Inference Is Expensive (and How to Cheat)
+# Prompt Caching & the KV Cache
 
-We noticed that re-running the same system prompt for every user cost us twice the tokens. Then we learned about KV cache — the model can "remember" previous calculations.
+TaskFlow's system prompt is re-sent on every single call — and on every iteration of a multi-turn agent loop. Re-running the same 800 tokens through the model a million times is a million times the same computation. Caching is how you stop paying for work you've already done.
 
 ::: tip Plain English
 When you read a long book chapter, and then someone asks you a question about it, you don't re-read the whole chapter before answering. You remember it. Your brain cached the reading.
@@ -68,6 +68,31 @@ At high volume, this is a very significant saving.
 - Highly dynamic contexts where nothing repeats across requests
 - Very low volume (the cache isn't hit enough to pay off the setup cost)
 - When your inputs are mostly unique per user (the prefix that's identical is small)
+:::
+
+## Ordering is the whole game
+
+Caching keys on the **prefix** — everything must match exactly, in order, from the start. Put anything variable (a timestamp, a user ID, today's date) near the front of the prompt and you invalidate the cache on every single request, silently, with no error to tell you.
+
+```
+Cache-breaking:  [user_id: 4821] [timestamp: ...] [static system prompt] [query]
+                    ↑ varies every request → static content never gets a stable prefix
+
+Cache-friendly:  [static system prompt] [static docs] [user_id + timestamp] [query]
+                    ↑ static content is a stable, matching prefix every time
+```
+
+This is the same ordering principle covered in [context engineering](/ai-engineering/module-01/03-context-engineering) — static content first, variable content last — but here the payoff is a direct line item on the invoice, not just answer quality.
+
+| Symptom | Likely cause |
+|---|---|
+| Cache hit rate near 100% at low volume | Working as intended |
+| Cache hit rate near 0% despite a repeated system prompt | Variable content sits before the static prefix |
+| Hit rate dropped after a prompt edit | Any change to the cached prefix — even whitespace — invalidates it |
+
+::: details Interview Question — Debugging a silent cache hit-rate collapse
+**Q:** Prompt caching was working, input costs were down significantly. After a routine prompt update, costs jumped back up with no code errors. What happened?
+**A:** Any edit to the cached prefix — even a single character — produces a different prefix, so it stops matching cached entries and every request pays full price again. Check whether the edit touched the system prompt or any content before the variable, per-request part of the input. The fix is usually reordering so genuinely static content forms a stable prefix that survives minor edits elsewhere, and treating that prefix as something to change deliberately, not casually.
 :::
 
 ::: details Interview Question — KV cache and cost

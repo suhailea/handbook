@@ -5,114 +5,54 @@ outline: deep
 
 # Model Serving — Cloud vs Local vs Self-Hosted
 
-Three options were on the table. Each had a very different risk, cost, and latency profile.
+Every module so far assumed you're calling a provider's API. That's the right default — but at some point cost, latency, data residency, or scale pushes teams toward running the model themselves. This page is the decision, not the implementation.
 
 ::: tip Plain English
-When you call OpenAI's API, you're renting someone else's server, someone else's GPU, and someone else's model. It's like renting a car — convenient, no maintenance, but the rental company has your data and you pay every time.
-
-Running a model yourself is like buying a car. Higher upfront cost, more maintenance, but the car is yours, your data stays with you, and the per-mile cost is near zero once you've paid for it.
-
-There's also a middle option: running a small model locally on your laptop or a cheap machine, no GPU required. Think of it as a bicycle — very cheap, limited range, but good for short trips.
-
-The right choice depends on how far you're going, how often, and how private the trip needs to be.
+Calling OpenAI or Anthropic's API is like ordering from a restaurant — no equipment, no staff, pay per meal, someone else handles quality and uptime. Self-hosting is running your own kitchen — real upfront cost and real operational burden, but full control and, at high enough volume, cheaper per meal. Most teams should stay in the restaurant far longer than instinct suggests.
 :::
 
 ## The three options
 
-### Option 1: Cloud API (OpenAI, Anthropic, Google)
-
-You call an API. The model runs on their servers. You pay per token.
-
-**How it works:** Sign up, get API key, make HTTP requests. Takes 30 minutes to production.
-
-**Pros:**
-- Zero infrastructure to manage
-- Access to the best models in the world
-- Scales automatically to any load
-- Constant model updates (and improvements)
-
-**Cons:**
-- Your data leaves your servers
-- Cost scales with usage — can get expensive at high volume
-- Latency depends on their servers and your distance
-- Rate limits cap your throughput
-- You're dependent on their uptime and pricing decisions
-
-### Option 2: Self-hosted on GPU (vLLM, TGI)
-
-You rent or buy GPUs and run an open-source model yourself using an inference server.
-
-**How it works:** Rent a GPU server (AWS, GCP, Lambda Labs), download a model (Llama 3, Mistral, etc.), run vLLM or similar. Exposes an OpenAI-compatible API your code calls.
-
-**Pros:**
-- Data never leaves your infrastructure
-- Fixed cost (predictable at scale)
-- Can customize the model (fine-tuning)
-- No rate limits
-
-**Cons:**
-- Significant ops burden (GPU management, scaling, updates)
-- High upfront cost to start
-- Model quality below frontier models
-- You manage the infrastructure, failures, security
-
-### Option 3: Local on CPU/Apple Silicon (Ollama, llama.cpp)
-
-You run a quantized model on regular hardware — no GPU required (or a consumer GPU).
-
-**How it works:** Install Ollama, run `ollama pull llama3`, call a local API endpoint. Works on a MacBook Pro.
-
-**Pros:**
-- Completely offline — data stays on the machine
-- Zero API costs
-- Great for development and testing
-- Works without internet
-
-**Cons:**
-- Much slower than cloud or GPU-hosted (seconds per response vs milliseconds)
-- Only practical for small quantized models
-- Not suitable for multiple concurrent users
-- Smaller/quantized models have lower quality
-
-## Comparison table
-
-| | Cloud API | Self-hosted GPU | Local (CPU/Apple Silicon) |
+| | Cloud API | Self-hosted (cloud GPU) | Local / on-prem |
 |---|---|---|---|
-| Cost | Per-token, scales with use | Fixed GPU cost + ops | Near zero |
-| Latency | 500ms–2s | 200ms–1s (depends on GPU) | 5s–60s |
-| Privacy | Data leaves your servers | Data stays with you | Fully local |
-| Ops burden | None | High | None |
-| Max model quality | Best (GPT-4o, Claude) | Good (Llama 3 70B) | Limited (8B quantized) |
-| Scales to 100+ users | Yes | Yes (with setup) | No |
-| Best for | Most production workloads | Privacy-sensitive production | Dev/test, offline use |
+| Setup effort | Minutes | Days–weeks | Weeks+ |
+| Cost model | Per-token, scales with usage | Fixed GPU cost, scales with capacity | Fixed hardware cost |
+| Data leaves your infra | Yes | Depends on provider | No |
+| Model quality ceiling | Frontier models | Whatever you can run | Whatever fits your hardware |
+| Ops burden | None | Real — scaling, uptime, upgrades | Highest |
 
-## When to choose each
+## When self-hosting actually makes sense
 
-::: tip Use Cloud API when
-- You're in the early stage — don't optimize prematurely
-- Model quality is critical and you need frontier performance
-- You don't have the ops team to manage GPU infrastructure
-- Your volume is moderate (the cost isn't prohibitive)
+**Data residency or compliance** requires prompts and outputs to never leave your infrastructure — TaskFlow's enterprise tier fits this, since some customer contracts prohibit sending data to third parties.
+
+**Sustained high volume** where the fixed cost of GPUs undercuts per-token API pricing — this crossover point is usually much higher than teams initially estimate; do the actual math before assuming self-hosting is cheaper.
+
+**Latency-critical paths** where a round trip to a provider's servers is unacceptable and co-locating the model with your infrastructure matters.
+
+**A narrow, well-defined task** that a smaller open model handles adequately — classification, extraction — where you don't need frontier-model reasoning.
+
+::: warning Watch out
+Self-hosting trades a per-token bill for an operations team. GPU capacity planning, model upgrades, scaling under load, and uptime all become your responsibility — and open models generally trail frontier closed models on general reasoning, so you're often trading quality for control. Run the honest cost comparison, including engineering time, before committing.
 :::
 
-::: tip Use self-hosted GPU when
-- Data privacy requirements prevent sending data to third parties
-- Your volume is high enough that per-token costs exceed GPU costs
-- You need to fine-tune or customize the model
-- You have (or can hire) the ops expertise
+::: details Interview Question — Justifying self-hosting to a skeptical stakeholder
+**Q:** Your team wants to self-host a model instead of using the OpenAI API. How do you evaluate whether that's actually justified?
+**A:** Start from the constraint, not the cost. If it's driven by data residency or compliance, that's often non-negotiable and settles it regardless of price. If it's driven by cost, calculate the real crossover volume — fixed GPU cost plus engineering time for scaling, monitoring and upgrades — against current API spend at realistic growth, not current volume. Teams frequently underestimate the ops burden and overestimate near-term savings.
 :::
 
-::: tip Use local/Ollama when
-- Development and testing — no need to burn API credits
-- Fully offline or air-gapped environments
-- Internal tools where latency is acceptable
-- Proof of concept before committing to GPU infrastructure
+::: details Interview Question — Choosing self-hosted vs API per task
+**Q:** Would you self-host for every task in an application, or mix approaches?
+**A:** Mix. Frontier-quality reasoning (complex support conversations, nuanced generation) stays on a cloud API where quality matters most. Narrow, high-volume, well-defined tasks (classification, simple extraction) are strong self-hosting candidates, since a smaller open model often performs adequately there at a fraction of the cost. Routing by task, not an all-or-nothing switch, usually wins.
 :::
 
-For TaskFlow's enterprise customers: we deployed a self-hosted Llama 3 70B on a pair of A100 GPUs. Enterprise data never left their VPC. Standard customers still use the OpenAI API. It's not one choice — it's a tiered architecture.
+## Key Mental Models
 
-::: details Interview Question — When to self-host
-**Q:** At what point does it make financial sense to self-host a model vs use a cloud API?
+**Self-hosting trades per-token cost for ops burden.** The crossover point is usually higher volume than intuition suggests.
 
-**A:** Rough math: A cloud API charges roughly $5–15 per million tokens (for GPT-4-class). An A100 GPU server costs ~$2–3/hour on AWS. If you're running 24/7, that's ~$1,500–2,000/month. You'd need to process 100–400 million tokens per month to break even (not counting engineering time to manage infrastructure). Beyond that, self-hosting is cheaper. In practice: self-host when you're spending >$3k/month on API costs, you have privacy requirements, or you need fine-tuning. Below that threshold, the ops overhead isn't worth it. Also consider: are you paying for GPU idle time? If your load is spiky, cloud APIs may remain cheaper even at high average volume because you don't pay when you're not using them.
-:::
+**Data residency, not cost, is the most common real reason to self-host.** Compliance requirements often settle the question before economics do.
+
+## Related
+
+- [9.2 GGUF & Local LLMs](./02-gguf-and-local-llms) — running smaller models locally
+- [9.3 vLLM](./03-vllm) — the serving layer for self-hosted throughput
+- [11.2 Kubernetes for AI](/ai-engineering/module-11/02-kubernetes-for-ai) — operationalizing self-hosted serving

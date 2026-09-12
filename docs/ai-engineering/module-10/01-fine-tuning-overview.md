@@ -1,73 +1,67 @@
 ---
-title: Fine-Tuning — Teaching the Model New Tricks
+title: Fine-Tuning Overview
 outline: deep
 ---
 
-# Fine-Tuning — Teaching the Model New Tricks
+# Fine-Tuning Overview
 
-The base model kept calling our product "the software" instead of "TaskFlow." It didn't know our support playbook. Should we fine-tune?
-
-We almost did. We spent a week preparing training data before someone asked the question that stopped us: "What exactly do we want the model to learn?"
-
-The answer was "use the right product name and follow our escalation policy." That's a behavior and format problem. Not a knowledge problem.
-
-We fixed it in 20 minutes with a better system prompt.
+Prompting and RAG cover most needs. Fine-tuning is the expensive last rung of the adaptation ladder — actually updating a model's weights on your own data, rather than shaping what goes into its context. It's real training, at a smaller scale than pretraining, with real cost and real risk.
 
 ::: tip Plain English
-Fine-tuning is like sending an employee to a training program that changes how they think and respond — not just what they read before a meeting.
-
-A system prompt is like giving that employee a briefing document before each meeting. It tells them the rules, the context, and what to do. Most of the time, the briefing is enough.
-
-Fine-tuning is for when you need the employee to have genuinely internalized a skill — not just follow instructions. When the skill needs to be effortless, consistent, and embedded in how they operate, not referenced from a document.
-
-The most common mistake: people fine-tune when a better briefing document (system prompt) would have solved the problem in an afternoon.
+If RAG is handing someone the right reference book before they answer, fine-tuning is sending them back to school for a focused course. It changes what they inherently know how to do, not what's on the desk in front of them — and like actual schooling, it's slower, more expensive, and harder to undo than just handing over a better reference.
 :::
 
-## What fine-tuning actually does
+## What actually happens
 
-Fine-tuning is continued training on your data. You take a pre-trained model and run more training steps on examples you provide — input/output pairs that demonstrate the behavior you want.
+You take a pretrained model and continue training it on a smaller, task-specific dataset — thousands to low-millions of examples, versus the trillions used in pretraining. The weights genuinely shift. This is the same category of process covered in [0.2 Training vs Inference](/ai-engineering/module-00/02-training-vs-inference), just later in the pipeline and on your own data instead of the original training corpus.
 
-The model's weights change. It learns patterns from your data at the parameter level. This is different from prompting, where you're just providing context.
+```
+Pretraining  → general capability, trillions of tokens, run by the lab
+Fine-tuning  → your data, thousands–millions of examples, run by you
+                shifts style, format, domain vocabulary, task-specific behavior
+```
 
-**What fine-tuning is good at:**
+## What it's actually good for
 
-- **Consistent tone and style** — if you want the model to always respond in a specific voice (formal, casual, your brand voice), fine-tuning embeds it at the weight level so it's consistent without needing a long style guide in every prompt
-- **Output format** — always respond in a specific JSON structure, always use bullet points, always include a greeting
-- **Domain-specific response patterns** — handling support tickets in exactly the way your playbook describes
-- **Smaller, faster inference** — fine-tune a small model (3B, 7B) to do a specific task that currently requires a large general-purpose model
+**Consistent style or format** — a specific tone, a specific output structure, applied reliably without needing few-shot examples in every prompt.
 
-**What fine-tuning is NOT good at:**
+**Domain vocabulary and patterns** — legal, medical, or highly technical domains where the base model's general training under-represents the specific terminology and conventions.
 
-- **Injecting factual knowledge** — if you fine-tune on "TaskFlow has feature X," the model may or may not recall this correctly, and it can still hallucinate. Use RAG for knowledge.
-- **Fixing reasoning** — if the model reasons poorly about something, fine-tuning usually doesn't fix the underlying reasoning ability
-- **One-off behavior changes** — if you just need the agent to say "TaskFlow" instead of "the software," that's a system prompt fix, not a fine-tuning job
+**Reducing prompt length at scale** — if you're currently achieving a behavior through a long, carefully engineered prompt repeated on every call, fine-tuning can bake that behavior in and shrink the prompt, which also reduces per-call cost.
 
-## The common mistake
+**What it's poor at:** teaching new facts (see [4.1](/ai-engineering/module-04/01-when-you-need-retrieval) — that's RAG's job, since facts change and fine-tuning doesn't update easily), and it won't reliably fix a model that's fundamentally the wrong size or capability tier for the task.
+
+| Need | Fine-tuning fit |
+|---|---|
+| Consistent tone/format at scale | Good |
+| Domain-specific terminology | Good |
+| Teaching new, changing facts | Poor — use RAG |
+| Fixing weak base reasoning | Poor — different model needed |
 
 ::: warning Watch out
-The most common fine-tuning mistake is using it to inject knowledge.
-
-Teams will take their product documentation, convert it to Q&A pairs, and fine-tune a model on it — expecting the model to now "know" their product. This usually fails:
-
-1. The model may generate plausible-sounding but wrong answers about your product (it doesn't know which facts it "learned" are reliable)
-2. When your product changes, the fine-tuned model has stale knowledge and needs retraining
-3. RAG solves this better — put your documentation in a vector store, retrieve the relevant section at query time, and the model cites accurate, up-to-date information
-
-Fine-tuning is for behavior. RAG is for knowledge.
+Fine-tuning can quietly degrade general capability — a model tuned hard on narrow support-ticket data can get measurably better at that task while getting worse at everything else, a failure called catastrophic forgetting. Always evaluate the fine-tuned model on both the target task *and* a general capability check before shipping, not just the target task in isolation.
 :::
 
-## When fine-tuning actually makes sense for TaskFlow
-
-After our analysis, the legitimate use cases were:
-
-1. **Training a small classifier** — fine-tune a tiny model to classify support intent (billing/technical/account) at very high accuracy. Fast, cheap to serve, no need for a big general model just for this step.
-
-2. **Response format consistency** — we have very specific rules for how escalation messages should be written. Fine-tuning a small model to always follow this format exactly is more reliable than prompting.
-
-3. **Cost optimization** — fine-tune a 7B model to handle the 70% of tickets that are simple and routine. Reserve the big model (GPT-4o / Llama 3 70B) for complex cases. Significant cost reduction at scale.
-
-::: details Interview Question — Fine-tuning vs RAG
-**Q:** A customer asks you to fine-tune the model on their 10,000-page product manual so the model "knows" their product. How do you respond?
-
-**A:** Politely redirect. Fine-tuning on knowledge doesn't work reliably — the model may recall fine-tuned facts inconsistently, can still confabulate, and the fine-tune becomes stale whenever the manual changes (requiring expensive retraining). RAG is the right architecture: chunk the manual, embed it, store in a vector database, retrieve relevant sections at query time. The model then reads the actual source document when answering — which is accurate, up-to-date, and citable. Fine-tuning is what you do if you want to change *how* the model responds (format, tone, style, specific behavioral patterns). It's not for making the model know facts.
+::: details Interview Question — Fine-tuning vs a longer prompt
+**Q:** A team achieves a specific output style through a long, carefully engineered system prompt. When would you recommend fine-tuning instead?
+**A:** When that prompt is repeated on every call at real volume and the cost of the extra tokens outweighs the fine-tuning investment, or when the style needs to be more reliable than prompting achieves even with careful engineering. Fine-tuning bakes the behavior into weights, so the prompt can shrink dramatically. It's not worth it at low volume — the fine-tuning setup and evaluation cost exceeds the token savings.
 :::
+
+::: details Interview Question — Detecting catastrophic forgetting
+**Q:** How would you check whether a fine-tuned model has lost general capability while gaining task-specific performance?
+**A:** Run the fine-tuned model against both your target-task golden dataset and a separate, general-capability evaluation set unrelated to the fine-tuning task, then compare both to the base model's scores. A model that improved on the target task but dropped meaningfully on general tasks is exhibiting catastrophic forgetting — the fix is usually a lower learning rate, fewer training epochs, or techniques like LoRA ([10.2](./02-lora-qlora)) that constrain how much the weights can shift.
+:::
+
+## Key Mental Models
+
+**Fine-tuning changes weights; it's real training, at smaller scale.** Different category of thing than prompting or context.
+
+**It's for behavior and style, not facts.** Facts belong in retrieval, which can be updated without retraining.
+
+**Always evaluate general capability, not just the target task.** Narrow improvement can hide broad regression.
+
+## Related
+
+- [10.2 LoRA & QLoRA](./02-lora-qlora) — the practical, affordable way most fine-tuning happens
+- [10.3 When to Fine-Tune](./03-when-to-fine-tune) — the fuller decision framework
+- [4.1 When You Need Retrieval](/ai-engineering/module-04/01-when-you-need-retrieval) — the other branch of this decision

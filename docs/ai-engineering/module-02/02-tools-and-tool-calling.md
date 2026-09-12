@@ -1,108 +1,73 @@
 ---
-title: Tools — Giving the Agent Hands
+title: Tools & Tool Calling
 outline: deep
 ---
 
-# Tools — Giving the Agent Hands
+# Tools & Tool Calling
 
-Our agent could only answer from its training data. It didn't know about real TaskFlow tickets. We gave it a `lookup_ticket` tool. That changed everything.
+Without tools, TaskFlow's agent could only answer from what it learned in training — nothing about real tickets, real account states, real anything. Tools are how it reaches out of its own head.
 
 ::: tip Plain English
-Without tools, the model is a brilliant person locked in a room with no phone, no computer, and no windows. It can only tell you what it already knows from before it was locked in.
-
-A tool is like handing that person a phone with one specific app. Now they can look things up. Give them another tool and they can send a message. Another and they can check a calendar.
-
-The model doesn't actually run the tool — you do. The model says "please look up ticket #4821," and your code makes the API call and brings back the result. The model just knows how to ask.
+A tool is a function the model can ask you to run, with arguments it fills in. The model never executes anything itself — it says "call `lookup_ticket` with id 4821," your code runs it, and the result goes back into the conversation. The model is choosing which door to open; your code is the one that opens it.
 :::
 
-## What tool calling actually is
+## How it actually works
 
-Under the hood, tools are structured JSON output. You tell the model: "These are the tools you can use. They work like this." The model, when it decides to use a tool, outputs a structured request instead of a normal text response:
+You describe each tool with a name, a description, and a JSON schema for its arguments — the description is doing most of the work, since it's how the model decides *when* to reach for that tool at all.
 
-```json
-{
-  "tool_call": {
-    "name": "lookup_ticket",
-    "arguments": {
-      "ticket_id": "4821"
-    }
-  }
-}
+```typescript
+const tools = [{
+  name: 'lookup_ticket',
+  description: 'Fetch current status, priority, and assignee for a support ticket by ID.',
+  parameters: {
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Ticket ID, e.g. "4821"' } },
+    required: ['id'],
+  },
+}];
 ```
 
-Your code (the harness) intercepts this, calls your actual `lookup_ticket` function, and feeds the result back into the conversation. The model never touches your database directly — it just asks, and you do the calling.
+The model doesn't call the function — it returns a structured request to call it. Your harness executes the real function, appends the result as a new message, and the loop continues. This is exactly [structured output](/ai-engineering/module-03/02-structured-outputs) under a different name: the schema constrains what the model can ask for.
 
-## Defining a tool
+## Designing tools that work
 
-Every provider has slightly different syntax, but the structure is the same: name, description, parameters.
+**Narrow beats broad.** `lookup_ticket(id)` is easier for the model to use correctly than `query_database(sql)`. A narrow tool has one obvious use; a broad one invites malformed or dangerous calls.
 
-```json
-{
-  "name": "lookup_ticket",
-  "description": "Look up a TaskFlow support ticket by ID. Returns the ticket status, priority, assigned agent, and last update.",
-  "parameters": {
-    "type": "object",
-    "properties": {
-      "ticket_id": {
-        "type": "string",
-        "description": "The TaskFlow ticket ID (e.g. '4821')"
-      }
-    },
-    "required": ["ticket_id"]
-  }
-}
-```
+**Descriptions are the interface.** The model picks tools by reading descriptions, not by inspecting your code. A vague description gets called at the wrong time or not at all.
 
-The description matters. The model reads it to decide when and how to use the tool. A good description answers: "What does this do? When should I use it? What does it return?"
-
-## Tool design principles
-
-**Name it clearly.** `lookup_ticket` is better than `get_data`. `escalate_to_human` is better than `escalate`. The model uses the name to decide when to call it.
-
-**Keep inputs simple.** If your tool needs 8 parameters, the model will often get some of them wrong or omit them. Design tools with 1–3 required inputs. If you need more, split into multiple tools or have your code look things up internally.
-
-**Return useful output.** The model reads the tool result and uses it to reason. Return structured data with clear field names, not a raw dump. Include the key fields upfront; don't make the model parse through noise.
-
-**One tool, one job.** A `lookup_and_escalate_ticket` tool that does two things is harder for the model to reason about than two separate tools. Split concerns.
-
-## What we gave TaskFlow's agent
-
-```
-lookup_ticket(ticket_id)       → status, priority, assignee, last_update
-list_user_tickets(user_email)  → array of open tickets
-escalate_to_human(ticket_id, reason) → confirmation
-search_help_docs(query)        → top 3 relevant doc sections
-```
-
-Four tools. Clear names, simple inputs, focused purposes.
-
-## When NOT to give the agent a tool
-
-::: warning Watch out
-Not every capability should be a tool. Ask:
-
-**"What's the worst case if the model calls this incorrectly?"**
-
-- `lookup_ticket` — worst case: looks up wrong ticket. Low risk. Give it.
-- `delete_ticket` — worst case: deletes a real ticket. **Do not give this as an autonomous tool.** Put a human confirmation step in the loop.
-- `send_email_to_user` — worst case: sends wrong message to real customer. Require confirmation or make it human-in-the-loop.
-- `issue_refund` — do not give this to an agent without human approval in the middle.
-
-The model is not reliable enough for irreversible high-stakes actions to be fully autonomous. Design tools that are reversible, or build confirmation flows for the ones that aren't.
-:::
-
-## When to use tools vs just prompting
+**Separate read from write.** Read tools can be given freely. Write tools — anything that sends, deletes, or charges — need a stricter path.
 
 | Situation | Approach |
-|-----------|----------|
-| Answer requires real-time data (ticket status, user plan) | Tool |
-| Answer is based on knowledge the model has | Just prompt |
-| You need to take an action (send email, update status) | Tool + confirmation |
-| You need to search documentation | Tool (search_help_docs) or RAG |
-| Simple formatting or classification | Just prompt |
+|---|---|
+| Needs real-time data (ticket status) | Tool |
+| Answer is general knowledge | Just prompt |
+| Takes an action (refund, email) | Tool + confirmation |
+| Searches documentation | Tool, or hand off to RAG |
 
-::: details Interview Question — Tool design for safety
-**Q:** You're building an agent that can update records in a database. How do you design the tools safely?
-
-**A:** Separate read tools from write tools, and add a confirmation layer for writes. Pattern: (1) Give the agent read-only lookup tools freely. (2) For write tools, the agent produces a "proposed action" that your harness intercepts and either auto-approves (for low-stakes updates) or routes to human review. (3) Design write tools to be idempotent — the same call twice shouldn't cause double updates. (4) Log every tool call with the full arguments so you have an audit trail. (5) For high-stakes writes (deletes, financial changes), require the agent to call a `request_confirmation` tool first, which triggers a human approval flow before the actual write tool is enabled for that session.
+::: warning Watch out
+The model is not reliable enough for irreversible high-stakes actions to run fully autonomously. Don't give an agent `issue_refund` without a human-approval step in between. Design write tools to be idempotent too — a retried call shouldn't double-charge or double-update.
 :::
+
+::: details Interview Question — Designing write tools safely
+**Q:** You're building an agent that can update database records. How do you keep that safe?
+**A:** Split reads from writes. Reads are freely available. Writes go through a `request_confirmation`-style flow: the agent proposes an action, the harness either auto-approves low-stakes ones or routes to a human for high-stakes ones (deletes, financial changes). Make writes idempotent so a retry can't double-apply, and log every call with full arguments for an audit trail.
+:::
+
+::: details Interview Question — Tool description quality
+**Q:** An agent keeps calling the wrong tool, or not calling one it should. What's the likely cause?
+**A:** Usually the description, not the model. If two tools sound similar, or a description doesn't state clearly *when* to use it, the model guesses. Fix by tightening descriptions with concrete trigger conditions and examples, and by narrowing overlapping tools into one, rather than adding more prompt instructions telling it to "be careful."
+:::
+
+## Key Mental Models
+
+**The model requests; your code executes.** It never runs anything directly — treat every tool call as untrusted input.
+
+**Narrow, well-described tools get used correctly.** Broad tools invite misuse.
+
+**Reads are cheap to expose; writes need a gate.** The blast radius is what determines how much friction belongs in front of a tool.
+
+## Related
+
+- [2.1 The Agent Loop](./01-agent-loop) — where tool calls fit in the cycle
+- [3.2 Structured Outputs](/ai-engineering/module-03/02-structured-outputs) — the same constrained-generation mechanism
+- [7.2 Agent Security](/ai-engineering/module-07/02-agent-security) — authorization gates for write tools

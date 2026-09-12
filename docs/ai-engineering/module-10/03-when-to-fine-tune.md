@@ -1,99 +1,63 @@
 ---
-title: When to Fine-Tune (and When Not To)
+title: When to Fine-Tune
 outline: deep
 ---
 
-# When to Fine-Tune (and When Not To)
+# When to Fine-Tune
 
-We almost fine-tuned when a better system prompt would have done the job. Here's the decision tree.
+Fine-tuning is the most over-reached-for tool in this track — teams jump to it when a better prompt or a retrieval layer would have solved the problem for a tenth of the cost and none of the retraining overhead.
 
 ::: tip Plain English
-Fine-tuning is like surgery. It can fix real problems. But you don't go straight to surgery when the problem might be fixed with rest and physical therapy. You exhaust the simpler options first.
-
-For most problems you encounter building an AI agent, the simpler option — a better prompt, a RAG setup, a different model — will solve it faster, cheaper, and with less risk than fine-tuning.
-
-Use this decision tree before even opening a Colab notebook.
+Fine-tuning is a genuinely useful tool that's also genuinely expensive to reach for prematurely — like hiring a specialist consultant when a clearer set of instructions to your existing team would have solved it. Worth doing when the problem actually calls for it; wasteful when a cheaper fix was available and nobody checked.
 :::
 
-## The decision tree
+## The decision, in order
 
-```
-What kind of problem is it?
+Work through cheaper options first — this is the full version of the ladder introduced in [4.1](/ai-engineering/module-04/01-when-you-need-retrieval):
 
-Is it a KNOWLEDGE problem?
-(The model doesn't know facts about your domain, product, or data)
-  └─ Yes → Use RAG. Fine-tuning won't reliably solve this.
-  └─ No ↓
+1. **Better prompting** — is the model capable of this but phrasing or formatting it wrong? Fix the prompt first; it's nearly free to iterate on.
+2. **More context** — does it just need the right information at request time? Add it directly if the set is small and stable.
+3. **RAG** — does it need access to a large or changing knowledge base? Retrieval, not retraining.
+4. **Fine-tuning** — does it need a genuine, consistent shift in *behavior*, *style*, or *format* that the above can't achieve reliably?
 
-Is it a BEHAVIOR / FORMAT / STYLE problem?
-(Tone, structure, following a specific process, using your terminology)
-  └─ Yes → Try prompting first.
-          └─ Prompting fixed it? → Done. Ship it.
-          └─ Prompting not enough? → Consider fine-tuning.
-  └─ No ↓
+Reach step 4 only after steps 1–3 have been genuinely tried, not assumed insufficient.
 
-Is it a COST / SPEED problem?
-(The model is too slow or too expensive for this task)
-  └─ Yes → Fine-tune a small model to do the specific task.
-           (Replace big-model usage with cheap fine-tuned small model)
-  └─ No ↓
+## Signals it's actually time
 
-Is it a REASONING problem?
-(The model reasons incorrectly about domain-specific concepts)
-  └─ Yes → Fine-tuning rarely fixes this. Try chain-of-thought,
-           better context, or a different base model.
-```
+- The same behavior is being coaxed through an increasingly long, brittle prompt, and it's still inconsistent
+- The task needs domain-specific patterns (legal phrasing, medical terminology) the base model under-represents
+- You're at high enough volume that shrinking the prompt via fine-tuning meaningfully cuts cost
+- The knowledge involved is stable, not changing week to week — otherwise it belongs in retrieval
 
-## The three-column comparison
+| Signal | Points toward |
+|---|---|
+| "The model just doesn't have this information" | RAG |
+| "The model has the knowledge but won't format/phrase it right, consistently" | Fine-tuning |
+| "It works with examples in the prompt but not without" | Fine-tuning (bake in the pattern) |
+| "It's wrong sometimes, in ways that seem random" | Better prompting or evaluation first — diagnose before assuming it needs retraining |
 
-| | Prompt Engineering | RAG | Fine-tuning |
-|---|---|---|---|
-| What it's for | Behavior, tone, instructions | Knowledge retrieval | Behavior, format, cost optimization |
-| Cost to implement | Hours | Days to weeks | Days to weeks (+ training cost) |
-| Updates easily? | Yes — edit the prompt | Yes — update the database | No — requires retraining |
-| Handles knowledge? | Somewhat (via context) | Yes — that's its job | Poorly |
-| Handles format? | Yes | No | Yes |
-| Requires data? | No | Your documents | Training pairs (100+) |
-| Model quality ceiling | High | High | Depends on base model |
-
-## When fine-tuning is clearly the right answer
-
-**1. You need a cheaper/faster model for a specific task at scale**
-
-You currently use GPT-4o to classify support tickets as billing/technical/account. At 100,000 requests/day, that's expensive. Fine-tune Llama 3 3B on 2,000 labeled examples from your historical tickets. Same classification quality, 50x cheaper per call.
-
-**2. Consistent format that prompting can't enforce reliably**
-
-Your ticketing system requires a specific JSON format with 12 fields. Even with extensive prompting, the model occasionally misses a field or uses the wrong format. Fine-tuning on 500 examples of correct format produces near-100% format adherence.
-
-**3. Deep domain-specific response style**
-
-You have a very specific way of handling escalations — specific phrases, specific structure, specific tone. It's subtle enough that a 3-paragraph system prompt doesn't capture it, but 200 examples of "correct" escalation handling would.
-
-## When fine-tuning is clearly NOT the answer
-
-**You expect it to learn facts.** Fine-tuned knowledge is unreliable and goes stale. Use RAG.
-
-**The base behavior changes over time.** If what "correct" looks like changes frequently, fine-tuning is expensive to maintain. Prompts update in minutes; fine-tunes take hours/days.
-
-**You haven't tried prompting yet.** Seriously — a well-written system prompt with 5 few-shot examples often achieves 90% of what fine-tuning achieves. Start there.
-
-**You have fewer than ~100 high-quality examples.** Fine-tuning on small, low-quality data produces an overfit mess. More data, better quality, or don't fine-tune.
-
-## For TaskFlow specifically
-
-After going through this decision tree, our fine-tuning roadmap:
-
-| Problem | Solution | Why |
-|---------|----------|-----|
-| Doesn't know product features | RAG on help docs | Knowledge problem |
-| Says "the software" instead of "TaskFlow" | System prompt | 5-minute fix |
-| Escalation message format | Fine-tune small model | Format consistency at scale |
-| Ticket intent classification | Fine-tune small model | Cost — 100k/day requests |
-| Complex reasoning on technical issues | Better prompting (CoT) | Fine-tuning won't fix reasoning |
-
-::: details Interview Question — Fine-tune decision
-**Q:** You're building a support agent. The model's responses are technically correct but consistently too formal for your brand voice — like a legal document. How do you fix this?
-
-**A:** Start with the cheapest fix: update the system prompt. Add explicit tone instructions with 2–3 examples of the desired voice — casual, warm, direct. This is a 20-minute change and often works completely. If the prompt doesn't hold the tone consistently across diverse inputs (especially under adversarial or unusual questions), the next step is few-shot examples in the prompt — add 8–10 complete examples of question → ideal-tone response. If that still doesn't produce reliable consistency (rare), then fine-tuning becomes justified: collect 200–500 real examples of correct-tone responses, fine-tune a model (possibly a smaller one), and use that for response generation. The investment is days of work and training costs. For most teams, the system prompt fix is enough and fine-tuning is never needed for tone alone.
+::: warning Watch out
+Fine-tuning locks in a snapshot. If the underlying task, tone, or policy changes, the fine-tuned model doesn't update itself — you retrain. This is exactly why fine-tuning is wrong for anything that changes regularly (pricing, policies, current events) and right mainly for durable behavior (tone, format, domain conventions) that isn't expected to shift often.
 :::
+
+::: details Interview Question — A team wants to fine-tune to "teach the model our product"
+**Q:** A team wants to fine-tune a model on your product documentation so it "knows the product." Is that the right approach?
+**A:** Usually not — that's a knowledge problem, and knowledge that can change (features, pricing, docs updates) belongs in RAG, not baked into weights via fine-tuning. Fine-tuning would need to be re-run every time the documentation changes, which doesn't scale. Redirect toward RAG for the factual grounding, and reserve fine-tuning for something else entirely — like teaching consistent formatting or tone in how the product is discussed.
+:::
+
+::: details Interview Question — Justifying fine-tuning against a real cost estimate
+**Q:** How would you build the case for fine-tuning to a stakeholder skeptical of the added complexity?
+**A:** Show that cheaper options were tried first and genuinely fell short — not assumed to. Present concrete evidence: prompt engineering plateaued at some measured quality level, or per-call cost is high enough at current volume that a shrunk fine-tuned prompt pays for the training cost within a defined period. Ground it in the golden dataset scores before and after prompting attempts, not "the prompt feels long."
+:::
+
+## Key Mental Models
+
+**Fine-tuning is the last step, not the first.** Most problems attributed to "the model doesn't know this" are solved by prompting or retrieval.
+
+**It's for durable behavior, not changing knowledge.** Anything that updates regularly belongs in retrieval instead.
+
+## Related
+
+- [4.1 When You Need Retrieval](/ai-engineering/module-04/01-when-you-need-retrieval) — the earlier rungs of this same ladder
+- [10.1 Fine-Tuning Overview](./01-fine-tuning-overview) — what fine-tuning is actually good for
+- [1.2 Prompt Engineering](/ai-engineering/module-01/02-prompt-engineering) — the cheapest rung, tried first

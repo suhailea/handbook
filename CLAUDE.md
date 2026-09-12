@@ -254,15 +254,17 @@ Describe these as typical patterns — never fabricate specific incidents or num
 
 | Element | Target |
 |---|---|
-| Words per content page | 1,600–2,200 |
+| Words per content page | **800–1,100 (compact — not a deep-dive track)** |
 | Plain English block | exactly 1, mandatory, never omitted |
 | Watch out block | ≥1 |
-| Interview questions | **≥2** per page |
-| Visual anchor (table or diagram) | ≥1 |
+| Interview questions | **≥2** per page, each answer 3–5 sentences, not an essay |
+| Visual anchor (table or diagram) | ≥1 where it replaces prose, not decorative |
+
+The earlier draft of this doctrine targeted 1,600–2,200 words. That was wrong for this track's purpose: readers need to get through a module in one sitting, not study it for a week. Prefer one sharp mechanism explained well over three mechanisms explained thoroughly. If a page is running past 1,200 words, cut before adding — split into a second page only if the two halves are genuinely separable topics.
 
 ### Hard rules
 
-- **Every page has a Plain English block.** A page without one is incomplete regardless of length. (Known violations to fix: `module-00/01-how-transformers-work.md`, `module-00/04-rlhf.md`.)
+- **Every page has a Plain English block.** A page without one is incomplete regardless of length.
 - **One topic, one home.** If a concept gets a full treatment in two modules, one of them is wrong. Merge toward the stronger page and delete the other.
 - **Narrative continuity.** Every main-line AI Engineering module advances the TaskFlow story, or is explicitly marked as a reference module in its index.
 - Never invent benchmarks, costs, or incidents. Model prices and context limits go stale — state them as illustrative, not authoritative.

@@ -1,86 +1,64 @@
 ---
-title: The Agent Loop — How an Agent Actually Runs
+title: The Agent Loop
 outline: deep
 ---
 
-# The Agent Loop — How an Agent Actually Runs
+# The Agent Loop
 
-We gave TaskFlow's agent a tool to look up tickets. But how does it decide when to use it? How does it know when it's done? That's the agent loop.
+TaskFlow's agent had a tool to look up tickets. The question was how it decides *when* to use it, and how it knows it's done. That's the agent loop.
 
 ::: tip Plain English
-A single LLM call is like asking a question and getting an answer. That's it — one in, one out.
-
-An agent is different. It's a loop. The model thinks, decides to do something, does it, sees the result, and then thinks again. It keeps going until it has an answer or hits a limit.
-
-Think of it like a detective. You don't just hand a detective a case file and wait. They read the file, then make a call, then follow up on what they learn, then look at something else, then form a conclusion. Each step informs the next. That's the agent loop.
+A single LLM call is one question, one answer. An agent is a loop: think, maybe act, observe the result, think again — like a detective who reads a file, makes a call, follows up on what they learn, then forms a conclusion. Each step informs the next.
 :::
 
-## The Think → Act → Observe cycle
+## Think → Act → Observe
 
 ```
-User message
-     ↓
-  Think (LLM call)
-     ↓
- Need a tool? ──── Yes ──→ Call tool ──→ Observe result ──┐
-     ↓ No                                                   │
-  Respond                                              back to Think
+User message → Think (LLM call) → tool needed? ─yes─→ Act → Observe ─┐
+                    ↑no                                               │
+                 Respond                                    back to Think
 ```
 
-Each iteration of the loop:
+For TaskFlow: user asks about ticket #4821 → model decides it needs `lookup_ticket` → harness calls it → result comes back as a new message → model now has enough to answer. One tool call here; a complex ticket might take three or four.
 
-1. **Think** — The model sees the conversation + any tool results so far, and produces either a tool call or a final response.
-2. **Act** — If the model produced a tool call, the harness executes it (calls your actual function/API).
-3. **Observe** — The result of the tool call is added to the conversation as a new message, and the loop repeats.
+## When it stops
 
-For TaskFlow:
-- User: "Can you check on ticket #4821?"
-- Think: "I need the lookup_ticket tool for this."
-- Act: Call `lookup_ticket(id="4821")`
-- Observe: `{ status: "open", priority: "high", assigned_to: "Sarah" }`
-- Think: "I have the info. I can answer now."
-- Respond: "Ticket #4821 is open and assigned to Sarah, marked high priority."
-
-That was one tool call. A complex ticket might require three or four.
-
-## When does the loop stop?
-
-The loop stops when one of these happens:
-
-1. **The model produces a final answer** (no tool call in its output)
-2. **Max turns is hit** — you set a limit (e.g., 10 iterations) and the loop stops regardless
-3. **An error occurs** — a tool fails and you decide not to retry
-4. **A guardrail triggers** — the harness detects something wrong and halts
-
-::: warning Watch out
-Without a max turns limit, agents can loop forever. We've seen this happen with TaskFlow: the agent would call lookup_ticket, get an unexpected status code, try to interpret it, call another tool to get more context, get confused, try the first tool again... and spin indefinitely.
-
-Always set a max turns limit. 10–15 is usually plenty for support tickets. If an agent needs more than that to answer a question, the question is probably too complex for a single agent run anyway.
-:::
-
-## Single LLM call vs agent
+1. The model returns a final answer with no tool call
+2. Max turns is hit (set one — 10–15 is plenty for support tasks)
+3. A tool errors and you choose not to retry
+4. A guardrail halts it
 
 | | Single call | Agent loop |
 |---|---|---|
 | Turns | 1 | Multiple |
-| Can use tools | No | Yes |
-| Can adapt | No — fixed input/output | Yes — observes results and adjusts |
-| Cost | Predictable | Variable (more tools = more tokens) |
-| Latency | Predictable | Variable |
-| Best for | Simple Q&A, formatting, classification | Multi-step tasks, tasks needing real data |
+| Uses tools | No | Yes |
+| Cost/latency | Predictable | Variable |
+| Best for | Simple Q&A, classification | Multi-step tasks needing real data |
 
-## The risk of infinite loops
+For TaskFlow, a simple "what's your refund policy" question never enters the loop at all — it's answered in one call. A ticket that requires checking account status, then cross-referencing a policy document, then possibly escalating, genuinely needs the loop: each step depends on what the previous one found.
 
-Three things cause runaway agents:
-
-1. **A tool that always fails** — the agent keeps retrying because it thinks the tool is the answer
-2. **The model misreading tool output** — it doesn't realize it already has what it needs
-3. **Circular reasoning** — "I need X to get Y, I need Y to get X"
-
-Defenses: max turns, timeout per tool call, detect repeated tool calls with identical inputs and break the loop.
-
-::: details Interview Question — Agent termination
-**Q:** How do you prevent an agent from running indefinitely or wasting tokens in a loop?
-
-**A:** Defense in depth: (1) Hard max-turns limit — no matter what, stop after N iterations (10–15 for most tasks). (2) Per-tool-call timeout — each tool call has a timeout so a slow external API can't stall the agent. (3) Loop detection — if the same tool is called with the same arguments twice, you're in a loop; break out. (4) Token budget — set a max total token usage per agent run and halt if exceeded. (5) Cost tracking per run — alert if a single agent run exceeds a cost threshold. In practice, max-turns + loop detection catches 99% of cases.
+::: warning Watch out
+Without a turn limit, agents loop forever — a failing tool, misread output, or circular reasoning ("I need X to get Y, I need Y to get X") can spin indefinitely. Defenses: hard max-turns, per-tool timeout, and loop detection (same tool, same arguments twice = break).
 :::
+
+::: details Interview Question — Preventing runaway agents
+**Q:** How do you stop an agent from looping indefinitely or burning tokens?
+**A:** Layered: hard max-turns (10–15 typical), per-tool-call timeout, loop detection on repeated identical calls, a total token budget per run, and cost alerts per run. Max-turns plus loop detection catches nearly everything in practice.
+:::
+
+::: details Interview Question — Single call vs agent
+**Q:** When would you deliberately avoid making something an agent?
+**A:** When the task is one-shot and doesn't need real-time data or actions — classification, formatting, simple Q&A. Agents add latency and cost variance for no benefit there; reserve the loop for tasks that genuinely need multiple steps or external state.
+:::
+
+## Key Mental Models
+
+**An agent is a loop, not a smarter call.** The intelligence is in the repetition, not any single step.
+
+**Always cap turns.** An uncapped loop is a production incident waiting for a bad tool response.
+
+## Related
+
+- [2.2 Tools & Tool Calling](./02-tools-and-tool-calling) — what Act actually invokes
+- [2.5 The Agent Harness](./05-agent-harness) — where turn limits and timeouts live
+- [3.3 Reliability & Fallbacks](/ai-engineering/module-03/03-reliability-and-fallbacks) — retry policy inside the loop

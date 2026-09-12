@@ -5,99 +5,56 @@ outline: deep
 
 # vLLM — High-Throughput Model Serving
 
-Local llama.cpp was too slow for production. We needed to serve Llama 3 to 100 concurrent users. Enter vLLM.
+Local runtimes serve one user well. Self-hosted production serves hundreds of concurrent requests against shared GPU memory, and naive serving falls over there in a way that's invisible at small scale. vLLM exists to solve exactly that problem.
 
 ::: tip Plain English
-llama.cpp is like a single checkout lane at a grocery store. One customer at a time. Everyone else waits. It's fine when there's one person in the store.
-
-vLLM is like a supermarket that batches customers together. While it's ringing up customer A's items, it's also already starting on customer B's items. Multiple customers are being served simultaneously, sharing the same register. The store (GPU) is never idle.
-
-This is called "continuous batching," and it's the core reason vLLM can serve 100 users in the time llama.cpp serves 5.
+Imagine a kitchen that starts one dish completely from scratch for every single order, even when ten orders share the same first three steps. vLLM is a kitchen that notices the shared steps across all the orders in flight and batches the work, instead of repeating it per customer. The result is far more orders served per unit of GPU, not a faster GPU.
 :::
 
-## What vLLM is
+## What it actually optimizes
 
-vLLM is an open-source inference server built specifically for high-throughput LLM serving. It runs models on GPU and exposes an OpenAI-compatible API. Your existing code that calls OpenAI just needs a base URL change:
+**Continuous batching** — instead of processing one request at a time or waiting to form a fixed batch, vLLM dynamically adds new requests to an in-flight batch as GPU capacity frees up. Naive serving either processes requests one-by-one (wasteful) or waits to batch a fixed group (adds latency); continuous batching does neither.
 
-```python
-# Before: OpenAI API
-client = OpenAI(api_key="sk-...")
+**PagedAttention** — the technique vLLM is best known for. It manages the KV cache ([3.5](/ai-engineering/module-03/05-prompt-caching)) in fixed-size memory pages, similar to how an OS manages RAM, instead of allocating one large contiguous block per request. This dramatically reduces wasted GPU memory and lets far more concurrent requests fit in the same hardware.
 
-# After: vLLM (same interface, local model)
-client = OpenAI(
-    api_key="not-needed",
-    base_url="http://your-vllm-server:8000/v1"
-)
+```
+Naive serving:      1 request → 1 large contiguous KV allocation → memory fragments, waste
+vLLM PagedAttention: requests → KV cache split into pages → allocated flexibly, reused, less waste
 ```
 
-## The key ideas
+## The practical effect
 
-### Continuous batching
+| | Naive serving | vLLM |
+|---|---|---|
+| Concurrent requests per GPU | Low | Significantly higher |
+| Memory efficiency | Poor — fragmentation | Strong — paged allocation |
+| Setup complexity | Simple | Moderate — real infra to run |
+| Right for | Single-user, dev | Production, many concurrent users |
 
-Traditional inference servers process one request at a time (or batch fixed-size groups). vLLM processes requests continuously — new requests join the batch mid-flight as others complete. The GPU is almost never idle. This dramatically increases throughput.
+vLLM is the serving layer, not the model itself — you load a model (often as GGUF or a native format) into vLLM, and it handles the concurrency and memory management around it. This is where [9.1's](./01-model-serving-overview) self-hosting decision becomes a running production system rather than a local experiment.
 
-### PagedAttention
-
-During inference, the model needs to store "KV cache" — intermediate computations from processing input tokens. (More on KV cache on the [next page](/ai-engineering/module-03/05-prompt-caching).)
-
-The problem: different requests have different lengths. A 5,000-token context and a 50-token context need very different amounts of KV cache space. If you pre-allocate the maximum, you waste most of your GPU memory most of the time.
-
-PagedAttention manages KV cache like a virtual memory system — it allocates memory in small, fixed-size pages and only uses what's needed. This means you can fit many more concurrent requests in GPU memory than traditional approaches. The name references operating system paging: the same idea that lets your computer run programs bigger than your RAM.
-
-For TaskFlow: with standard attention, we could handle ~20 concurrent requests on our A100. With PagedAttention (vLLM), we handle 80+ concurrent requests on the same GPU.
-
-### OpenAI-compatible API
-
-vLLM serves the exact same REST API as OpenAI. You can run:
-- `/v1/chat/completions` (the standard chat endpoint)
-- `/v1/completions` (legacy)
-- `/v1/models` (model listing)
-
-Any code that works with OpenAI works with vLLM. This is non-trivial — it means you can switch between cloud and self-hosted without changing your agent code.
-
-## Deploying vLLM
-
-```bash
-# Install
-pip install vllm
-
-# Serve Llama 3 8B
-python -m vllm.entrypoints.openai.api_server \
-  --model meta-llama/Meta-Llama-3-8B-Instruct \
-  --tensor-parallel-size 1  # number of GPUs
-
-# Serve Llama 3 70B across 4 GPUs
-python -m vllm.entrypoints.openai.api_server \
-  --model meta-llama/Meta-Llama-3-70B-Instruct \
-  --tensor-parallel-size 4
-```
-
-## Comparison table
-
-| | llama.cpp / Ollama | vLLM | Cloud API |
-|---|---|---|---|
-| Hardware | CPU / Apple Silicon | GPU required | Their problem |
-| Concurrent users | 1 (effectively) | 50–500+ | Unlimited |
-| Latency | 5–60s | 200ms–2s | 500ms–2s |
-| Setup complexity | Low | Medium | None |
-| Cost at scale | Near zero | GPU costs | Per token |
-| Best for | Dev / single user | Self-hosted production | Cloud production |
-
-::: tip When to use vLLM
-- Self-hosting a model in production for multiple concurrent users
-- Privacy requirements prevent cloud APIs
-- High volume where cloud API costs exceed GPU costs
-- You need fine-tuned models in production
+::: warning Watch out
+vLLM solves throughput and memory efficiency, not model quality — a self-hosted open model served through vLLM is still that model's quality ceiling, just served efficiently at scale. Don't expect vLLM to close a capability gap; it closes an infrastructure gap. Also budget real setup time: GPU provisioning, model loading, and tuning batch parameters is meaningfully more work than `ollama run`.
 :::
 
-::: warning When NOT to use vLLM
-- You don't have GPU access — vLLM needs NVIDIA GPU (though AMD ROCm support exists)
-- Low traffic — if you have < 100 requests/hour, cloud API is simpler and probably cheaper
-- You need frontier model quality — vLLM serves open models, which still trail GPT-4o/Claude on complex reasoning
+::: details Interview Question — What problem does vLLM actually solve?
+**Q:** What specific problem does vLLM solve that a naive model-serving setup doesn't?
+**A:** GPU memory efficiency and throughput under concurrency. Naive serving allocates a large contiguous block of KV cache memory per request, which fragments quickly and limits how many requests can run simultaneously. vLLM's PagedAttention manages that memory in smaller, flexible pages — closer to how an OS manages RAM — which lets significantly more concurrent requests fit in the same GPU memory, plus continuous batching keeps the GPU busy rather than idling between fixed batches.
 :::
 
-::: details Interview Question — PagedAttention
-**Q:** What problem does PagedAttention solve, and why does it matter for throughput?
-
-**A:** Traditional KV cache management pre-allocates a contiguous block of memory per request equal to the maximum sequence length. This leads to internal fragmentation — if your max is 4k tokens but most requests use 500 tokens, 87% of allocated memory is wasted per request. This limits how many requests can be in-flight simultaneously. PagedAttention manages KV cache in fixed-size pages (like OS virtual memory), allocating only the pages actually needed by each request. Pages from different requests can be interleaved in physical GPU memory. Result: much higher GPU memory utilization, 2–4x more concurrent requests for the same GPU. It also enables efficient memory sharing for requests with the same prompt prefix (prompt caching), and zero-copy beam search. The net effect is higher throughput without any model quality changes.
+::: details Interview Question — vLLM vs a cloud API
+**Q:** If vLLM makes self-hosted serving efficient, does that mean self-hosting is now usually better than a cloud API?
+**A:** No — vLLM makes self-hosting *viable at scale*, it doesn't change the underlying trade-off from [9.1](./01-model-serving-overview). You still need real GPU capacity, real ops effort, and an open model whose quality ceiling may trail frontier closed models. vLLM is the answer to "how do I serve efficiently once I've decided to self-host," not an argument for making that decision in the first place.
 :::
+
+## Key Mental Models
+
+**vLLM optimizes throughput and memory, not model quality.** It's an infrastructure answer, not a capability answer.
+
+**PagedAttention is memory management for the KV cache, borrowed from OS design.** Fixed-size pages instead of large contiguous allocations is the whole trick.
+
+## Related
+
+- [9.1 Model Serving Overview](./01-model-serving-overview) — the decision that leads here
+- [3.5 Prompt Caching & the KV Cache](/ai-engineering/module-03/05-prompt-caching) — the KV cache concept vLLM manages at scale
+- [11.2 Kubernetes for AI](/ai-engineering/module-11/02-kubernetes-for-ai) — running vLLM in production

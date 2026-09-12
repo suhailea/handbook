@@ -45,3 +45,9 @@ Backend engineers who can already build APIs and want to build AI systems that s
 **[ML Foundations](/ml-foundations/)** — statistics, linear algebra, neural networks, optimization. A reference track, linked on demand. You don't need it first, and for most engineering work you won't need it at all.
 
 Start at [Module 0](/ai-engineering/module-00/).
+
+## Interview prep
+
+- [60 Interview Questions](/ai-engineering/questions) — self-test bank covering every module
+- [Crash Sheet](/ai-engineering/crash-sheet) — 10-minute scan before an interview
+- [Interview Answer Framework](/ai-engineering/interview-framework) — a structured approach for AI system design questions

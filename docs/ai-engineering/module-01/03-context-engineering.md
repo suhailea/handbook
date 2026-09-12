@@ -1,93 +1,65 @@
 ---
-title: Context Engineering — What You Put in the Window
+title: Context Engineering
 outline: deep
 ---
 
-# Context Engineering — What You Put in the Window
+# Context Engineering
 
-Our agent had a 128k context window. We stuffed everything in it. Costs tripled and responses got worse. Here's what we learned.
-
-Week two of building TaskFlow's agent, we hit a problem: the agent needed to know about our features. So we dumped the entire help documentation — 400 pages — into the system prompt. It fit. Technically.
-
-But two things happened: our API bill tripled overnight, and the agent started giving worse answers. It was getting lost in the noise.
+Prompt engineering is what you say to the model. Context engineering is everything else you hand it — conversation history, retrieved documents, tool results, user data — and getting that mix wrong breaks agents that have a perfectly good prompt.
 
 ::: tip Plain English
-Context engineering is not prompt engineering. Prompt engineering is about *how* you say things to the model. Context engineering is about *what information* you include at all.
-
-Think of the context window like a whiteboard in a meeting room. You can write anything on it — but the bigger it gets, the harder it is to find the one thing that actually matters right now.
-
-Putting your entire product documentation on that whiteboard doesn't help the agent. It gives the agent more to get confused by. The skill is figuring out: for this specific user question, what's the minimum information the model needs to give a great answer?
+Good prompting is choosing your words carefully. Context engineering is choosing what's on the table in front of you before you speak. You can be perfectly articulate and still give a wrong answer if the only documents in front of you are the wrong ones, or if there are so many that the relevant one gets lost in the pile.
 :::
 
-## The three problems with big contexts
+## What's competing for space
 
-**1. Cost scales linearly.** Every token in your context costs money, every request. If you put 20,000 tokens of documentation in the system prompt and you handle 100,000 requests/day, you're paying for 2 billion tokens of documentation per day — most of which is irrelevant to most requests.
+Every token in the context window is doing one of these jobs: system prompt, conversation history, retrieved knowledge, tool definitions, tool results. They all cost the same per token and all compete for a limited, priced budget — a bloated system prompt isn't free just because it "sets the tone."
 
-**2. Quality degrades.** Models have a "lost in the middle" problem — information at the very start and very end of a long context is recalled better than information in the middle. Burying the relevant paragraph in 400 pages of docs doesn't help.
+**Position matters, not just presence.** Models don't weight all positions in a long context equally — information buried in the middle of a long document is used less reliably than information near the start or end. This is sometimes called "lost in the middle." Practical implication: put the most important instruction or fact either first or last, not centered in a wall of text.
 
-**3. Latency increases.** Processing more tokens takes longer. A 128k-token context takes significantly longer than a 2k-token context.
-
-## The three approaches
-
-### Full context — just put it all in
-
-Works when:
-- The total relevant knowledge is small (under ~5,000 tokens)
-- Every request is likely to need all of it
-- You want simplicity over optimization
-
-For TaskFlow's "how do I export?" type questions, a focused 3,000-token guide covering the top 50 features is worth just including. Not the entire 400-page docs.
-
-### RAG — retrieve only what's relevant
-
-Instead of putting all docs in context, you:
-1. When a question comes in, search your docs for the relevant sections
-2. Pull only the top 3–5 matching chunks
-3. Add those chunks to the context for this specific request
-
-A user asking about exports gets the export documentation. A user asking about billing gets the billing documentation. Neither gets 400 pages.
-
-This is covered in depth in the [Production RAG track](/rag/). For now: RAG is the right answer when your knowledge base is large and only a subset is relevant per request.
-
-### Prompt caching — pay once, reuse
-
-If you have content that's the same across many requests — like your system prompt or a large document you always include — some providers let you "cache" it. You pay full price the first time, and a fraction (10–25%) of the price on subsequent requests where the prefix matches.
-
-**Anthropic prompt caching** requires that the cacheable content is at the start of the context and marked explicitly. The cache persists for a few minutes to an hour.
-
-**OpenAI prompt caching** happens automatically for context prefixes longer than 1,024 tokens that match a previous request within a session.
-
-For TaskFlow: our 800-token system prompt is always the same. With caching enabled, we pay full price once and ~10% of the price for subsequent requests in the same cache window.
-
-## Dynamic context assembly
-
-The pattern we ended up using for TaskFlow:
+**More retrieved content isn't better.** Ten retrieved chunks with the seventh being the actually-relevant one is worse than three chunks with the relevant one first — both for accuracy and for cost. This is why reranking exists as a step in RAG pipelines.
 
 ```
-[System prompt — always the same, cached]
-[User's profile — their plan, open tickets count, last login]
-[Relevant docs — 3-5 chunks retrieved based on their question]
-[Conversation history — last 10 messages only]
-[User's current message]
+Bad ordering:   [static system prompt] [user history, growing] [retrieved docs] [query]
+                                          ↑ pushes the cache-friendly prefix out of position
+
+Better:         [static system prompt] [retrieved docs, most relevant first] [recent history] [query]
+                                          ↑ static content stays a stable prefix for caching
 ```
 
-Each piece is assembled dynamically per request. The profile comes from our database. The docs come from our vector search. The conversation history is trimmed when it gets too long.
+## The recurring failure modes
 
-## When to use what
-
-| Approach | Use when | Don't use when |
-|----------|----------|----------------|
-| Full context | Knowledge base is small (<5k tokens) | Docs are large and only partially relevant |
-| RAG | Large docs, question determines what's relevant | You always need all the info (overkill complexity) |
-| Prompt caching | Same content repeated across many requests | Content changes frequently |
-| Trimmed history | Long conversations | You need the model to reference old context |
+| Symptom | Likely cause |
+|---|---|
+| Model ignores an instruction stated early in a long prompt | Position — it's buried; move it later or repeat it near the query |
+| Answers drift as conversation grows | Irrelevant history accumulating; window or summarize (see [Agent Memory](/ai-engineering/module-02/03-agent-memory)) |
+| Retrieved doc is relevant but ignored | Too many other chunks diluting it; rerank and trim |
+| Costs rising with no behavior change | Static content isn't positioned as a stable prefix, breaking prompt cache hits |
 
 ::: warning Watch out
-The most common mistake is treating context like free space. It's not. Every token is a cost and a potential distraction. The question to ask for every piece of context you're adding: "Would a smart support agent need to read this before answering this type of question?" If the answer is "sometimes," don't always include it.
+Adding more context to "give the model more to work with" is the default instinct and often the wrong move. Past a point, more content doesn't add information, it adds noise the model has to work around — measure whether trimming context improves accuracy before assuming more is safer.
 :::
 
-::: details Interview Question — Context window limits
-**Q:** A conversation has been going for 2 hours and the context is now too long for the model. How do you handle it?
-
-**A:** Several strategies, often combined: (1) **Sliding window** — drop the oldest messages first, always keeping the system prompt and recent messages. Simple, loses early context. (2) **Summarization** — when approaching the limit, use the model to summarize the conversation so far, replace the raw messages with the summary. More expensive but preserves semantic content. (3) **External memory** — store key facts extracted from the conversation in a database and retrieve them as needed, rather than keeping the raw message history. (4) **Session boundaries** — tell the user "this is a new session" and start fresh, relying on external memory for persistence. For TaskFlow, we used a hybrid: summarize after 20 messages, and store key facts (user's plan, their open issues) in a semantic memory store.
+::: details Interview Question — "Lost in the middle" and what to do about it
+**Q:** You've retrieved the correct document for a RAG query, but the answer still misses key information — the document was included. Why, and what would you change?
+**A:** Likely a position effect — if that document landed in the middle of a long context stuffed with other retrieved chunks, the model may have under-weighted it relative to content nearer the edges. Fix by reranking so the most relevant chunk is placed first (or last, right before the query), and by trimming the total number of chunks rather than passing everything retrieval returned.
 :::
+
+::: details Interview Question — Context engineering vs prompt engineering
+**Q:** How would you explain the difference between prompt engineering and context engineering to someone who conflates them?
+**A:** Prompt engineering shapes the instructions — wording, examples, format requests. Context engineering shapes everything else in the window — what history, documents, and tool results are included, in what order, and how much. A well-worded prompt can still fail if the context around it is bloated, badly ordered, or missing the one fact that mattered; that failure isn't a wording problem.
+:::
+
+## Key Mental Models
+
+**Every token in context is competing for a limited, priced budget.** Nothing is free just because it feels helpful to include.
+
+**Position affects how well content is used, not just whether it's present.** Put critical content first or last, not buried in the middle.
+
+**More context is not inherently safer.** Past a point it adds noise, not signal.
+
+## Related
+
+- [1.2 Prompt Engineering](./02-prompt-engineering) — the instructions layered on top of this context
+- [2.3 Agent Memory](/ai-engineering/module-02/03-agent-memory) — managing conversation history specifically
+- [3.5 Prompt Caching](/ai-engineering/module-03/05-prompt-caching) — why prefix ordering also affects cost

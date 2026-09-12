@@ -1,129 +1,71 @@
 ---
-title: Agent Memory — Making It Remember
+title: Agent Memory
 outline: deep
 ---
 
-# Agent Memory — Making It Remember
+# Agent Memory
 
-Every time a user came back, our agent forgot everything. "I explained this three times already!" — a real user complaint. We needed memory.
+Every TaskFlow conversation started from zero. A returning user who'd explained their issue yesterday had to explain it again today. Memory is what fixes that — at a cost, because everything you remember is something you have to store, retrieve, and pay to re-send.
 
 ::: tip Plain English
-By default, every conversation starts fresh. The model has no idea you talked to it yesterday. It's like a customer service rep with amnesia — professional, capable, but starts every interaction knowing nothing about you.
-
-To make an agent remember, you have to explicitly decide what to store, where to store it, and how to bring it back. Memory isn't something the model does — it's something your system does, and you feed the results to the model.
-
-There are four kinds of memory, each solving a different problem. You often need more than one.
+A single conversation without memory is like a stranger who forgets you the moment you walk away. Memory gives an agent different kinds of forgetting: some things it should only remember for the next five minutes, some for the whole conversation, and some — like your subscription plan — it should never forget at all. Picking the wrong kind for a given fact is how agents end up either forgetful or creepily over-informed.
 :::
 
-## The four types of memory
+## Four kinds of memory
 
-### 1. In-context memory — the simplest kind
+**Working memory** — the current conversation's message history. Lives entirely in the context window; gone when the session ends unless you persist it.
 
-Just include previous conversation turns in the context window.
+**Episodic memory** — records of past conversations or runs, retrievable later. "What did this user ask about last week?" This is usually just a database of past transcripts, sometimes summarised.
 
-```
-[system prompt]
-[turn 1: user said X, agent said Y]
-[turn 2: user said A, agent said B]
-[turn 3: user's current message]
-```
+**Semantic memory** — durable facts about the user or domain: their plan tier, their timezone, their preferred name. Stored as structured data, not transcript.
 
-The model "remembers" because it can see the history. No database needed.
+**Procedural memory** — learned patterns about *how* to handle something, closer to a cached strategy than a fact. Least common in production agents; mostly relevant to systems that self-improve over many runs.
 
-**Pros:** Simple. No extra infrastructure. Works immediately.
+| Type | Lifespan | Where it lives |
+|---|---|---|
+| Working | One session | Context window |
+| Episodic | Indefinite | Database of past runs |
+| Semantic | Indefinite | Structured user/account store |
+| Procedural | Indefinite | Rare — learned strategies |
 
-**Cons:** Context window fills up. Gets expensive for long conversations. When the window is full, you have to drop old messages — and the model forgets them.
+## The real design problem
 
-**Use when:** Conversations are short (under ~20 turns), or you're prototyping and want simplicity.
+Context windows are finite and every token costs money on every turn — so "remember everything" isn't a strategy, it's a cost model with no limit. Working memory in a long conversation needs active management: a sliding window of recent turns, plus a running summary of what fell off the front.
 
-### 2. External memory — store and retrieve
-
-When conversations get long, store key information in a database and retrieve it when needed.
-
-For TaskFlow: when a user explains their setup in session 1, we extract and store: "User is on Pro plan, using Chrome, has 3 open tickets." In session 2, we pull that record and include it in the context.
-
-```python
-# Rough pseudocode
-user_facts = db.get("user_memory", user_id)
-context = build_context(system_prompt, user_facts, current_message)
-response = llm.call(context)
-```
-
-**Pros:** Scales to any conversation length. Persists across sessions. Cheap to store.
-
-**Cons:** You have to decide what to store. Retrieval logic can be tricky — what if the stored facts are outdated? Adds latency.
-
-**Use when:** You need memory to persist across sessions, or conversations routinely get long.
-
-### 3. Episodic memory — remembering past conversations
-
-Instead of storing facts, store summaries of past conversations and retrieve the relevant ones.
-
-For TaskFlow: "User contacted us 3 times about the export feature. Each time they were frustrated. The issue was never resolved." The agent reads this summary at the start of the session and can acknowledge the history.
-
-Implementation: after each conversation ends, use the model to write a short summary. Store it tagged with user ID and timestamp. At the start of new conversations, retrieve the last N summaries.
-
-**Pros:** Gives the agent human-like memory of what happened before. Dramatically improves experience for repeat users.
-
-**Cons:** Requires a summarization step after each conversation. Summary quality affects retrieval quality. Can surface outdated or incorrect past episodes.
-
-**Use when:** Users return regularly and past context matters (support, coaching, personal assistants).
-
-### 4. Semantic memory — facts about entities
-
-A structured store of facts: who this user is, what their plan is, what their preferences are.
-
-For TaskFlow:
-```json
-{
-  "user_id": "u_4821",
-  "plan": "pro",
-  "onboarding_completed": true,
-  "preferred_contact": "email",
-  "open_tickets": 2,
-  "known_issues": ["export bug reported twice"]
+```typescript
+// Summarize-and-truncate: keep the last N turns verbatim,
+// compress everything older into a running summary.
+if (messages.length > MAX_TURNS) {
+  const [old, recent] = [messages.slice(0, -MAX_TURNS), messages.slice(-MAX_TURNS)];
+  const summary = await summarize(old);
+  messages = [{ role: 'system', content: `Earlier context: ${summary}` }, ...recent];
 }
 ```
 
-This is distinct from episodic memory (what happened) — it's a curated fact store about the entity. The agent reads it at the start of every session.
-
-**Pros:** Very compact. Always relevant. Easy to update programmatically.
-
-**Cons:** Requires curation — who decides what goes in and when it's stale? Manual or automated extraction needed.
-
-**Use when:** You have structured, persistent facts about users or accounts that should always be available.
-
-## Comparison table
-
-| Memory type | Where stored | When retrieved | Best for |
-|------------|--------------|----------------|----------|
-| In-context | Context window | Always present | Short sessions |
-| External | Database | On request or always | Long/returning users |
-| Episodic | Database (summaries) | Start of session | Repeat interaction history |
-| Semantic | Database (structured) | Start of session | User facts, preferences |
-
-## What we built for TaskFlow
-
-```
-Session start:
-  1. Load semantic memory (user plan, open tickets)   → always in context
-  2. Load last 3 episode summaries                    → in context if returning user
-  3. Conversation starts
-
-During session:
-  4. Full message history kept in context             → up to 20 turns
-
-Session end:
-  5. Summarize conversation → store as new episode
-  6. Update semantic memory (any new facts learned)
-```
+Semantic memory should be looked up, not carried in every prompt — fetch the user's plan tier from your database when needed rather than repeating it in every system message.
 
 ::: warning Watch out
-Memory can go stale. If you store "user is on Pro plan" and they downgrade, your stored fact is wrong. For facts that can change (plan, ticket count, account status), always check live via a tool rather than relying on stored memory. Stored memory is good for stable facts and historical context — not for real-time state.
+Summarizing loses detail, and you won't know what until it's missing. A summary written after turn 10 might drop a constraint the user stated in turn 2 that turns out to matter at turn 20. For anything load-bearing — a stated hard requirement, a confirmed identity — extract it into semantic memory explicitly rather than trusting it survives compression.
 :::
 
-::: details Interview Question — Memory architecture
-**Q:** A user comes back after 3 months. How does your agent handle the conversation without asking them to repeat themselves?
-
-**A:** Three layers: (1) **Semantic memory** — pull their profile (plan, known preferences, account state) from your database and include it in the system prompt prefix. This gives the agent baseline context. (2) **Episodic memory** — retrieve the last few conversation summaries and include them so the agent knows the history of past interactions. (3) **Live tool calls** — for anything that changes (current open tickets, current plan status), use a tool to fetch fresh data rather than relying on stored memory. The goal is: the agent greets the user as if it knows them, because it does — not because it pretends to, but because it actually read their history.
+::: details Interview Question — Managing a long-running conversation
+**Q:** A support conversation runs 40 turns. How do you keep it within context limits without losing important information?
+**A:** Sliding window for recent turns (verbatim, since recency matters most for coherence), summarization for everything older, and explicit extraction of durable facts (stated preferences, confirmed account details) into semantic memory rather than relying on them surviving in the summary. Re-inject extracted facts each turn instead of carrying full history.
 :::
+
+::: details Interview Question — Memory vs RAG
+**Q:** How is agent memory different from RAG?
+**A:** RAG retrieves from a fixed knowledge base (docs, policies) that doesn't change per-user. Memory is about *this specific user or session* — their history, preferences, and current context. They often sit side by side: RAG answers "what's our refund policy," memory answers "what did this user already tell me."
+:::
+
+## Key Mental Models
+
+**Not all memory needs the same lifespan.** Matching type to purpose is the actual design decision.
+
+**Everything remembered is re-billed every turn.** Working memory management is a cost problem as much as a UX one.
+
+## Related
+
+- [2.1 The Agent Loop](./01-agent-loop) — where memory gets read and written each iteration
+- [3.4 Cost & Token Accounting](/ai-engineering/module-03/04-cost-and-token-accounting) — quadratic growth of re-sent context
+- [1.3 Context Engineering](/ai-engineering/module-01/03-context-engineering) — what belongs in the window at all

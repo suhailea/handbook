@@ -1,5 +1,5 @@
 ---
-title: Module 3 Summary — Model Serving
+title: Module 9 Summary — Model Serving
 outline: deep
 ---
 
