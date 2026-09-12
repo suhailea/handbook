@@ -33,8 +33,11 @@ features:
     details: 18 modules — from chunking and embeddings to reranking, security, scaling, and 10 full case studies. Production-ready architecture.
     link: /rag/
   - title: AI Engineering
-    details: 13 modules — mental models, agents, model serving, LLMOps, enterprise AI architecture, GPU infrastructure, security, energy trading AI, and AI business strategy.
+    details: 11 modules — mental models, agents, model serving, LLMOps, enterprise AI architecture, GPU infrastructure, security, energy trading AI, and AI business strategy.
     link: /ai-engineering/
+  - title: ML Foundations
+    details: Reference track — statistics, linear algebra, classical ML algorithms, optimization, neural networks, and NLP. Linked on demand from AI Engineering.
+    link: /ml-foundations/
   - title: Interview Prep
     details: Crash sheets, a full question bank, and worked design walkthroughs.
     link: /interview/
@@ -51,7 +54,7 @@ Below those, you'll find **Where It Bites** (production failure modes) and **Che
 
 This is not a reference manual and not a beginner tutorial. It's a handbook that gives you both *intuition* and *internals* on the same page.
 
-## The Eight Tracks
+## The Nine Tracks
 
 | Track | Focus | Pages |
 |-------|-------|-------|
@@ -61,5 +64,6 @@ This is not a reference manual and not a beginner tutorial. It's a handbook that
 | [System Design](/system-design/) | Queues, microservices, load balancing, caching, scaling | 14 |
 | [Python](/python/) | 13 modules — CPython internals, data structures, concurrency, type hints, FastAPI | 75 |
 | [Production RAG](/rag/) | 18 modules — end-to-end RAG: ingestion, chunking, retrieval, reranking, security, scaling | 50+ |
-| [AI Engineering](/ai-engineering/) | 13 modules — mental models through enterprise AI architecture, LLMOps, GPU infra, security, and AI strategy | 58 |
+| [AI Engineering](/ai-engineering/) | 11 modules — mental models through enterprise AI architecture, LLMOps, GPU infra, security, and AI strategy | 43 |
+| [ML Foundations](/ml-foundations/) | Reference — statistics, linear algebra, ML algorithms, optimization, neural nets, NLP | 12 |
 | [Interview Prep](/interview/) | Crash sheets, question bank, design walkthroughs | 8 |

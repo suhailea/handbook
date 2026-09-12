@@ -5,7 +5,7 @@ outline: deep
 
 # Optimization — Loss Functions, Gradient Descent, Backpropagation
 
-🔥🔥🔥 Interview weight | Prerequisites: [6.5 Linear Algebra for AI](./05-linear-algebra-for-ai)
+🔥🔥🔥 Interview weight | Prerequisites: [1.5 Linear Algebra for AI](./05-linear-algebra-for-ai)
 
 ## 🗣️ In Plain English
 
@@ -344,6 +344,6 @@ for step in [0, 100, 500, 1000, 5000, 9999]:
 
 ## Related
 
-- [6.5 Linear Algebra for AI](./05-linear-algebra-for-ai) — the matrix operations that implement forward and backward pass
-- [Module 7.1 Neural Networks](../module-07/01-neural-networks) — how these optimization concepts apply in practice
+- [1.5 Linear Algebra for AI](./05-linear-algebra-for-ai) — the matrix operations that implement forward and backward pass
+- [Module 7.1 Neural Networks](../module-02/01-neural-networks) — how these optimization concepts apply in practice
 - [Module 4 Fine-Tuning](/ai-engineering/module-04/) — fine-tuning uses these same optimization principles on pre-trained models

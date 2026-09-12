@@ -5,7 +5,7 @@ outline: deep
 
 # ML Algorithms — From Linear Regression to XGBoost
 
-🔥🔥 Interview weight | Prerequisites: [6.1 Supervised vs Unsupervised](./01-supervised-vs-unsupervised), [6.2 Train/Val/Test](./02-training-validation-test)
+🔥🔥 Interview weight | Prerequisites: [1.1 Supervised vs Unsupervised](./01-supervised-vs-unsupervised), [1.2 Train/Val/Test](./02-training-validation-test)
 
 ## 🗣️ In Plain English
 
@@ -335,6 +335,6 @@ print(f"Reduced shape: {X_reduced.shape}")
 
 ## Related
 
-- [6.2 Train / Validation / Test](./02-training-validation-test) — how to evaluate all of these algorithms
-- [6.6 ML Metrics](./06-ml-metrics) — what to measure: AUC, F1, RMSE
-- [Module 0 — ML Foundations](/ai-engineering/module-00/) — neural networks as the next step beyond these classical algorithms
+- [1.2 Train / Validation / Test](./02-training-validation-test) — how to evaluate all of these algorithms
+- [1.6 ML Metrics](./06-ml-metrics) — what to measure: AUC, F1, RMSE
+- [Module 0 — Mental Models](/ai-engineering/module-00/) — neural networks as the next step beyond these classical algorithms

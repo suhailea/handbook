@@ -5,7 +5,7 @@ outline: deep
 
 # NLP Fundamentals — Tokenization, NER, Semantic Similarity
 
-🔥🔥 Interview weight | Prerequisites: [6.5 Linear Algebra for AI](../module-06/05-linear-algebra-for-ai)
+🔥🔥 Interview weight | Prerequisites: [1.5 Linear Algebra for AI](../module-01/05-linear-algebra-for-ai)
 
 ## 🗣️ In Plain English
 
@@ -343,6 +343,6 @@ print(result)
 
 ## Related
 
-- [6.5 Linear Algebra for AI](../module-06/05-linear-algebra-for-ai) — the vector math that makes semantic similarity work
+- [1.5 Linear Algebra for AI](../module-01/05-linear-algebra-for-ai) — the vector math that makes semantic similarity work
 - [RAG Module 7 — Embeddings](/rag/module-07/01-embeddings-similarity) — embedding models in production retrieval
 - [Module 1.1 LLMs & Tokens](/ai-engineering/module-01/01-llms-and-tokens) — tokenization as it affects LLM prompting

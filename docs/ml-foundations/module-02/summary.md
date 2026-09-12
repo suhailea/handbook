@@ -32,4 +32,4 @@ A working mental model of how neural networks learn, why specialized architectur
 
 ## Next Module
 
-[Module 8 — AI Architecture](../module-08/) takes these building blocks and shows how to combine them into production enterprise systems: API gateways, orchestrators, guardrails, and data architectures that power real AI applications.
+[Module 8 — AI Architecture](/ai-engineering/module-08/) takes these building blocks and shows how to combine them into production enterprise systems: API gateways, orchestrators, guardrails, and data architectures that power real AI applications.

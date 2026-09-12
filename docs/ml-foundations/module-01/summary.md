@@ -38,4 +38,4 @@ A solid mathematical foundation for AI engineering: the statistical tools, linea
 
 ## Next Module
 
-[Module 7 — Deep Learning & NLP](../module-07/) covers neural networks, CNNs, RNNs, and why Transformers replaced them — building on the optimization foundations from this module.
+[Module 7 — Deep Learning & NLP](../module-02/) covers neural networks, CNNs, RNNs, and why Transformers replaced them — building on the optimization foundations from this module.

@@ -5,7 +5,7 @@ outline: deep
 
 # Linear Algebra for AI
 
-🔥🔥🔥 Interview weight | Prerequisites: [6.4 Statistics for AI](./04-statistics-for-ai)
+🔥🔥🔥 Interview weight | Prerequisites: [1.4 Statistics for AI](./04-statistics-for-ai)
 
 ## 🗣️ In Plain English
 
@@ -297,6 +297,6 @@ bad_norms = np.linalg.norm(batch, axis=0)  # (768,) — norms over batch, not em
 
 ## Related
 
-- [6.7 Optimization](./07-optimization) — gradient descent uses these same matrix operations
+- [1.7 Optimization](./07-optimization) — gradient descent uses these same matrix operations
 - [Module 0.1 How Transformers Work](/ai-engineering/module-00/01-how-transformers-work) — attention mechanism in full transformer context
 - [RAG Module 7 — Embeddings](/rag/module-07/01-embeddings-similarity) — cosine similarity in production retrieval

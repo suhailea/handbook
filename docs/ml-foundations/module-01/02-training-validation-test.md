@@ -5,7 +5,7 @@ outline: deep
 
 # Train / Validation / Test Splits
 
-🔥🔥🔥 Interview weight | Prerequisites: [6.1 Supervised vs Unsupervised](./01-supervised-vs-unsupervised)
+🔥🔥🔥 Interview weight | Prerequisites: [1.1 Supervised vs Unsupervised](./01-supervised-vs-unsupervised)
 
 ## 🗣️ In Plain English
 
@@ -227,6 +227,6 @@ The regularization coefficient `λ` (or `C = 1/λ` in sklearn) is a **hyperparam
 
 ## Related
 
-- [6.6 ML Metrics](./06-ml-metrics) — what to measure on val and test sets
-- [6.7 Optimization](./07-optimization) — training loop where overfitting occurs
+- [1.6 ML Metrics](./06-ml-metrics) — what to measure on val and test sets
+- [1.7 Optimization](./07-optimization) — training loop where overfitting occurs
 - [Module 9 LLMOps & Evaluation](/ai-engineering/module-09/) — validation and test split concepts applied to LLM evaluation

@@ -179,6 +179,6 @@ Supervised learning requires **labeled data** — and labels are expensive. Huma
 
 ## Related
 
-- [6.2 Train / Validation / Test Splits](./02-training-validation-test) — how to evaluate supervised models without peeking at test data
-- [6.6 ML Metrics](./06-ml-metrics) — precision/recall/F1 for classification; RMSE/R² for regression
+- [1.2 Train / Validation / Test Splits](./02-training-validation-test) — how to evaluate supervised models without peeking at test data
+- [1.6 ML Metrics](./06-ml-metrics) — precision/recall/F1 for classification; RMSE/R² for regression
 - [Module 0.1 How Transformers Work](/ai-engineering/module-00/01-how-transformers-work) — self-supervised pre-training in context

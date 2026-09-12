@@ -28,6 +28,7 @@ export default withMermaid(defineConfig({
       { text: 'Python', link: '/python/', activeMatch: '/python/' },
       { text: 'RAG', link: '/rag/', activeMatch: '/rag/' },
       { text: 'AI Engineering', link: '/ai-engineering/', activeMatch: '/ai-engineering/' },
+      { text: 'ML Foundations', link: '/ml-foundations/', activeMatch: '/ml-foundations/' },
       { text: 'Interview Prep', link: '/interview/', activeMatch: '/interview/' },
     ],
 
@@ -742,6 +743,38 @@ export default withMermaid(defineConfig({
       ],
 
       // ── Track 8: AI Engineering ──
+      '/ml-foundations/': [
+        {
+          text: 'ML Foundations',
+          items: [{ text: 'Overview', link: '/ml-foundations/' }],
+        },
+        {
+          text: 'Module 1 — ML Fundamentals & Statistics',
+          collapsed: false,
+          items: [
+            { text: 'Overview', link: '/ml-foundations/module-01/' },
+            { text: '1.1 Supervised vs Unsupervised', link: '/ml-foundations/module-01/01-supervised-vs-unsupervised' },
+            { text: '1.2 Training, Validation & Test', link: '/ml-foundations/module-01/02-training-validation-test' },
+            { text: '1.3 ML Algorithms', link: '/ml-foundations/module-01/03-ml-algorithms' },
+            { text: '1.4 Statistics for AI', link: '/ml-foundations/module-01/04-statistics-for-ai' },
+            { text: '1.5 Linear Algebra for AI', link: '/ml-foundations/module-01/05-linear-algebra-for-ai' },
+            { text: '1.6 ML Metrics', link: '/ml-foundations/module-01/06-ml-metrics' },
+            { text: '1.7 Optimization', link: '/ml-foundations/module-01/07-optimization' },
+            { text: 'Summary', link: '/ml-foundations/module-01/summary' },
+          ],
+        },
+        {
+          text: 'Module 2 — Deep Learning & NLP',
+          collapsed: false,
+          items: [
+            { text: 'Overview', link: '/ml-foundations/module-02/' },
+            { text: '2.1 Neural Networks', link: '/ml-foundations/module-02/01-neural-networks' },
+            { text: '2.2 CNNs, RNNs, LSTMs', link: '/ml-foundations/module-02/02-cnn-rnn-lstm' },
+            { text: '2.3 NLP Fundamentals', link: '/ml-foundations/module-02/03-nlp-fundamentals' },
+            { text: 'Summary', link: '/ml-foundations/module-02/summary' },
+          ],
+        },
+      ],
       '/ai-engineering/': [
         {
           text: 'AI Engineering',
@@ -809,32 +842,6 @@ export default withMermaid(defineConfig({
             { text: '4.2 LoRA & QLoRA', link: '/ai-engineering/module-04/02-lora-qlora' },
             { text: '4.3 When to Fine-Tune', link: '/ai-engineering/module-04/03-when-to-fine-tune' },
             { text: 'Summary', link: '/ai-engineering/module-04/summary' },
-          ],
-        },
-        {
-          text: 'Module 6 — ML Fundamentals & Statistics',
-          collapsed: true,
-          items: [
-            { text: 'Overview', link: '/ai-engineering/module-06/' },
-            { text: '6.1 Supervised vs Unsupervised', link: '/ai-engineering/module-06/01-supervised-vs-unsupervised' },
-            { text: '6.2 Training, Validation & Test', link: '/ai-engineering/module-06/02-training-validation-test' },
-            { text: '6.3 ML Algorithms', link: '/ai-engineering/module-06/03-ml-algorithms' },
-            { text: '6.4 Statistics for AI', link: '/ai-engineering/module-06/04-statistics-for-ai' },
-            { text: '6.5 Linear Algebra for AI', link: '/ai-engineering/module-06/05-linear-algebra-for-ai' },
-            { text: '6.6 ML Metrics', link: '/ai-engineering/module-06/06-ml-metrics' },
-            { text: '6.7 Optimization', link: '/ai-engineering/module-06/07-optimization' },
-            { text: 'Summary', link: '/ai-engineering/module-06/summary' },
-          ],
-        },
-        {
-          text: 'Module 7 — Deep Learning & NLP',
-          collapsed: true,
-          items: [
-            { text: 'Overview', link: '/ai-engineering/module-07/' },
-            { text: '7.1 Neural Networks', link: '/ai-engineering/module-07/01-neural-networks' },
-            { text: '7.2 CNN, RNN & LSTM', link: '/ai-engineering/module-07/02-cnn-rnn-lstm' },
-            { text: '7.3 NLP Fundamentals', link: '/ai-engineering/module-07/03-nlp-fundamentals' },
-            { text: 'Summary', link: '/ai-engineering/module-07/summary' },
           ],
         },
         {

@@ -5,7 +5,7 @@ outline: deep
 
 # Responsible AI — Bias, Fairness, Transparency, Compliance
 
-🔥🔥 Interview weight | Prerequisites: [6.6 ML Metrics](../module-06/06-ml-metrics)
+🔥🔥 Interview weight | Prerequisites: [ML 1.6 ML Metrics](/ml-foundations/module-01/06-ml-metrics)
 
 ## 🗣️ In Plain English
 
@@ -437,4 +437,4 @@ class AIAuditSystem {
 
 - [11.2 Agent Security](./02-agent-security) — security controls that prevent unfair automated actions
 - [9.3 Evaluation Pipeline](../module-09/03-evaluation-pipeline) — red teaming includes bias testing
-- [6.6 ML Metrics](../module-06/06-ml-metrics) — the underlying metrics that fairness metrics extend
+- [ML 1.6 ML Metrics](/ml-foundations/module-01/06-ml-metrics) — the underlying metrics that fairness metrics extend

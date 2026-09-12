@@ -5,7 +5,7 @@ outline: deep
 
 # ML Metrics — Accuracy, Precision, Recall, AUC, RMSE
 
-🔥🔥🔥 Interview weight | Prerequisites: [6.1 Supervised vs Unsupervised](./01-supervised-vs-unsupervised)
+🔥🔥🔥 Interview weight | Prerequisites: [1.1 Supervised vs Unsupervised](./01-supervised-vs-unsupervised)
 
 ## 🗣️ In Plain English
 
@@ -276,6 +276,6 @@ print(f"F1        (macro):    {f1_score(y_test, y_pred, average='macro'):.4f}")
 
 ## Related
 
-- [6.2 Train / Validation / Test](./02-training-validation-test) — what split these metrics are computed on
+- [1.2 Train / Validation / Test](./02-training-validation-test) — what split these metrics are computed on
 - [Module 9.1 RAG Evaluation Metrics](/ai-engineering/module-09/01-rag-evaluation-metrics) — retrieval-specific metrics (Recall@K, MRR)
 - [Module 9.3 Evaluation Pipeline](/ai-engineering/module-09/03-evaluation-pipeline) — applying metrics to agent evaluation

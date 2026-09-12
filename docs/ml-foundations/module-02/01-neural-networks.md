@@ -5,7 +5,7 @@ outline: deep
 
 # Neural Networks — Layers, Weights, Activations, Backprop
 
-🔥🔥🔥 Interview weight | Prerequisites: [6.5 Linear Algebra](../module-06/05-linear-algebra-for-ai), [6.7 Optimization](../module-06/07-optimization)
+🔥🔥🔥 Interview weight | Prerequisites: [1.5 Linear Algebra](../module-01/05-linear-algebra-for-ai), [1.7 Optimization](../module-01/07-optimization)
 
 ## 🗣️ In Plain English
 
@@ -287,6 +287,6 @@ print(dropout(x, p=0.5, training=False))  # all ones
 
 ## Related
 
-- [6.7 Optimization](../module-06/07-optimization) — the gradient descent that trains these networks
-- [7.2 CNNs, RNNs, LSTMs](./02-cnn-rnn-lstm) — specialized architectures built on these foundations
+- [1.7 Optimization](../module-01/07-optimization) — the gradient descent that trains these networks
+- [2.2 CNNs, RNNs, LSTMs](./02-cnn-rnn-lstm) — specialized architectures built on these foundations
 - [Module 0.1 How Transformers Work](/ai-engineering/module-00/01-how-transformers-work) — the modern architecture that uses all of the above
