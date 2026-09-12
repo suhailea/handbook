@@ -1,63 +1,123 @@
 ---
-title: RLHF — How Models Learn to Be Helpful (Not Just Accurate)
+title: RLHF & Alignment
 outline: deep
 ---
 
-# RLHF — How Models Learn to Be Helpful (Not Just Accurate)
+# RLHF & Alignment
 
-A model trained only on internet text would be helpful, harmful, and rude in equal measure — because the internet is. RLHF is what turned raw language capability into something you can actually ship to users.
+A model trained only on internet text is helpful, harmful and rude in roughly the proportions the internet is. Alignment training is what turned raw language capability into something shippable — and it's also the direct cause of most of the model behaviour you'll find yourself fighting.
 
-## The problem with "just predict the next word"
+::: tip Plain English
+Picture someone who has read essentially everything: every manual, every forum argument, every novel, every support transcript. They can imitate any of it perfectly.
 
-Pre-training produces a model that is, in a weird sense, *too good* at mimicking the internet. Ask it something, and it might respond the way a Reddit argument would. Or a how-to guide. Or a fiction forum. Or a conspiracy theory thread. It has seen all of these and can do all of them.
+Now ask them a question. Which voice do they answer in? The patient technical writer? The combative forum poster? The character in a thriller who happens to be discussing the same topic? They've seen all of those, and nothing in "having read everything" tells them which one you wanted.
 
-What it hasn't learned is: *which of these is the right response to give a user who needs help?* Predicting the next word doesn't teach you to be helpful. It teaches you to be statistically plausible.
+That's a base model. Enormously capable, no sense of what a *good answer to a user* looks like — because being statistically plausible and being helpful are different targets, and only the first one was ever trained for.
 
-This is the problem RLHF solves.
+Alignment is the second training stage that supplies the missing judgement. First by showing examples of good answers, then — and this is the clever part — by showing pairs of answers and asking people which is better. Judging is far faster than authoring, so you can collect vastly more signal for the same money.
 
-## The three phases of building an assistant
-
-**Phase 1 — Pre-training.** The model learns language from a massive text corpus. Billions of tokens. It learns grammar, facts, reasoning patterns, coding conventions, everything — but without any sense of what "good assistant behavior" looks like. This produces the base model.
-
-**Phase 2 — Supervised Fine-Tuning (SFT).** Human contractors write examples of good conversations: a question asked, a high-quality answer given. The model trains on these examples. This shifts its behavior from "generate statistically plausible text" toward "generate the kind of response a thoughtful human would give." It's still crude — the training data is finite and expensive to produce — but it gets the model into the right ballpark.
-
-**Phase 3 — RLHF.** This is where it gets clever. Instead of writing ideal answers (expensive), humans are shown two or more model outputs and asked to *rank* them — which answer was better? Ranking is much faster than writing.
-
-Those rankings train a separate model called a **reward model**, whose job is to predict which outputs humans would prefer. Then, using reinforcement learning, the original language model gets nudged toward outputs that score highly with the reward model. It's a feedback loop: generate output, score it, adjust toward higher scores, repeat.
-
-The result is a model that, over many iterations, learns to give answers that humans consistently rate as more helpful, accurate, and appropriate.
-
-## Why this matters when you're fighting the model
-
-RLHF is why models refuse harmful requests. It's why they format responses helpfully. It's why they say "I don't know" instead of hallucinating confidently (at least more often). It's also why they sometimes refuse things that are obviously fine, or add unnecessary disclaimers to straightforward answers.
-
-When you're wrestling with a model that won't do something reasonable, or that's being overly cautious in ways that hurt your product, you're experiencing the downstream effects of alignment training. The model isn't being randomly weird — it's been tuned to err on the side of caution when uncertain, and sometimes that calibration is off.
-
-Understanding this helps you craft prompts that work with the alignment rather than against it. You're not trying to "jailbreak" anything — you're providing context that shifts the model's assessment of what a helpful response looks like.
-
-::: warning The alignment tax
-Making a model safer and more helpful requires tradeoffs. Over-align it and it becomes useless — refusing too much, adding endless caveats, hedging every answer. Under-align it and it's unpredictable and potentially harmful. Every frontier lab navigates this constantly, which is why model behavior changes noticeably between versions. When Claude 3.5 Sonnet behaves differently from Claude 3 Opus, a big part of that difference is alignment tuning, not just capability.
+Everything you like about a deployed model, and most of what irritates you, comes from this stage rather than the first.
 :::
 
-## The modern alternatives
+## Three stages, three different objectives
 
-**DPO (Direct Preference Optimization)** is now more common than classic RLHF in many settings. Instead of training a separate reward model and running a full RL loop, DPO uses preference data directly to fine-tune the language model in a single step. Simpler pipeline, similar results, less instability. Most fine-tuned models you see today use DPO or a variant.
+| Stage | What it optimises | Data | Cost |
+|---|---|---|---|
+| **Pre-training** | Predict the next token | Trillions of tokens, scraped | Enormous — months, thousands of GPUs |
+| **Supervised fine-tuning (SFT)** | Imitate good answers | Tens of thousands of written examples | Moderate — humans author each one |
+| **Preference tuning (RLHF/DPO)** | Produce answers humans prefer | Hundreds of thousands of rankings | Moderate — humans only compare |
 
-**RLAIF (RL from AI Feedback)** replaces human raters with another AI model. Instead of paying humans to rank outputs, you use a capable model (like GPT-4) to generate the preference data. Cheaper, scales better, but the quality depends on the judge model's own alignment — you can get subtle biases in the AI-rated data that wouldn't exist with human raters.
+Pre-training produces capability. SFT produces format. Preference tuning produces judgement. They aren't interchangeable, and skipping the last one is what separates a base model from an assistant.
 
----
+The economics of the third stage are the point. Writing an ideal answer to a hard question might take a skilled contractor twenty minutes. Deciding which of two answers is better takes thirty seconds. Ranking is where the scale comes from, and the whole method is built around that asymmetry.
 
-::: details Interview Question — What is RLHF and why can't you skip it?
+## How preference tuning works
 
-**Q:** A pre-trained language model scores well on benchmarks for factual accuracy and reasoning. Why isn't that sufficient to deploy it as a user-facing assistant? What does RLHF add?
+Classic RLHF runs in two steps:
 
-**A:** Benchmark performance measures capability — whether the model *can* produce correct answers. RLHF shapes behavior — whether the model *does* produce helpful, appropriate, safe answers in real-world conditions.
+**Train a reward model.** Show humans pairs of model outputs for the same prompt; record which they preferred. Train a separate model to predict those preferences. The reward model is now a cheap, automatic stand-in for human judgement — it can score any output without a human present.
 
-A pre-trained base model, even a highly capable one, has no concept of what a "good assistant response" looks like. It's optimized to be statistically plausible given its training data, which includes harmful content, low-quality content, and content written in inappropriate registers for a user-facing product. Left to its own devices, it might respond to "how do I cancel my subscription?" by continuing the question rather than answering it, or respond to a sensitive question the way a shock-forum would.
+**Optimise against it.** Generate outputs from the language model, score them with the reward model, and adjust the language model toward higher-scoring outputs using reinforcement learning. Repeat.
 
-RLHF teaches the model preferences: what humans consider helpful vs unhelpful, appropriate vs inappropriate, honest vs evasive. It instills the refusal behavior that blocks harmful requests, the formatting habits that make answers readable, and the calibration that leads to "I'm not certain" instead of confident hallucination. You can't skip it without either accepting unpredictable output, or manually filtering everything — neither of which is viable at scale.
+```
+prompt ──> language model ──> two candidate answers
+                                      │
+                            human picks the better one
+                                      │
+                                reward model learns to predict the pick
+                                      │
+              language model nudged toward outputs the reward model scores highly
+```
 
+There's a constraint that matters: the optimisation is penalised for drifting too far from the SFT model. Without that leash, the model finds ways to score highly on the reward model while producing degenerate text — the classic reward-hacking failure, where output stops being language and starts being whatever the scorer likes.
+
+## What replaced it
+
+**DPO (Direct Preference Optimization)** is now the more common choice. It skips the separate reward model and the RL loop entirely, deriving a loss directly from preference pairs and fine-tuning in one stage. Simpler pipeline, far less training instability, comparable results. Most fine-tunes you'll encounter today use DPO or a variant of it.
+
+**RLAIF (RL from AI Feedback)** substitutes a capable model for the human rankers. Much cheaper, scales indefinitely — and inherits whatever biases the judge model has. It's the same trade-off you'll meet again in [LLM-as-judge evaluation](/ai-engineering/module-05/02-evaluation-pipeline): automated preference is affordable enough to use everywhere and correlated enough with human judgement to be useful, but it is not the same thing.
+
+**RLVR (RL from Verifiable Rewards)** applies where correctness is checkable — maths with a known answer, code that either passes tests or doesn't. The reward comes from the verifier rather than from preference, which removes the subjectivity entirely. It's a large part of why recent models improved sharply on reasoning tasks specifically.
+
+## Why this shows up in your product
+
+Alignment explains refusals, formatting habits, hedging, and the tendency to say "I'm not certain" instead of confidently inventing an answer. It also explains over-refusal on obviously benign requests, and disclaimers attached to things that needed none.
+
+When a model won't do something reasonable, you're meeting a calibration decision, not randomness. The useful response is to supply context that changes the model's read of what a helpful answer looks like here — stating the professional setting, the audience, the purpose. That's not circumvention; it's giving the model the information a human would have needed to make the same judgement.
+
+It also explains why behaviour shifts between model versions more than capability benchmarks suggest. A new version can be measurably smarter and still feel worse for your use case, because the alignment calibration moved. This is a concrete argument for keeping a golden dataset and re-running it on every model upgrade — capability benchmarks won't catch a tone or refusal regression that breaks your product.
+
+::: warning Watch out
+**The alignment tax is real and bidirectional.** Over-align and the model refuses too much, hedges everything, and buries answers in caveats. Under-align and it's unpredictable. Every lab navigates this continuously, which is why the same model family behaves noticeably differently across versions.
+
+**Preference tuning optimises for what raters liked, not for what's true.** Raters reward answers that *look* good: confident, fluent, well-structured. That's a systematic pressure toward confident phrasing regardless of actual certainty, and it's part of why fluent hallucination is the failure mode rather than obvious garbage. Your [evaluation](/ai-engineering/module-05/) has to check grounding directly, because the training process did not.
+
+**Alignment is not a security boundary.** It reduces the probability of bad output; it doesn't prevent it, and it can be steered by adversarial input. Anything with real consequences needs enforcement in code — see [agent security](/ai-engineering/module-07/02-agent-security).
 :::
+
+::: details Interview Question — Why benchmarks aren't enough
+**Q:** A base model scores well on factual accuracy and reasoning benchmarks. Why can't you ship it as an assistant, and what specifically does alignment add?
+
+**A:** Benchmarks measure capability — whether the model *can* produce a correct answer. They say nothing about whether it *will* produce an appropriate one unprompted.
+
+A base model is optimised for statistical plausibility given its training distribution, which contains harmful content, low-quality content, and content in registers entirely wrong for a user-facing product. Asked "how do I cancel my subscription?", a base model might continue the question rather than answer it — because in its training data, questions are frequently followed by more questions. It has no notion that a query implies a request for help.
+
+Alignment supplies three things benchmarks don't measure: the instruction-following behaviour that maps a question to an answer rather than a continuation; the refusal behaviour that declines harmful requests; and calibration, which is the tendency to express uncertainty rather than confidently fabricate.
+
+The practical framing for an interview: pre-training buys capability, alignment buys behaviour, and shipping requires both. You can't substitute output filtering for alignment at scale, because you'd be filtering a firehose of plausible-but-wrong-register text rather than catching occasional edge cases.
+:::
+
+::: details Interview Question — When a model upgrade regresses your product
+**Q:** You upgrade to a newer model that benchmarks better across the board. Users report the assistant "got worse." How is that possible and how do you handle it?
+
+**A:** Entirely possible, and common. Benchmarks measure capability on standardised tasks; your users experience behaviour on your specific task. Alignment calibration changes between versions independently of capability, so a smarter model can refuse more, hedge more, change formatting conventions, or shift verbosity in ways that break prompts tuned against the previous version's defaults.
+
+Concretely: prompts that relied on the old model's tendencies may now under-specify. Few-shot examples that anchored format may be overridden by stronger instruction-following. Output length can change enough to break downstream parsing. A newly cautious refusal boundary can catch legitimate requests in your domain.
+
+Handling it: never upgrade on benchmarks alone. Run your golden dataset against both versions and compare on the dimensions your users care about — task completion, tone, refusal rate, format conformance — not on aggregate quality. Use pairwise judging where absolute scores are unstable. Shadow-deploy and compare outcome metrics like escalation rate over real traffic before switching.
+
+And expect to re-tune prompts. Prompts are fitted to a model's calibration; changing the model changes the fit. Treating the prompt as portable across versions is the mistake that produces this exact surprise.
+:::
+
+## Key Mental Models
+
+**Pre-training buys capability, alignment buys behaviour.** They're separate training stages with separate objectives, and only one of them is measured by benchmarks.
+
+**Ranking scales where authoring doesn't.** The whole method exists because comparing two answers is vastly cheaper than writing one.
+
+**Preference tuning rewards what looks good to raters.** That's a structural bias toward confident phrasing, and a direct cause of fluent hallucination.
+
+**Refusals and hedging are calibration, not malfunction.** Supply the context a human would have needed and the assessment usually changes.
+
+**Alignment reduces probability; it never guarantees.** High-stakes behaviour belongs in code.
+
+## Related
+
+- [0.2 Training vs Inference](./02-training-vs-inference) — where these stages sit in the lifecycle
+- [1.2 Prompt Engineering](/ai-engineering/module-01/02-prompt-engineering) — working with the alignment rather than against it
+- [10.1 Fine-Tuning Overview](/ai-engineering/module-10/01-fine-tuning-overview) — running SFT and DPO on your own data
+- [5.2 Evaluation Pipeline](/ai-engineering/module-05/02-evaluation-pipeline) — catching alignment regressions on upgrade
+- [7.3 Responsible AI](/ai-engineering/module-07/03-responsible-ai) — the wider picture
 
 ---
 
