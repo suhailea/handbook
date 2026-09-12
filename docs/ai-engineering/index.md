@@ -11,17 +11,17 @@ It is split into two arcs:
 
 **Arc 1 — Building AI Systems (Modules 0–5):** Start here if you want to build LLM-powered products. We build **TaskFlow's customer support agent** from scratch, hitting every real decision an AI engineer faces: choosing a model, writing prompts that don't hallucinate, giving the agent tools and memory, running it without sending customer data to a third party, and knowing when it breaks.
 
-**Arc 2 — Engineering Depth (Modules 6–12):** Go deeper into the foundations and production concerns that separate senior AI engineers from prompt engineers. Covers ML fundamentals, deep learning, enterprise architecture, LLMOps, cloud infrastructure, security, and domain-specific AI.
+**Arc 2 — Engineering Depth (Modules 6–13):** Go deeper into the foundations and production concerns that separate senior AI engineers from prompt engineers. Covers ML fundamentals, deep learning, enterprise architecture, LLMOps, cloud infrastructure, security, domain-specific AI, and the business strategy questions senior engineers are expected to answer.
 
 ## Who this is for
 
 Backend engineers who can already build APIs and want to understand how to build AI systems that actually work in production — not just demos.
 
-## All 13 Modules
+## All 14 Modules
 
 | Module | Arc | What you'll learn |
 |--------|-----|-------------------|
-| [Module 0 — ML Foundations](/ai-engineering/module-00/) | 1 | How Transformers work, training vs inference, embeddings, RLHF |
+| [Module 0 — Mental Models](/ai-engineering/module-00/) | 1 | How Transformers work, training vs inference, embeddings, RLHF |
 | [Module 1 — LLMs & Prompting](/ai-engineering/module-01/) | 1 | What are we actually calling? How does prompting work? |
 | [Module 2 — Agents](/ai-engineering/module-02/) | 1 | Tools, memory, planning, reflection, multi-agent, MCP |
 | [Module 3 — Model Serving](/ai-engineering/module-03/) | 1 | Cloud vs local vs self-hosted; vLLM, KV cache, quantization |
@@ -34,5 +34,6 @@ Backend engineers who can already build APIs and want to understand how to build
 | [Module 10 — AI Infrastructure & Cloud](/ai-engineering/module-10/) | 2 | Docker, Kubernetes, AKS & Azure OpenAI, GPU infrastructure |
 | [Module 11 — Security & Responsible AI](/ai-engineering/module-11/) | 2 | Prompt injection, agent security, bias, fairness, GDPR |
 | [Module 12 — Energy Trading AI](/ai-engineering/module-12/) | 2 | Energy markets, AI trading architecture, LLM + quant models |
+| [Module 13 — AI Business Strategy](/ai-engineering/module-13/) | 2 | Build vs buy, AI decision frameworks, ROI metrics, org-level strategy |
 
-Start with Module 1 and follow Arc 1 end-to-end, then continue into Arc 2 for production depth.
+Start with Module 0 and follow Arc 1 end-to-end, then continue into Arc 2 for production depth.

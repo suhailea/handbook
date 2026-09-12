@@ -39,7 +39,7 @@ engineering-handbook/
 ├─ source-material/                # RAW input content (gitignored is fine) — see "Content pipeline"
 └─ docs/
    ├─ .vitepress/
-   │  ├─ config.ts                 # nav (5 tracks), sidebar per track, search, theme
+   │  ├─ config.ts                 # nav (8 tracks), sidebar per track, search, theme
    │  └─ theme/
    │     ├─ index.ts               # extends default theme
    │     └─ custom.css             # styles for custom containers + badges
@@ -48,7 +48,11 @@ engineering-handbook/
    ├─ nodejs/                      # Track 2 (module-01 ... module-10 subfolders)
    ├─ frameworks/                  # Track 3 (express/, nestjs/)
    ├─ system-design/               # Track 4 (queues/, microservices/, load-balancing/, caching/, scaling/)
-   └─ interview/                   # Track 5 (crash sheets + question bank)
+   ├─ interview/                   # Track 5 (crash sheets + question bank)
+   ├─ python/                      # Track 6 (dual-layer doctrine)
+   ├─ rag/                         # Track 7 (AI-track doctrine)
+   ├─ ai-engineering/              # Track 8 (AI-track doctrine)
+   └─ ml-foundations/              # Reference track — theory, linked on demand, not in a build line
 ```
 
 **File naming:** kebab-case, numeric prefixes for ordering within a module, e.g. `docs/nodejs/module-03/02-unhandled-rejections.md`. Every folder gets an `index.md` acting as the track/module overview + roadmap.
@@ -133,7 +137,12 @@ Rules: one analogy carried through, no API names except the concept being named,
 
 ---
 
-## The five tracks and their content maps
+## The eight tracks and their content maps
+
+> Tracks 1–5 are the original backend tracks and follow the dual-layer page template above.
+> Tracks 6–8 (Python, RAG, AI Engineering) were added later. **AI Engineering and RAG use a
+> different page doctrine** — see "AI-track doctrine" below. Do not apply the dual-layer
+> template to them.
 
 Create every folder now; create stub pages (frontmatter + title + "🚧 Planned" + a 5-10 bullet roadmap of what the page will cover) for everything not yet written, so the full site shape is navigable from day one. Sidebar must show the complete tree with stubs marked.
 
@@ -178,6 +187,86 @@ Each Node module folder ends with a `summary.md`: mental models gained + self-as
 - `crash-sheet-node.md`, `crash-sheet-js.md`, `crash-sheet-system-design.md`: Tier-1/2/3 rapid-review bullets, each bullet linking to its full page.
 - `question-bank.md`: auto-compiled list of every Checkpoint question across the site, grouped by track, linking back (maintain manually; keep in sync when adding pages).
 - `design-walkthroughs/`: rate limiter, job queue, LLM gateway, webhook system — full worked designs.
+
+### Track 6 — Python (`/python/`)
+12 modules: language foundations, data structures, concurrency, type hints, CPython internals, FastAPI. Follows the dual-layer template (Tracks 1–5 doctrine).
+
+### Track 7 — Production RAG (`/rag/`)
+18 modules, ingestion through operations, plus 10 case studies in Module 18. Uses the **AI-track doctrine** below. This track is the reference implementation of a finished track: it is the only one with the full support set (`index.md`, `questions.md`, `crash-sheet.md`, `interview-framework.md`). Match it.
+
+### Track 8 — AI Engineering (`/ai-engineering/`)
+The main build line: mental models → prompting → agents → application layer → RAG bridge → evaluation → observability → security → architecture → serving → fine-tuning → infrastructure → case studies → strategy. Uses the **AI-track doctrine** below.
+
+Pure ML/math theory does **not** live here — it lives in `/ml-foundations/` and is linked on demand. If a page teaches gradient descent or backprop as its subject, it is in the wrong track.
+
+---
+
+## AI-track doctrine (applies to `/rag/` and `/ai-engineering/` only)
+
+These tracks deliberately **do not** use the dual-layer template. The reasoning: Node internals reward source-level depth because the mechanism is stable for years, whereas AI engineering knowledge goes stale in months. What outlives it is intuition, decision frameworks, and trade-off judgment. A second "Under the Hood" layer here would mostly document APIs that change.
+
+**The rule: plain English carried all the way through, grounded in worked examples.** Not a technical reference. Not a watered-down explainer either — the reasoning must be rigorous, only the register is conversational.
+
+### Page template
+
+```md
+---
+title: <Concept name>
+outline: deep
+---
+
+# <Concept name>
+
+<One-paragraph story hook. For /ai-engineering/, continue the TaskFlow narrative —
+the running example is TaskFlow's customer support agent. Each page opens with the
+problem TaskFlow hit that makes this concept necessary.>
+
+::: tip Plain English
+<The concept with zero jargon, one analogy carried through. 150–400 words.>
+:::
+
+## <Mechanism sections — 2–4 of them>
+
+<How it actually works. Tables for comparisons, ASCII diagrams for flows, TypeScript
+for code. Examples are concrete and TaskFlow-anchored, never abstract.>
+
+::: warning Watch out
+<1–3 real failure modes: the symptom as an engineer sees it, the cause, the fix.
+Describe these as typical patterns — never fabricate specific incidents or numbers.>
+:::
+
+::: details Interview Question — <short label>
+**Q:** <question>
+
+**A:** <rigorous answer giving the mechanism, not just the conclusion>
+:::
+
+## Key Mental Models
+
+<3–5 one-sentence takeaways, bolded lead-ins.>
+
+## Related
+
+<Cross-links, including to /ml-foundations/ for theory and /rag/ for retrieval.>
+```
+
+### Depth targets
+
+| Element | Target |
+|---|---|
+| Words per content page | 1,600–2,200 |
+| Plain English block | exactly 1, mandatory, never omitted |
+| Watch out block | ≥1 |
+| Interview questions | **≥2** per page |
+| Visual anchor (table or diagram) | ≥1 |
+
+### Hard rules
+
+- **Every page has a Plain English block.** A page without one is incomplete regardless of length. (Known violations to fix: `module-00/01-how-transformers-work.md`, `module-00/04-rlhf.md`.)
+- **One topic, one home.** If a concept gets a full treatment in two modules, one of them is wrong. Merge toward the stronger page and delete the other.
+- **Narrative continuity.** Every main-line AI Engineering module advances the TaskFlow story, or is explicitly marked as a reference module in its index.
+- Never invent benchmarks, costs, or incidents. Model prices and context limits go stale — state them as illustrative, not authoritative.
+- Theory is linked, not inlined. Send readers to `/ml-foundations/`.
 
 ---
 

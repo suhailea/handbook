@@ -1,9 +1,9 @@
 ---
-title: Module 0 — ML Foundations
+title: Module 0 — Mental Models for AI Engineers
 outline: deep
 ---
 
-# Module 0 — ML Foundations
+# Module 0 — Mental Models for AI Engineers
 
 Before we touch the API, let's understand what we're working with. Not the math — the mental model.
 

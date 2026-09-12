@@ -748,7 +748,7 @@ export default withMermaid(defineConfig({
           items: [{ text: 'Overview', link: '/ai-engineering/' }],
         },
         {
-          text: 'Module 0 — ML Foundations',
+          text: 'Module 0 — Mental Models',
           collapsed: false,
           items: [
             { text: 'Overview', link: '/ai-engineering/module-00/' },
@@ -823,7 +823,7 @@ export default withMermaid(defineConfig({
           ],
         },
         {
-          text: 'Module 6 — ML Foundations',
+          text: 'Module 6 — ML Fundamentals & Statistics',
           collapsed: true,
           items: [
             { text: 'Overview', link: '/ai-engineering/module-06/' },
