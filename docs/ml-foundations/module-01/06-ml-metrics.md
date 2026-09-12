@@ -277,5 +277,5 @@ print(f"F1        (macro):    {f1_score(y_test, y_pred, average='macro'):.4f}")
 ## Related
 
 - [1.2 Train / Validation / Test](./02-training-validation-test) — what split these metrics are computed on
-- [Module 9.1 RAG Evaluation Metrics](/ai-engineering/module-05/01-metrics) — retrieval-specific metrics (Recall@K, MRR)
-- [Module 9.3 Evaluation Pipeline](/ai-engineering/module-05/02-evaluation-pipeline) — applying metrics to agent evaluation
+- [Module 5.1 Metrics](/ai-engineering/module-05/01-metrics) — retrieval-specific metrics (Recall@K, MRR)
+- [Module 5.2 Evaluation Pipeline](/ai-engineering/module-05/02-evaluation-pipeline) — applying metrics to agent evaluation

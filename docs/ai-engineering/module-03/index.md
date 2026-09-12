@@ -19,3 +19,5 @@ None of those are model problems. They're application problems — the layer bet
 4. [Cost & Token Accounting](./04-cost-and-token-accounting) — attribution, the cost model, budgets as controls
 5. [Prompt Caching & the KV Cache](./05-prompt-caching) — why prefix order decides your bill
 6. [Semantic Caching](./06-semantic-caching) — skipping the model entirely for repeat questions
+
+[Summary](./summary)

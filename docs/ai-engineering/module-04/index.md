@@ -20,3 +20,5 @@ This module is deliberately short. Retrieval is a large enough subject to have i
 [**Production RAG**](/rag/) covers ingestion, parsing, chunking, embeddings, vector databases, hybrid search, reranking, grounded generation, evaluation and 10 case studies across 18 modules.
 
 Come back here at [Module 5 — Evaluation](/ai-engineering/module-05/) once retrieval is in place. Evaluation is where RAG and agents stop being separate problems.
+
+[Summary](./summary)

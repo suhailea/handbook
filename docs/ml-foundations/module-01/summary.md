@@ -1,9 +1,9 @@
 ---
-title: Module 6 Summary — ML Fundamentals & Statistics
+title: Module 1 Summary — ML Fundamentals & Statistics
 outline: deep
 ---
 
-# Module 6 Summary — ML Fundamentals & Statistics
+# Module 1 Summary — ML Fundamentals & Statistics
 
 ## What you built
 
@@ -38,4 +38,4 @@ A solid mathematical foundation for AI engineering: the statistical tools, linea
 
 ## Next Module
 
-[Module 7 — Deep Learning & NLP](../module-02/) covers neural networks, CNNs, RNNs, and why Transformers replaced them — building on the optimization foundations from this module.
+[Module 2 — Deep Learning & NLP](../module-02/) covers neural networks, CNNs, RNNs, and why Transformers replaced them — building on the optimization foundations from this module.

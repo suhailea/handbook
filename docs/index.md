@@ -64,6 +64,6 @@ This is not a reference manual and not a beginner tutorial. It's a handbook that
 | [System Design](/system-design/) | Queues, microservices, load balancing, caching, scaling | 14 |
 | [Python](/python/) | 13 modules — CPython internals, data structures, concurrency, type hints, FastAPI | 75 |
 | [Production RAG](/rag/) | 18 modules — end-to-end RAG: ingestion, chunking, retrieval, reranking, security, scaling | 50+ |
-| [AI Engineering](/ai-engineering/) | 14 modules — mental models through enterprise AI architecture, LLMOps, GPU infra, security, and AI strategy | 43 |
-| [ML Foundations](/ml-foundations/) | Reference — statistics, linear algebra, ML algorithms, optimization, neural nets, NLP | 12 |
+| [AI Engineering](/ai-engineering/) | 14 modules — mental models through enterprise AI architecture, LLMOps, GPU infra, security, and AI strategy | 52 |
+| [ML Foundations](/ml-foundations/) | Reference — statistics, linear algebra, ML algorithms, optimization, neural nets, NLP | 10 |
 | [Interview Prep](/interview/) | Crash sheets, question bank, design walkthroughs | 8 |

@@ -229,4 +229,4 @@ The regularization coefficient `λ` (or `C = 1/λ` in sklearn) is a **hyperparam
 
 - [1.6 ML Metrics](./06-ml-metrics) — what to measure on val and test sets
 - [1.7 Optimization](./07-optimization) — training loop where overfitting occurs
-- [Module 9 LLMOps & Evaluation](/ai-engineering/module-05/) — validation and test split concepts applied to LLM evaluation
+- [Module 5 — Evaluation](/ai-engineering/module-05/) — validation and test split concepts applied to LLM evaluation

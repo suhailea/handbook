@@ -28,6 +28,8 @@ For TaskFlow: user asks about ticket #4821 → model decides it needs `lookup_ti
 3. A tool errors and you choose not to retry
 4. A guardrail halts it
 
+Each exit needs an explicit path in your code. A loop that exits only because a `for` completed, with no branch handling that case, returns nothing — and "the agent didn't answer" is a much harder bug report to act on than a logged, deliberate timeout message.
+
 | | Single call | Agent loop |
 |---|---|---|
 | Turns | 1 | Multiple |

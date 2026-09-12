@@ -1,9 +1,9 @@
 ---
-title: Module 7 Summary — Deep Learning & NLP
+title: Module 2 Summary — Deep Learning & NLP
 outline: deep
 ---
 
-# Module 7 Summary — Deep Learning & NLP
+# Module 2 Summary — Deep Learning & NLP
 
 ## What you built
 

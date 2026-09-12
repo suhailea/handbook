@@ -813,10 +813,12 @@ export default withMermaid(defineConfig({
             { text: '3.3 Reliability & Fallbacks', link: '/ai-engineering/module-03/03-reliability-and-fallbacks' },
             { text: '3.4 Cost & Token Accounting', link: '/ai-engineering/module-03/04-cost-and-token-accounting' },
             { text: '3.5 Prompt Caching & KV Cache', link: '/ai-engineering/module-03/05-prompt-caching' },
-            { text: '3.6 Semantic Caching', link: '/ai-engineering/module-03/06-semantic-caching' } ] },
+            { text: '3.6 Semantic Caching', link: '/ai-engineering/module-03/06-semantic-caching' },
+            { text: 'Summary', link: '/ai-engineering/module-03/summary' } ] },
         { text: 'Module 4 — RAG, The Bridge', collapsed: true, items: [
             { text: 'Overview', link: '/ai-engineering/module-04/' },
-            { text: '4.1 When You Need Retrieval', link: '/ai-engineering/module-04/01-when-you-need-retrieval' } ] },
+            { text: '4.1 When You Need Retrieval', link: '/ai-engineering/module-04/01-when-you-need-retrieval' },
+            { text: 'Summary', link: '/ai-engineering/module-04/summary' } ] },
         { text: 'Module 5 — Evaluation', collapsed: true, items: [
             { text: 'Overview', link: '/ai-engineering/module-05/' },
             { text: '5.1 Metrics', link: '/ai-engineering/module-05/01-metrics' },
@@ -825,7 +827,8 @@ export default withMermaid(defineConfig({
         { text: 'Module 6 — Observability & LLMOps', collapsed: true, items: [
             { text: 'Overview', link: '/ai-engineering/module-06/' },
             { text: '6.1 Production Metrics', link: '/ai-engineering/module-06/01-production-metrics' },
-            { text: '6.2 LLMOps', link: '/ai-engineering/module-06/02-llmops' } ] },
+            { text: '6.2 LLMOps', link: '/ai-engineering/module-06/02-llmops' },
+            { text: 'Summary', link: '/ai-engineering/module-06/summary' } ] },
         { text: 'Module 7 — Security & Guardrails', collapsed: true, items: [
             { text: 'Overview', link: '/ai-engineering/module-07/' },
             { text: '7.1 AI Security', link: '/ai-engineering/module-07/01-ai-security' },

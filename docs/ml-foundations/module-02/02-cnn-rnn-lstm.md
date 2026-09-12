@@ -249,4 +249,4 @@ The Transformer's self-attention provides **direct connections between any two p
 
 - [2.1 Neural Networks](./01-neural-networks) — foundations these architectures build on
 - [Module 0.1 How Transformers Work](/ai-engineering/module-00/01-how-transformers-work) — the winning architecture in full detail
-- [Module 3.3 vLLM](/ai-engineering/module-09/03-vllm) — efficient inference for Transformer-based LLMs
+- [Module 9.3 vLLM](/ai-engineering/module-09/03-vllm) — efficient inference for Transformer-based LLMs
