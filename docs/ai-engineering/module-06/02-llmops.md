@@ -5,7 +5,7 @@ outline: deep
 
 # LLMOps — Prompt Versioning, Model Versioning, A/B Testing
 
-🔥🔥 Interview weight | Prerequisites: [9.3 Evaluation Pipeline](./03-evaluation-pipeline)
+🔥🔥 Interview weight | Prerequisites: [5.2 Evaluation Pipeline](/ai-engineering/module-05/02-evaluation-pipeline)
 
 ## 🗣️ In Plain English
 
@@ -427,6 +427,6 @@ class CanaryController {
 
 ## Related
 
-- [9.3 Evaluation Pipeline](./03-evaluation-pipeline) — the eval pipeline that gates prompt promotions
-- [9.2 Production Metrics](./02-production-metrics) — metrics monitored during A/B tests
-- [Module 4 Fine-Tuning](/ai-engineering/module-04/) — model versioning considerations during fine-tuning
+- [5.2 Evaluation Pipeline](/ai-engineering/module-05/02-evaluation-pipeline) — the eval pipeline that gates prompt promotions
+- [6.1 Production Metrics](./01-production-metrics) — metrics monitored during A/B tests
+- [Module 4 Fine-Tuning](/ai-engineering/module-10/) — model versioning considerations during fine-tuning

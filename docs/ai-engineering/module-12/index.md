@@ -1,9 +1,9 @@
 ---
-title: Module 12 — Energy Trading AI
+title: Module 12 — Case Studies
 outline: deep
 ---
 
-# Module 12 — Energy Trading AI
+# Module 12 — Case Studies
 
 Oil, gas, and power markets move billions of dollars daily on signals that take milliseconds to form and hours to explain. AI is transforming how traders process information — but the architecture of AI systems in trading is fundamentally different from consumer AI. The stakes, the regulations, and the physics of markets demand that deterministic models stay in control while LLMs stay in the interpretation lane.
 

@@ -459,4 +459,4 @@ LLM-interpreted signals remain valuable when:
 
 - [12.1 Energy Trading Concepts](./01-energy-trading-concepts) — the market concepts this architecture serves
 - [12.3 LLM + Quant Models](./03-llm-plus-quant) — deep dive into the LLM interpretation + quant calculation separation
-- [Module 11 — Security & Responsible AI](../module-11/) — security and audit requirements apply here at 10× stakes
+- [Module 11 — Security & Responsible AI](/ai-engineering/module-07/) — security and audit requirements apply here at 10× stakes

@@ -5,36 +5,43 @@ outline: deep
 
 # AI Engineering
 
-This track covers the full spectrum of AI engineering — from the mathematical foundations of machine learning through production LLM systems, infrastructure, security, and domain-specific AI in energy trading.
+This track teaches you to build, ship and operate LLM-powered systems, following one story end to end: **TaskFlow's customer support agent**, from first API call to the strategy conversation about what to build next.
 
-It is split into two arcs:
+It is a build line, not a reference manual. Each module exists because the previous one created a problem it has to solve.
 
-**Arc 1 — Building AI Systems (Modules 0–4):** Start here if you want to build LLM-powered products. We build **TaskFlow's customer support agent** from scratch, hitting every real decision an AI engineer faces: choosing a model, writing prompts that don't hallucinate, giving the agent tools and memory, running it without sending customer data to a third party, and knowing when it breaks.
+## The story
 
-**Arc 2 — Engineering Depth (Modules 8–13):** Go deeper into the production concerns that separate senior AI engineers from prompt engineers. Covers enterprise architecture, LLMOps, cloud infrastructure, security, domain-specific AI, and the business strategy questions senior engineers are expected to answer.
+> I need to understand what I'm calling *(Module 0)* → I learn to talk to it *(1)* → I make it act *(2)* → I build a real application around it *(3)* → I give it knowledge *(4)* → **I find out whether it works** *(5)* → I watch it and keep it safe *(6, 7)* → I architect it properly *(8)* → I outgrow the API *(9, 10)* → I run it at scale *(11)* → I see how others did it *(12)* → I decide what's worth building *(13)*.
+
+Evaluation at Module 5 is the hinge. Everything before it is construction; everything after it operates a system you can actually measure.
 
 ## Who this is for
 
-Backend engineers who can already build APIs and want to understand how to build AI systems that actually work in production — not just demos.
+Backend engineers who can already build APIs and want to build AI systems that survive production — not demos.
 
-## All 11 Modules
+## The 14 modules
 
-| Module | Arc | What you'll learn |
-|--------|-----|-------------------|
-| [Module 0 — Mental Models](/ai-engineering/module-00/) | 1 | How Transformers work, training vs inference, embeddings, RLHF |
-| [Module 1 — LLMs & Prompting](/ai-engineering/module-01/) | 1 | What are we actually calling? How does prompting work? |
-| [Module 2 — Agents](/ai-engineering/module-02/) | 1 | Tools, memory, planning, reflection, multi-agent, MCP |
-| [Module 3 — Model Serving](/ai-engineering/module-03/) | 1 | Cloud vs local vs self-hosted; vLLM, KV cache, quantization |
-| [Module 4 — Fine-Tuning](/ai-engineering/module-04/) | 1 | LoRA, QLoRA, when to fine-tune vs prompt |
-| [Module 8 — AI Architecture](/ai-engineering/module-08/) | 2 | System patterns, enterprise AI stack, data architecture |
-| [Module 9 — LLMOps & Evaluation](/ai-engineering/module-09/) | 2 | RAG metrics, production metrics, evaluation pipelines, prompt versioning |
-| [Module 10 — AI Infrastructure & Cloud](/ai-engineering/module-10/) | 2 | Docker, Kubernetes, AKS & Azure OpenAI, GPU infrastructure |
-| [Module 11 — Security & Responsible AI](/ai-engineering/module-11/) | 2 | Prompt injection, agent security, bias, fairness, GDPR |
-| [Module 12 — Energy Trading AI](/ai-engineering/module-12/) | 2 | Energy markets, AI trading architecture, LLM + quant models |
-| [Module 13 — AI Business Strategy](/ai-engineering/module-13/) | 2 | Build vs buy, AI decision frameworks, ROI metrics, org-level strategy |
+| Module | What you'll learn |
+|--------|-------------------|
+| [0 — Mental Models](/ai-engineering/module-00/) | Transformers, training vs inference, embeddings, RLHF — the intuitions everything else assumes |
+| [1 — LLMs & Prompting](/ai-engineering/module-01/) | Tokens, context windows, prompt and context engineering |
+| [2 — Agents](/ai-engineering/module-02/) | The agent loop, tools, memory, planning, multi-agent, MCP, A2A |
+| [3 — The Application Layer](/ai-engineering/module-03/) | Streaming, structured outputs, reliability, cost, prompt and semantic caching |
+| [4 — RAG, The Bridge](/ai-engineering/module-04/) | When retrieval is the answer — then hand off to the RAG track |
+| [5 — Evaluation](/ai-engineering/module-05/) | Metrics, golden datasets, LLM-as-judge, regression gates, red teaming |
+| [6 — Observability & LLMOps](/ai-engineering/module-06/) | Tracing agent runs, latency, cost, prompt and model versioning |
+| [7 — Security & Guardrails](/ai-engineering/module-07/) | Prompt injection, agent authorization, guardrails, responsible AI |
+| [8 — AI Architecture](/ai-engineering/module-08/) | System patterns, the enterprise stack, data architecture |
+| [9 — Model Serving](/ai-engineering/module-09/) | Cloud vs local vs self-hosted, GGUF, vLLM, quantization |
+| [10 — Fine-Tuning](/ai-engineering/module-10/) | LoRA, QLoRA, and when fine-tuning is the wrong answer |
+| [11 — Infrastructure & Cloud](/ai-engineering/module-11/) | Docker, Kubernetes, AKS, GPU infrastructure patterns |
+| [12 — Case Studies](/ai-engineering/module-12/) | Full worked systems, starting with AI in energy trading |
+| [13 — AI Business Strategy](/ai-engineering/module-13/) | Build vs buy, ROI, and the questions senior engineers get asked |
 
-Start with Module 0 and follow Arc 1 end-to-end, then continue into Arc 2 for production depth.
+## Two tracks you'll be sent to
 
-> **Note:** observability, evaluation and guardrails were previously a separate Module 5. They now live with their full treatments in [Module 9 — LLMOps & Evaluation](/ai-engineering/module-09/) and [Module 11 — Security & Responsible AI](/ai-engineering/module-11/). Module numbering is renumbered to close the gap in a later pass.
+**[Production RAG](/rag/)** — 18 modules on retrieval. Module 4 hands you over and tells you when to come back.
 
-> **Theory lives elsewhere.** ML fundamentals, statistics, linear algebra, neural networks and NLP moved to the [ML Foundations](/ml-foundations/) reference track. This track links there on demand — you don't need to read it first.
+**[ML Foundations](/ml-foundations/)** — statistics, linear algebra, neural networks, optimization. A reference track, linked on demand. You don't need it first, and for most engineering work you won't need it at all.
+
+Start at [Module 0](/ai-engineering/module-00/).

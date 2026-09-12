@@ -1,5 +1,5 @@
 ---
-title: KV Cache — Why Inference Is Expensive (and How to Cheat)
+title: Prompt Caching & the KV Cache — Why Inference Is Expensive (and How to Cheat)
 outline: deep
 ---
 

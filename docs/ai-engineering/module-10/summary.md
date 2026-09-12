@@ -1,37 +1,22 @@
 ---
-title: Module 10 Summary — AI Infrastructure & Cloud
+title: Module 4 Summary — Fine-Tuning
 outline: deep
 ---
 
-# Module 10 Summary — AI Infrastructure & Cloud
+# Module 4 Summary
 
-## What you built
+Four things to remember from this module as TaskFlow's agent matures.
 
-A complete picture of AI infrastructure: how to containerize AI workloads correctly, orchestrate them in Kubernetes, deploy on Azure (AKS + Azure OpenAI), and optimize GPU-based model serving for throughput and cost.
+## Mental Models
 
-## 6 Mental Models to Take Forward
+**1. Fine-tuning changes how the model behaves — not what it knows.** This is the single most important distinction. Use fine-tuning for consistent behavior, tone, and format. Use RAG for knowledge. Confusing these is the most common (and expensive) mistake in AI engineering.
 
-1. **Model weights don't belong in Docker layers** — fetch from object storage at container startup; bake weights into images only for air-gapped environments, and use a separate rarely-changing layer.
+**2. Try prompting first, always.** Fine-tuning is surgery. Prompting is physical therapy. Almost every behavior problem can be significantly improved with few-shot examples and explicit instructions before you need to retrain the model. The bar for fine-tuning should be "prompting demonstrably doesn't solve this" — not "this might be better with fine-tuning."
 
-2. **Startup probe ≠ Readiness probe ≠ Liveness probe** — they have distinct roles: startup prevents liveness restarts during warm-up; readiness gates traffic; liveness detects deadlocks. All three are needed for AI services.
+**3. LoRA and QLoRA make fine-tuning accessible without expensive hardware.** Training only the adapter parameters rather than the full model reduces VRAM requirements by 5–10x. A meaningful fine-tune is achievable on a single A10G or even a high-end consumer GPU. The quality cost is small and usually acceptable.
 
-3. **Azure OpenAI = GPT-4 in your tenant** — same model, Azure data residency, no secrets needed with Workload Identity, PTU for predictable throughput. The right choice for enterprise AI in 90% of cases.
+**4. The strongest use case for fine-tuning is cost optimization, not quality.** Fine-tune a small model to do a specific high-volume task (classification, formatting) that currently runs on a large expensive model. This is a real engineering win: same quality, 10–50x cheaper per call.
 
-4. **GPU VRAM = weights + KV cache + activations** — quantization reduces weights; FP8 KV cache reduces the second term; reducing max concurrent sequences reduces the third. Always calculate before provisioning hardware.
+## What's next
 
-5. **Continuous batching is the key vLLM innovation** — keeping the GPU full with dynamically-added requests gives 20-40× better throughput than static batching. Use vLLM, not a custom inference server.
-
-6. **GPU node pools should scale to zero** — A100/H100 nodes cost $25-50/hour; leave them running idle and you'll spend $18K-$36K/month. Design for cold start or use scheduled pre-provisioning.
-
-## Self-Assessment Checklist
-
-- [ ] Can you write a Dockerfile for an AI service with correct layer ordering and startup probe?
-- [ ] Can you explain the three Kubernetes probes and configure them for a model-serving container?
-- [ ] Can you describe the difference between Azure OpenAI and OpenAI direct API from a data residency perspective?
-- [ ] Can you calculate GPU memory requirements for a 13B model with 16K context and 32 concurrent users?
-- [ ] Can you explain how continuous batching improves GPU throughput over static batching?
-- [ ] Can you describe when to use tensor parallelism vs pipeline parallelism?
-
-## Next Module
-
-[Module 11 — Security & Responsible AI](../module-11/) covers the security and ethical considerations that are mandatory for production AI systems: prompt injection, agent security, bias, fairness, and compliance.
+Module 5 is about operating the agent in production. The agent is built and running — now how do we know it's working, catch failures before users do, and keep it from going off the rails?

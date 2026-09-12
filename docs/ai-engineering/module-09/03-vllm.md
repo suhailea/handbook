@@ -38,7 +38,7 @@ Traditional inference servers process one request at a time (or batch fixed-size
 
 ### PagedAttention
 
-During inference, the model needs to store "KV cache" — intermediate computations from processing input tokens. (More on KV cache on the [next page](./04-kv-cache).)
+During inference, the model needs to store "KV cache" — intermediate computations from processing input tokens. (More on KV cache on the [next page](/ai-engineering/module-03/05-prompt-caching).)
 
 The problem: different requests have different lengths. A 5,000-token context and a 50-token context need very different amounts of KV cache space. If you pre-allocate the maximum, you waste most of your GPU memory most of the time.
 

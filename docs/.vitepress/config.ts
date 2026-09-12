@@ -776,37 +776,21 @@ export default withMermaid(defineConfig({
         },
       ],
       '/ai-engineering/': [
-        {
-          text: 'AI Engineering',
-          items: [{ text: 'Overview', link: '/ai-engineering/' }],
-        },
-        {
-          text: 'Module 0 — Mental Models',
-          collapsed: false,
-          items: [
+        { text: 'AI Engineering', items: [{ text: 'Overview', link: '/ai-engineering/' }] },
+        { text: 'Module 0 — Mental Models', collapsed: false, items: [
             { text: 'Overview', link: '/ai-engineering/module-00/' },
             { text: '0.1 How Transformers Work', link: '/ai-engineering/module-00/01-how-transformers-work' },
             { text: '0.2 Training vs Inference', link: '/ai-engineering/module-00/02-training-vs-inference' },
             { text: '0.3 Embeddings', link: '/ai-engineering/module-00/03-embeddings' },
             { text: '0.4 RLHF & Alignment', link: '/ai-engineering/module-00/04-rlhf' },
-            { text: 'Summary', link: '/ai-engineering/module-00/summary' },
-          ],
-        },
-        {
-          text: 'Module 1 — LLMs & Prompting',
-          collapsed: false,
-          items: [
+            { text: 'Summary', link: '/ai-engineering/module-00/summary' } ] },
+        { text: 'Module 1 — LLMs & Prompting', collapsed: false, items: [
             { text: 'Overview', link: '/ai-engineering/module-01/' },
             { text: '1.1 LLMs & Tokens', link: '/ai-engineering/module-01/01-llms-and-tokens' },
             { text: '1.2 Prompt Engineering', link: '/ai-engineering/module-01/02-prompt-engineering' },
             { text: '1.3 Context Engineering', link: '/ai-engineering/module-01/03-context-engineering' },
-            { text: 'Summary', link: '/ai-engineering/module-01/summary' },
-          ],
-        },
-        {
-          text: 'Module 2 — Agents',
-          collapsed: true,
-          items: [
+            { text: 'Summary', link: '/ai-engineering/module-01/summary' } ] },
+        { text: 'Module 2 — Agents', collapsed: true, items: [
             { text: 'Overview', link: '/ai-engineering/module-02/' },
             { text: '2.1 The Agent Loop', link: '/ai-engineering/module-02/01-agent-loop' },
             { text: '2.2 Tools & Tool Calling', link: '/ai-engineering/module-02/02-tools-and-tool-calling' },
@@ -815,106 +799,73 @@ export default withMermaid(defineConfig({
             { text: '2.5 The Agent Harness', link: '/ai-engineering/module-02/05-agent-harness' },
             { text: '2.6 Multi-Agent Systems', link: '/ai-engineering/module-02/06-multi-agent' },
             { text: '2.7 MCP', link: '/ai-engineering/module-02/07-mcp' },
-            { text: '2.8 A2A — Agent-to-Agent Protocol', link: '/ai-engineering/module-02/08-a2a' },
-            { text: 'Summary', link: '/ai-engineering/module-02/summary' },
-          ],
-        },
-        {
-          text: 'Module 3 — Model Serving',
-          collapsed: true,
-          items: [
+            { text: '2.8 A2A', link: '/ai-engineering/module-02/08-a2a' },
+            { text: 'Summary', link: '/ai-engineering/module-02/summary' } ] },
+        { text: 'Module 3 — Application Layer', collapsed: true, items: [
             { text: 'Overview', link: '/ai-engineering/module-03/' },
-            { text: '3.1 Cloud vs Local vs Self-Hosted', link: '/ai-engineering/module-03/01-model-serving-overview' },
-            { text: '3.2 GGUF & Local LLMs', link: '/ai-engineering/module-03/02-gguf-and-local-llms' },
-            { text: '3.3 vLLM', link: '/ai-engineering/module-03/03-vllm' },
-            { text: '3.4 KV Cache', link: '/ai-engineering/module-03/04-kv-cache' },
-            { text: '3.5 Quantization', link: '/ai-engineering/module-03/05-quantization' },
-            { text: '3.6 Semantic Caching', link: '/ai-engineering/module-03/06-semantic-caching' },
-            { text: 'Summary', link: '/ai-engineering/module-03/summary' },
-          ],
-        },
-        {
-          text: 'Module 4 — Fine-Tuning',
-          collapsed: true,
-          items: [
+            { text: '3.1 Streaming & SSE 🚧', link: '/ai-engineering/module-03/01-streaming-and-sse' },
+            { text: '3.2 Structured Outputs 🚧', link: '/ai-engineering/module-03/02-structured-outputs' },
+            { text: '3.3 Reliability & Fallbacks 🚧', link: '/ai-engineering/module-03/03-reliability-and-fallbacks' },
+            { text: '3.4 Cost & Token Accounting 🚧', link: '/ai-engineering/module-03/04-cost-and-token-accounting' },
+            { text: '3.5 Prompt Caching & KV Cache', link: '/ai-engineering/module-03/05-prompt-caching' },
+            { text: '3.6 Semantic Caching', link: '/ai-engineering/module-03/06-semantic-caching' } ] },
+        { text: 'Module 4 — RAG, The Bridge', collapsed: true, items: [
             { text: 'Overview', link: '/ai-engineering/module-04/' },
-            { text: '4.1 Fine-Tuning Overview', link: '/ai-engineering/module-04/01-fine-tuning-overview' },
-            { text: '4.2 LoRA & QLoRA', link: '/ai-engineering/module-04/02-lora-qlora' },
-            { text: '4.3 When to Fine-Tune', link: '/ai-engineering/module-04/03-when-to-fine-tune' },
-            { text: 'Summary', link: '/ai-engineering/module-04/summary' },
-          ],
-        },
-        {
-          text: 'Module 8 — AI Architecture',
-          collapsed: true,
-          items: [
+            { text: '4.1 When You Need Retrieval 🚧', link: '/ai-engineering/module-04/01-when-you-need-retrieval' } ] },
+        { text: 'Module 5 — Evaluation', collapsed: true, items: [
+            { text: 'Overview', link: '/ai-engineering/module-05/' },
+            { text: '5.1 Metrics', link: '/ai-engineering/module-05/01-metrics' },
+            { text: '5.2 Evaluation Pipeline', link: '/ai-engineering/module-05/02-evaluation-pipeline' },
+            { text: 'Summary', link: '/ai-engineering/module-05/summary' } ] },
+        { text: 'Module 6 — Observability & LLMOps', collapsed: true, items: [
+            { text: 'Overview', link: '/ai-engineering/module-06/' },
+            { text: '6.1 Production Metrics', link: '/ai-engineering/module-06/01-production-metrics' },
+            { text: '6.2 LLMOps', link: '/ai-engineering/module-06/02-llmops' } ] },
+        { text: 'Module 7 — Security & Guardrails', collapsed: true, items: [
+            { text: 'Overview', link: '/ai-engineering/module-07/' },
+            { text: '7.1 AI Security', link: '/ai-engineering/module-07/01-ai-security' },
+            { text: '7.2 Agent Security', link: '/ai-engineering/module-07/02-agent-security' },
+            { text: '7.3 Responsible AI', link: '/ai-engineering/module-07/03-responsible-ai' },
+            { text: 'Summary', link: '/ai-engineering/module-07/summary' } ] },
+        { text: 'Module 8 — AI Architecture', collapsed: true, items: [
             { text: 'Overview', link: '/ai-engineering/module-08/' },
             { text: '8.1 AI System Patterns', link: '/ai-engineering/module-08/01-ai-system-patterns' },
             { text: '8.2 Enterprise AI Architecture', link: '/ai-engineering/module-08/02-enterprise-ai-architecture' },
-            { text: '8.3 Data Architecture for AI', link: '/ai-engineering/module-08/03-data-architecture' },
-            { text: 'Summary', link: '/ai-engineering/module-08/summary' },
-          ],
-        },
-        {
-          text: 'Module 9 — LLMOps & Evaluation',
-          collapsed: true,
-          items: [
+            { text: '8.3 Data Architecture', link: '/ai-engineering/module-08/03-data-architecture' },
+            { text: 'Summary', link: '/ai-engineering/module-08/summary' } ] },
+        { text: 'Module 9 — Model Serving', collapsed: true, items: [
             { text: 'Overview', link: '/ai-engineering/module-09/' },
-            { text: '9.1 RAG Evaluation Metrics', link: '/ai-engineering/module-09/01-rag-evaluation-metrics' },
-            { text: '9.2 Production Metrics', link: '/ai-engineering/module-09/02-production-metrics' },
-            { text: '9.3 Evaluation Pipeline', link: '/ai-engineering/module-09/03-evaluation-pipeline' },
-            { text: '9.4 LLMOps', link: '/ai-engineering/module-09/04-llmops' },
-            { text: 'Summary', link: '/ai-engineering/module-09/summary' },
-          ],
-        },
-        {
-          text: 'Module 10 — AI Infrastructure & Cloud',
-          collapsed: true,
-          items: [
+            { text: '9.1 Cloud vs Local vs Self-Hosted', link: '/ai-engineering/module-09/01-model-serving-overview' },
+            { text: '9.2 GGUF & Local LLMs', link: '/ai-engineering/module-09/02-gguf-and-local-llms' },
+            { text: '9.3 vLLM', link: '/ai-engineering/module-09/03-vllm' },
+            { text: '9.4 Quantization', link: '/ai-engineering/module-09/04-quantization' },
+            { text: 'Summary', link: '/ai-engineering/module-09/summary' } ] },
+        { text: 'Module 10 — Fine-Tuning', collapsed: true, items: [
             { text: 'Overview', link: '/ai-engineering/module-10/' },
-            { text: '10.1 Docker for AI', link: '/ai-engineering/module-10/01-docker-for-ai' },
-            { text: '10.2 Kubernetes for AI', link: '/ai-engineering/module-10/02-kubernetes-for-ai' },
-            { text: '10.3 AKS & Azure', link: '/ai-engineering/module-10/03-aks-and-azure' },
-            { text: '10.4 AI Infrastructure Patterns', link: '/ai-engineering/module-10/04-ai-infrastructure-patterns' },
-            { text: 'Summary', link: '/ai-engineering/module-10/summary' },
-          ],
-        },
-        {
-          text: 'Module 11 — Security & Responsible AI',
-          collapsed: true,
-          items: [
+            { text: '10.1 Fine-Tuning Overview', link: '/ai-engineering/module-10/01-fine-tuning-overview' },
+            { text: '10.2 LoRA & QLoRA', link: '/ai-engineering/module-10/02-lora-qlora' },
+            { text: '10.3 When to Fine-Tune', link: '/ai-engineering/module-10/03-when-to-fine-tune' },
+            { text: 'Summary', link: '/ai-engineering/module-10/summary' } ] },
+        { text: 'Module 11 — Infrastructure & Cloud', collapsed: true, items: [
             { text: 'Overview', link: '/ai-engineering/module-11/' },
-            { text: '11.1 AI Security', link: '/ai-engineering/module-11/01-ai-security' },
-            { text: '11.2 Agent Security', link: '/ai-engineering/module-11/02-agent-security' },
-            { text: '11.3 Responsible AI', link: '/ai-engineering/module-11/03-responsible-ai' },
-            { text: 'Summary', link: '/ai-engineering/module-11/summary' },
-          ],
-        },
-        {
-          text: 'Module 12 — Energy Trading AI',
-          collapsed: true,
-          items: [
+            { text: '11.1 Docker for AI', link: '/ai-engineering/module-11/01-docker-for-ai' },
+            { text: '11.2 Kubernetes for AI', link: '/ai-engineering/module-11/02-kubernetes-for-ai' },
+            { text: '11.3 AKS & Azure', link: '/ai-engineering/module-11/03-aks-and-azure' },
+            { text: '11.4 AI Infrastructure Patterns', link: '/ai-engineering/module-11/04-ai-infrastructure-patterns' },
+            { text: 'Summary', link: '/ai-engineering/module-11/summary' } ] },
+        { text: 'Module 12 — Case Studies', collapsed: true, items: [
             { text: 'Overview', link: '/ai-engineering/module-12/' },
             { text: '12.1 Energy Trading Concepts', link: '/ai-engineering/module-12/01-energy-trading-concepts' },
             { text: '12.2 AI in Trading Architecture', link: '/ai-engineering/module-12/02-ai-in-trading-architecture' },
             { text: '12.3 LLM + Quant Models', link: '/ai-engineering/module-12/03-llm-plus-quant' },
-            { text: 'Summary', link: '/ai-engineering/module-12/summary' },
-          ],
-        },
-        {
-          text: 'Module 13 — AI Business Strategy',
-          collapsed: true,
-          items: [
+            { text: 'Summary', link: '/ai-engineering/module-12/summary' } ] },
+        { text: 'Module 13 — AI Business Strategy', collapsed: true, items: [
             { text: 'Overview', link: '/ai-engineering/module-13/' },
-            { text: '13.1 The AI Decision Framework', link: '/ai-engineering/module-13/01-ai-decision-framework' },
+            { text: '13.1 AI Decision Framework', link: '/ai-engineering/module-13/01-ai-decision-framework' },
             { text: '13.2 AI Metrics & ROI', link: '/ai-engineering/module-13/02-ai-metrics-roi' },
-            { text: '13.3 AI Strategy for Engineers', link: '/ai-engineering/module-13/03-ai-strategy' },
-            { text: 'Summary', link: '/ai-engineering/module-13/summary' },
-          ],
-        },
+            { text: '13.3 AI Strategy', link: '/ai-engineering/module-13/03-ai-strategy' },
+            { text: 'Summary', link: '/ai-engineering/module-13/summary' } ] },
       ],
-
-      // ── Track 5: Interview Prep ──
       '/interview/': [
         {
           text: 'Interview Prep',

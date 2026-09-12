@@ -420,6 +420,6 @@ The load-bearing principle: for high-stakes actions, guardrails belong in code. 
 
 ## Related
 
-- [11.2 Agent Security](./02-agent-security) — security for agents that take actions
-- [9.3 Evaluation Pipeline](../module-09/03-evaluation-pipeline) — red teaming for AI security testing
-- [Module 9.3 Evaluation Pipeline](/ai-engineering/module-09/03-evaluation-pipeline) — red teaming your guardrails
+- [7.2 Agent Security](./02-agent-security) — security for agents that take actions
+- [5.2 Evaluation Pipeline](/ai-engineering/module-05/02-evaluation-pipeline) — red teaming for AI security testing
+- [Module 9.3 Evaluation Pipeline](/ai-engineering/module-05/02-evaluation-pipeline) — red teaming your guardrails

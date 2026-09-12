@@ -510,5 +510,5 @@ console.log(`Estimated cost: $${estimatedCost.toFixed(4)}`)  // ~$0.023
 ## Related
 
 - [8.1 AI System Patterns](./01-ai-system-patterns) — the patterns this architecture wraps
-- [Module 9 LLMOps](/ai-engineering/module-09/) — monitoring and evaluating the systems built here
-- [Module 11 Security](/ai-engineering/module-11/) — security considerations for this architecture
+- [Module 9 LLMOps](/ai-engineering/module-05/) — monitoring and evaluating the systems built here
+- [Module 11 Security](/ai-engineering/module-07/) — security considerations for this architecture

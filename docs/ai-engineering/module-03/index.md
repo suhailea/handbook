@@ -1,24 +1,21 @@
 ---
-title: Module 3 — Model Serving
+title: Module 3 — The LLM Application Layer
 outline: deep
 ---
 
-# Module 3 — Model Serving
+# Module 3 — The LLM Application Layer
 
-Our agent worked great with OpenAI. Then product said: "We can't send customer data to OpenAI." We had to think about model serving.
+The agent works in a notebook. Now it has to survive contact with users.
 
-TaskFlow's enterprise customers started asking about data privacy. Their support tickets contained confidential business information. Sending that to a third-party API — even OpenAI — was a non-starter for their compliance teams. We needed to run a model ourselves.
+TaskFlow's agent could reason and call tools, but the first real deployment exposed everything the notebook hid: responses arrived as a four-second wall of silence, a malformed JSON reply crashed the ticket parser, one provider outage took the whole feature down, and nobody could say what any of it cost per conversation.
 
-That opens a completely different set of questions: which model? In what format? On what hardware? With what serving engine? How do we handle 100 concurrent users?
-
-This module covers those decisions.
+None of those are model problems. They're application problems — the layer between "the model can do it" and "users can rely on it."
 
 ## Pages in this module
 
-1. [Model Serving — Cloud vs Local vs Self-Hosted](./01-model-serving-overview) — the three options and when to choose each
-2. [GGUF & Local LLMs — Running Models on Your Machine](./02-gguf-and-local-llms) — file formats, Ollama, llama.cpp
-3. [vLLM — High-Throughput Model Serving](./03-vllm) — production inference for multiple users
-4. [KV Cache — Why Inference Is Expensive (and How to Cheat)](./04-kv-cache) — prompt caching, cost reduction
-5. [Quantization — Making Models Smaller Without Breaking Them](./05-quantization) — FP16, INT8, INT4
-6. [Semantic Caching — Caching by Meaning, Not by Text](./06-semantic-caching) — skip the LLM entirely for repeated questions
-7. [Summary](./summary) — 5 mental models to take forward
+1. [Streaming & SSE](./01-streaming-and-sse) — 🚧 Planned — token streaming, backpressure, disconnect cleanup
+2. [Structured Outputs](./02-structured-outputs) — 🚧 Planned — schema-constrained generation, validation, repair loops
+3. [Reliability & Fallbacks](./03-reliability-and-fallbacks) — 🚧 Planned — retries, timeouts, provider fallback, idempotency
+4. [Cost & Token Accounting](./04-cost-and-token-accounting) — 🚧 Planned — per-request budgets, attribution, the cost model
+5. [Prompt Caching & the KV Cache](./05-prompt-caching) — why prefix order decides your bill
+6. [Semantic Caching](./06-semantic-caching) — skipping the model entirely for repeat questions

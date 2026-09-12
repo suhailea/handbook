@@ -258,4 +258,4 @@ print(f"Outliers: {outliers}")
 
 - [1.5 Linear Algebra for AI](./05-linear-algebra-for-ai) — vectors and matrices that implement the math above
 - [1.6 ML Metrics](./06-ml-metrics) — statistical metrics for model evaluation
-- [Module 9 — LLMOps & Evaluation](/ai-engineering/module-09/) — applying statistical rigor to LLM evaluation
+- [Module 9 — LLMOps & Evaluation](/ai-engineering/module-05/) — applying statistical rigor to LLM evaluation

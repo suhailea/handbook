@@ -5,7 +5,7 @@ outline: deep
 
 # Evaluation Pipeline — Golden Datasets, LLM-as-Judge, Red Teaming
 
-🔥🔥🔥 Interview weight | Prerequisites: [9.1 RAG Evaluation Metrics](./01-rag-evaluation-metrics), [9.2 Production Metrics](./02-production-metrics)
+🔥🔥🔥 Interview weight | Prerequisites: [5.1 RAG Evaluation Metrics](./01-metrics), [6.1 Production Metrics](/ai-engineering/module-06/01-production-metrics)
 
 ::: tip Plain English
 In traditional software, you have unit tests and integration tests. They run on every code change. If a test fails, the deployment is blocked.
@@ -516,6 +516,6 @@ The framing matters: different is not worse, and prompt changes legitimately shi
 
 ## Related
 
-- [9.4 LLMOps](./04-llmops) — operationalizing the evaluation pipeline
-- [Module 11 Security](/ai-engineering/module-11/) — red teaming security perspective
+- [6.2 LLMOps](/ai-engineering/module-06/02-llmops) — operationalizing the evaluation pipeline
+- [Module 11 Security](/ai-engineering/module-07/) — red teaming security perspective
 - [RAG Module 13 — Evaluation Frameworks](/rag/module-13/02-frameworks) — RAG-specific evaluation tools

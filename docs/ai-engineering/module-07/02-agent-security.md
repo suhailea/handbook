@@ -5,7 +5,7 @@ outline: deep
 
 # Agent Security — Authorization Gates and Deterministic Controls
 
-🔥🔥🔥 Interview weight | Prerequisites: [11.1 AI Security](./01-ai-security), [Module 2 Agents](/ai-engineering/module-02/)
+🔥🔥🔥 Interview weight | Prerequisites: [7.1 AI Security](./01-ai-security), [Module 2 Agents](/ai-engineering/module-02/)
 
 ## 🗣️ In Plain English
 
@@ -427,6 +427,6 @@ function enforceAgentProfile(
 
 ## Related
 
-- [11.1 AI Security](./01-ai-security) — attack vectors the agent security must defend against
+- [7.1 AI Security](./01-ai-security) — attack vectors the agent security must defend against
 - [Module 2 Agents](/ai-engineering/module-02/) — agent architecture these security controls wrap
 - [Module 12.3 LLM + Quant](/ai-engineering/module-12/03-llm-plus-quant) — deterministic controls in financial AI context

@@ -5,7 +5,7 @@ outline: deep
 
 # AKS and Azure — Cloud AI Infrastructure
 
-🔥🔥 Interview weight | Prerequisites: [10.2 Kubernetes for AI](./02-kubernetes-for-ai)
+🔥🔥 Interview weight | Prerequisites: [7.2 Kubernetes for AI](./02-kubernetes-for-ai)
 
 ## 🗣️ In Plain English
 
@@ -425,6 +425,6 @@ spec:
 
 ## Related
 
-- [10.2 Kubernetes for AI](./02-kubernetes-for-ai) — K8s concepts for the workloads running here
-- [10.4 AI Infrastructure Patterns](./04-ai-infrastructure-patterns) — GPU memory and serving optimization
-- [Module 3.3 vLLM](/ai-engineering/module-03/03-vllm) — vLLM internals running inside AKS GPU pods
+- [7.2 Kubernetes for AI](./02-kubernetes-for-ai) — K8s concepts for the workloads running here
+- [7.4 AI Infrastructure Patterns](./04-ai-infrastructure-patterns) — GPU memory and serving optimization
+- [Module 3.3 vLLM](/ai-engineering/module-09/03-vllm) — vLLM internals running inside AKS GPU pods

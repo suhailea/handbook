@@ -1,22 +1,24 @@
 ---
-title: Module 9 — LLMOps & Evaluation
+title: Module 9 — Model Serving & Self-Hosting
 outline: deep
 ---
 
-# Module 9 — LLMOps & Evaluation
+# Module 9 — Model Serving & Self-Hosting
 
-Your AI system is live. Users are using it. Is it working?
+Our agent worked great with OpenAI. Then product said: "We can't send customer data to OpenAI." We had to think about model serving.
 
-Without proper evaluation, you're flying blind. A RAG system might be silently retrieving the wrong context. An agent might be succeeding at tasks that humans would have done better. A prompt change might have improved one query type while breaking ten others.
+TaskFlow's enterprise customers started asking about data privacy. Their support tickets contained confidential business information. Sending that to a third-party API — even OpenAI — was a non-starter for their compliance teams. We needed to run a model ourselves.
 
-LLMOps is the discipline of measuring, monitoring, and improving AI systems in production — adapted from traditional MLOps for the specific characteristics of language models.
+That opens a completely different set of questions: which model? In what format? On what hardware? With what serving engine? How do we handle 100 concurrent users?
+
+This module covers those decisions.
 
 ## Pages in this module
 
-| Page | What you'll learn |
-|------|------------------|
-| [9.1 RAG Evaluation Metrics](./01-rag-evaluation-metrics) | Recall@K, Precision@K, MRR, NDCG; Faithfulness, Correctness, Relevance |
-| [9.2 Production Metrics](./02-production-metrics) | Latency, TTFT, token usage, cost, error rate |
-| [9.3 Evaluation Pipeline](./03-evaluation-pipeline) | Golden datasets, LLM-as-Judge, regression testing, red teaming |
-| [9.4 LLMOps](./04-llmops) | Prompt versioning, model versioning, A/B testing AI systems |
-| [Summary](./summary) |Mental models to take forward |
+1. [Model Serving — Cloud vs Local vs Self-Hosted](./01-model-serving-overview) — the three options and when to choose each
+2. [GGUF & Local LLMs — Running Models on Your Machine](./02-gguf-and-local-llms) — file formats, Ollama, llama.cpp
+3. [vLLM — High-Throughput Model Serving](./03-vllm) — production inference for multiple users
+4. [KV Cache — Why Inference Is Expensive (and How to Cheat)](/ai-engineering/module-03/05-prompt-caching) — prompt caching, cost reduction
+5. [Quantization — Making Models Smaller Without Breaking Them](./04-quantization) — FP16, INT8, INT4
+6. [Semantic Caching — Caching by Meaning, Not by Text](/ai-engineering/module-03/06-semantic-caching) — skip the LLM entirely for repeated questions
+7. [Summary](./summary) — 5 mental models to take forward

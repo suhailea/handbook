@@ -206,4 +206,4 @@ Don't build the platform speculatively. Build it when the pain is real and visib
 - [The AI Decision Framework](./01-ai-decision-framework) — project-level decision making
 - [AI Metrics & ROI](./02-ai-metrics-roi) — measuring whether individual projects work
 - [Enterprise AI Architecture](../module-08/02-enterprise-ai-architecture) — the technical architecture that strategy produces
-- [Responsible AI](../module-11/03-responsible-ai) — governance and compliance considerations
+- [Responsible AI](/ai-engineering/module-07/03-responsible-ai) — governance and compliance considerations

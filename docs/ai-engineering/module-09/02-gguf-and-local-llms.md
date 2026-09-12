@@ -27,7 +27,7 @@ When you download a Llama 3 model from Hugging Face for local use, you download 
 
 ## GGUF quantization names decoded
 
-GGUF files come in different sizes because of quantization (covered in more depth on the [next page](./05-quantization)):
+GGUF files come in different sizes because of quantization (covered in more depth on the [next page](./04-quantization)):
 
 | Name | What it means | Size (8B model) | Quality |
 |------|---------------|-----------------|---------|

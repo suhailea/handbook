@@ -5,7 +5,7 @@ outline: deep
 
 # Semantic Caching — Caching by Meaning, Not by Text
 
-🔥🔥🔥 Interview weight — appears in both LLMOps and system design rounds. Prerequisites: [KV Cache](./04-kv-cache), [Embeddings](/ai-engineering/module-00/03-embeddings).
+🔥🔥🔥 Interview weight — appears in both LLMOps and system design rounds. Prerequisites: [KV Cache](./05-prompt-caching), [Embeddings](/ai-engineering/module-00/03-embeddings).
 
 ## 🗣️ In Plain English
 
@@ -251,7 +251,7 @@ Additionally: apply a conservative TTL (e.g., 24h) as a backstop so even untrack
 
 ## Related
 
-- [KV Cache](./04-kv-cache) — the complementary caching layer inside the inference server
+- [KV Cache](./05-prompt-caching) — the complementary caching layer inside the inference server
 - [Embeddings](/ai-engineering/module-00/03-embeddings) — how queries become vectors for similarity search
 - [RAG Caching](/rag/module-17/01-caching-freshness) — caching strategies in the RAG pipeline
-- [Production Metrics](../module-09/02-production-metrics) — measuring cache hit rate and cost reduction
+- [Production Metrics](/ai-engineering/module-06/01-production-metrics) — measuring cache hit rate and cost reduction

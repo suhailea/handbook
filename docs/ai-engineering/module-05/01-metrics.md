@@ -403,6 +403,6 @@ print(result)
 
 ## Related
 
-- [9.3 Evaluation Pipeline](./03-evaluation-pipeline) — how to run these metrics at scale
+- [5.2 Evaluation Pipeline](./02-evaluation-pipeline) — how to run these metrics at scale
 - [ML 1.6 ML Metrics](/ml-foundations/module-01/06-ml-metrics) — classical ML metrics that ground these concepts
 - [RAG Module 13 — Evaluation](/rag/module-13/) — deeper RAG evaluation in the RAG track

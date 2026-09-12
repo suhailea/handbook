@@ -32,4 +32,4 @@ A system-level view of how production AI systems are structured: the three funda
 
 ## Next Module
 
-[Module 9 — LLMOps & Evaluation](../module-09/) covers how to measure whether your AI system is working: retrieval metrics, generation metrics, evaluation pipelines, and the operational practices for managing LLMs in production.
+[Module 9 — LLMOps & Evaluation](/ai-engineering/module-05/) covers how to measure whether your AI system is working: retrieval metrics, generation metrics, evaluation pipelines, and the operational practices for managing LLMs in production.

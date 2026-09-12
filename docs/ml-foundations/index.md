@@ -29,7 +29,7 @@ Read in this order if you're following the build line and hit something you want
 | When you're reading | Come here for |
 |---|---|
 | [Module 0 — Mental Models](/ai-engineering/module-00/) (transformers, embeddings) | [Linear Algebra for AI](/ml-foundations/module-01/05-linear-algebra-for-ai), [Neural Networks](/ml-foundations/module-02/01-neural-networks) |
-| [Module 9 — LLMOps & Evaluation](/ai-engineering/module-09/) (metrics, judges) | [ML Metrics](/ml-foundations/module-01/06-ml-metrics), [Statistics for AI](/ml-foundations/module-01/04-statistics-for-ai) |
-| [Module 4 — Fine-Tuning](/ai-engineering/module-04/) (LoRA, training) | [Optimization](/ml-foundations/module-01/07-optimization), [Train/Validation/Test](/ml-foundations/module-01/02-training-validation-test) |
+| [Module 9 — LLMOps & Evaluation](/ai-engineering/module-05/) (metrics, judges) | [ML Metrics](/ml-foundations/module-01/06-ml-metrics), [Statistics for AI](/ml-foundations/module-01/04-statistics-for-ai) |
+| [Module 4 — Fine-Tuning](/ai-engineering/module-10/) (LoRA, training) | [Optimization](/ml-foundations/module-01/07-optimization), [Train/Validation/Test](/ml-foundations/module-01/02-training-validation-test) |
 
 Start with [Module 1](/ml-foundations/module-01/) if you're reading straight through.

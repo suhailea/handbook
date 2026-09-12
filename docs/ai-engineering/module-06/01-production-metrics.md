@@ -437,6 +437,6 @@ Without tracing you're asking the user to reproduce it and guessing at inputs. T
 
 ## Related
 
-- [9.1 RAG Evaluation Metrics](./01-rag-evaluation-metrics) — quality metrics to complement these operational metrics
-- [9.3 Evaluation Pipeline](./03-evaluation-pipeline) — how to automate measurement
+- [5.1 RAG Evaluation Metrics](/ai-engineering/module-05/01-metrics) — quality metrics to complement these operational metrics
+- [5.2 Evaluation Pipeline](/ai-engineering/module-05/02-evaluation-pipeline) — how to automate measurement
 - [8.2 Enterprise AI Architecture](../module-08/02-enterprise-ai-architecture) — where these metrics are collected

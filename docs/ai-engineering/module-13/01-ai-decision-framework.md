@@ -5,7 +5,7 @@ outline: deep
 
 # The AI Decision Framework — Is AI the Right Tool?
 
-🔥🔥🔥 Interview weight — asked in every senior AI engineer loop. Prerequisites: [LLMs & Tokens](../module-01/01-llms-and-tokens), [Fine-Tuning Overview](../module-04/01-fine-tuning-overview).
+🔥🔥🔥 Interview weight — asked in every senior AI engineer loop. Prerequisites: [LLMs & Tokens](../module-01/01-llms-and-tokens), [Fine-Tuning Overview](/ai-engineering/module-10/01-fine-tuning-overview).
 
 ## 🗣️ In Plain English
 
@@ -197,7 +197,7 @@ Fine-tuning is expensive (data collection, training compute, ongoing maintenance
 
 ## Related
 
-- [Fine-Tuning Overview](../module-04/01-fine-tuning-overview) — when fine-tuning is actually warranted
+- [Fine-Tuning Overview](/ai-engineering/module-10/01-fine-tuning-overview) — when fine-tuning is actually warranted
 - [AI Metrics & ROI](./02-ai-metrics-roi) — how to measure whether the AI project succeeded
-- [AI Security & Guardrails](../module-11/01-ai-security) — handling the risk when AI gets it wrong
-- [Evaluation Pipeline](../module-09/03-evaluation-pipeline) — building the evaluation pipeline
+- [AI Security & Guardrails](/ai-engineering/module-07/01-ai-security) — handling the risk when AI gets it wrong
+- [Evaluation Pipeline](/ai-engineering/module-05/02-evaluation-pipeline) — building the evaluation pipeline

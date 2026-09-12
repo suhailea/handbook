@@ -5,7 +5,7 @@ outline: deep
 
 # AI Metrics & ROI — How to Know if It's Working
 
-🔥🔥🔥 Interview weight — separates senior from mid-level in architecture rounds. Prerequisites: [LLMOps & Evaluation](../module-09/04-llmops), [The AI Decision Framework](./01-ai-decision-framework).
+🔥🔥🔥 Interview weight — separates senior from mid-level in architecture rounds. Prerequisites: [LLMOps & Evaluation](/ai-engineering/module-06/02-llmops), [The AI Decision Framework](./01-ai-decision-framework).
 
 ## 🗣️ In Plain English
 
@@ -282,5 +282,5 @@ Always present a conservative, base, and optimistic scenario. Never present only
 
 - [The AI Decision Framework](./01-ai-decision-framework) — deciding whether to build at all
 - [AI Strategy for Engineers](./03-ai-strategy) — the organizational context
-- [LLMOps](../module-09/04-llmops) — the operational pipeline behind these metrics
-- [Evaluation Pipeline](../module-09/03-evaluation-pipeline) — evaluation frameworks and golden datasets
+- [LLMOps](/ai-engineering/module-06/02-llmops) — the operational pipeline behind these metrics
+- [Evaluation Pipeline](/ai-engineering/module-05/02-evaluation-pipeline) — evaluation frameworks and golden datasets

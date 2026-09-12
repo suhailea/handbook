@@ -1,39 +1,37 @@
 ---
-title: Module 11 Summary — Security & Responsible AI
+title: Module 10 Summary — AI Infrastructure & Cloud
 outline: deep
 ---
 
-# Module 11 Summary — Security & Responsible AI
+# Module 10 Summary — AI Infrastructure & Cloud
 
 ## What you built
 
-A security-and-ethics framework for production AI systems: defenses against prompt injection and PII leakage, authorization gates for autonomous agents, and the fairness/transparency/compliance stack required for regulated industries.
+A complete picture of AI infrastructure: how to containerize AI workloads correctly, orchestrate them in Kubernetes, deploy on Azure (AKS + Azure OpenAI), and optimize GPU-based model serving for throughput and cost.
 
 ## 6 Mental Models to Take Forward
 
-1. **Every LLM input is an untrusted network request** — validate and sanitize AI inputs the same way you validate HTTP request bodies. Injection patterns, PII, and adversarial instructions all arrive via the same channel: user text.
+1. **Model weights don't belong in Docker layers** — fetch from object storage at container startup; bake weights into images only for air-gapped environments, and use a separate rarely-changing layer.
 
-2. **The LLM decides what to do; your code decides whether it happens** — never let an agent's tool call execute without a deterministic permission check outside the model. The model's intent is advisory; your authorization layer is authoritative.
+2. **Startup probe ≠ Readiness probe ≠ Liveness probe** — they have distinct roles: startup prevents liveness restarts during warm-up; readiness gates traffic; liveness detects deadlocks. All three are needed for AI services.
 
-3. **Human-in-the-loop is not a UX choice, it is a safety architecture** — irreversible, high-value, or cross-system actions (payments, deletions, emails to customers) require an explicit human approval gate with a TTL-bounded pending state.
+3. **Azure OpenAI = GPT-4 in your tenant** — same model, Azure data residency, no secrets needed with Workload Identity, PTU for predictable throughput. The right choice for enterprise AI in 90% of cases.
 
-4. **Bias lives in data, amplifies in models, and manifests in outputs** — auditing model accuracy alone misses disparate impact. Measure demographic parity, equal opportunity, and equalized odds on representative slices before every production deployment.
+4. **GPU VRAM = weights + KV cache + activations** — quantization reduces weights; FP8 KV cache reduces the second term; reducing max concurrent sequences reduces the third. Always calculate before provisioning hardware.
 
-5. **GDPR Article 22 is not optional when AI makes consequential decisions** — automated decisions affecting individuals require a legal basis, human review on request, and a meaningful explanation. Audit logs are the evidence that you complied.
+5. **Continuous batching is the key vLLM innovation** — keeping the GPU full with dynamically-added requests gives 20-40× better throughput than static batching. Use vLLM, not a custom inference server.
 
-6. **Explainability is not transparency theater** — SHAP values point to the features driving a decision (which helps engineers debug bias), but a human-readable explanation generated from SHAP + LLM is what actually satisfies a customer or regulator asking "why."
+6. **GPU node pools should scale to zero** — A100/H100 nodes cost $25-50/hour; leave them running idle and you'll spend $18K-$36K/month. Design for cold start or use scheduled pre-provisioning.
 
 ## Self-Assessment Checklist
 
-- [ ] Can you describe three distinct prompt injection attack vectors and a defense for each?
-- [ ] Can you implement an input validator that blocks injection patterns without over-blocking legitimate user queries?
-- [ ] Can you explain the difference between PII detection (find) and PII masking (replace) and name a production tool for each?
-- [ ] Can you design an agent permission model with per-tool limits and a human approval gate for high-value actions?
-- [ ] Can you define demographic parity, equal opportunity, and equalized odds and calculate them from a confusion matrix?
-- [ ] Can you explain what SHAP values represent and how to use them to diagnose model bias?
-- [ ] Can you list the GDPR Article 22 obligations for an AI system that auto-approves or rejects loan applications?
-- [ ] Can you design an audit log schema that satisfies regulatory review requirements for AI decisions?
+- [ ] Can you write a Dockerfile for an AI service with correct layer ordering and startup probe?
+- [ ] Can you explain the three Kubernetes probes and configure them for a model-serving container?
+- [ ] Can you describe the difference between Azure OpenAI and OpenAI direct API from a data residency perspective?
+- [ ] Can you calculate GPU memory requirements for a 13B model with 16K context and 32 concurrent users?
+- [ ] Can you explain how continuous batching improves GPU throughput over static batching?
+- [ ] Can you describe when to use tensor parallelism vs pipeline parallelism?
 
 ## Next Module
 
-[Module 12 — Energy Trading AI](../module-12/) covers domain-specific AI for commodities trading: energy market concepts, AI trading architecture, and the critical principle that LLMs interpret while quantitative models calculate.
+[Module 11 — Security & Responsible AI](/ai-engineering/module-07/) covers the security and ethical considerations that are mandatory for production AI systems: prompt injection, agent security, bias, fairness, and compliance.

@@ -1,19 +1,20 @@
 ---
-title: Module 11 — Security & Responsible AI
+title: Module 11 — AI Infrastructure & Cloud
 outline: deep
 ---
 
-# Module 11 — Security & Responsible AI
+# Module 11 — AI Infrastructure & Cloud
 
-AI systems introduce attack vectors that don't exist in traditional software, and failure modes that go beyond technical errors into ethical territory. A production AI system that ignores security is vulnerable in novel ways. One that ignores responsible AI can cause real harm — and regulatory consequences.
+You've designed the architecture. You've built the evaluation pipeline. Now you need to run it at scale.
 
-This module covers both dimensions: the security engineering needed to protect AI systems from attack, and the responsible AI practices needed to ensure they work fairly and transparently.
+This module covers the infrastructure that powers production AI systems: containerizing AI workloads, orchestrating them with Kubernetes, deploying on Azure (AKS + Azure OpenAI), and running GPU-based model serving for local or self-hosted LLMs.
 
 ## Pages in this module
 
 | Page | What you'll learn |
 |------|------------------|
-| [11.1 AI Security](./01-ai-security) | Prompt injection, jailbreaking, PII leakage, insecure tool execution |
-| [11.2 Agent Security](./02-agent-security) | Authorization gates for agent tool calls; deterministic financial controls |
-| [11.3 Responsible AI](./03-responsible-ai) | Bias, fairness, transparency, GDPR, audit logs |
-| [Summary](./summary) | Mental models to carry forward |
+| [7.1 Docker for AI](./01-docker-for-ai) | Multi-stage builds, GPU containers, model caching in images |
+| [7.2 Kubernetes for AI](./02-kubernetes-for-ai) | Pods, Deployments, Services, HPA, probes for AI workloads |
+| [7.3 AKS and Azure](./03-aks-and-azure) | Azure Kubernetes Service, Azure OpenAI, GPU node pools |
+| [7.4 AI Infrastructure Patterns](./04-ai-infrastructure-patterns) | GPU memory management, model serving patterns, scaling strategies |
+| [Summary](./summary) | Mental models to take forward |

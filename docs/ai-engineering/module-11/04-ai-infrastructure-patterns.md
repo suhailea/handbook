@@ -5,7 +5,7 @@ outline: deep
 
 # AI Infrastructure Patterns — GPU, Model Serving, Scaling
 
-🔥🔥 Interview weight | Prerequisites: [10.3 AKS and Azure](./03-aks-and-azure)
+🔥🔥 Interview weight | Prerequisites: [7.3 AKS and Azure](./03-aks-and-azure)
 
 ## 🗣️ In Plain English
 
@@ -385,6 +385,6 @@ async def benchmark_throughput(
 
 ## Related
 
-- [10.3 AKS and Azure](./03-aks-and-azure) — deploying these serving patterns on Azure
-- [Module 3.3 vLLM](/ai-engineering/module-03/03-vllm) — vLLM internals: PagedAttention, KV cache mechanics
-- [Module 3.5 Quantization](/ai-engineering/module-03/05-quantization) — quantization techniques in depth
+- [7.3 AKS and Azure](./03-aks-and-azure) — deploying these serving patterns on Azure
+- [Module 3.3 vLLM](/ai-engineering/module-09/03-vllm) — vLLM internals: PagedAttention, KV cache mechanics
+- [Module 3.5 Quantization](/ai-engineering/module-09/04-quantization) — quantization techniques in depth

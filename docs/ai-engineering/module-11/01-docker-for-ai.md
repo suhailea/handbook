@@ -311,6 +311,6 @@ CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000
 
 ## Related
 
-- [10.2 Kubernetes for AI](./02-kubernetes-for-ai) — orchestrating these containers at scale
-- [10.3 AKS and Azure](./03-aks-and-azure) — running GPU containers on Azure Kubernetes Service
-- [Module 3.3 vLLM](/ai-engineering/module-03/03-vllm) — vLLM running inside these containers
+- [7.2 Kubernetes for AI](./02-kubernetes-for-ai) — orchestrating these containers at scale
+- [7.3 AKS and Azure](./03-aks-and-azure) — running GPU containers on Azure Kubernetes Service
+- [Module 3.3 vLLM](/ai-engineering/module-09/03-vllm) — vLLM running inside these containers

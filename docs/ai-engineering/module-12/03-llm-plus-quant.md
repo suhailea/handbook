@@ -633,5 +633,5 @@ Several reasons why LLM sentiment should remain a minority feature:
 
 - [12.1 Energy Trading Concepts](./01-energy-trading-concepts) — the domain vocabulary underlying these models
 - [12.2 AI in Trading Architecture](./02-ai-in-trading-architecture) — the full stack this page extends
-- [Module 9 — LLMOps & Evaluation](../module-09/) — evaluation pipelines for LLM signal quality
-- [Module 11 — Security & Responsible AI](../module-11/) — prompt injection and audit requirements
+- [Module 9 — LLMOps & Evaluation](/ai-engineering/module-05/) — evaluation pipelines for LLM signal quality
+- [Module 11 — Security & Responsible AI](/ai-engineering/module-07/) — prompt injection and audit requirements

@@ -403,4 +403,4 @@ console.log(result)
 
 - [8.2 Enterprise AI Architecture](./02-enterprise-ai-architecture) — the full production stack around these patterns
 - [Module 2 Agents](/ai-engineering/module-02/) — the agent loop in depth
-- [Module 9 LLMOps](/ai-engineering/module-09/) — evaluating these patterns in production
+- [Module 9 LLMOps](/ai-engineering/module-05/) — evaluating these patterns in production

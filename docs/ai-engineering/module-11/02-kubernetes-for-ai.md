@@ -5,7 +5,7 @@ outline: deep
 
 # Kubernetes for AI — Pods, Deployments, HPA, Probes
 
-🔥🔥🔥 Interview weight | Prerequisites: [10.1 Docker for AI](./01-docker-for-ai)
+🔥🔥🔥 Interview weight | Prerequisites: [7.1 Docker for AI](./01-docker-for-ai)
 
 ## 🗣️ In Plain English
 
@@ -492,6 +492,6 @@ data:
 
 ## Related
 
-- [10.3 AKS and Azure](./03-aks-and-azure) — running these K8s workloads on Azure
-- [10.1 Docker for AI](./01-docker-for-ai) — the containers that run in these pods
-- [Module 9.2 Production Metrics](/ai-engineering/module-09/02-production-metrics) — tracing and metrics for pods serving AI workloads
+- [7.3 AKS and Azure](./03-aks-and-azure) — running these K8s workloads on Azure
+- [7.1 Docker for AI](./01-docker-for-ai) — the containers that run in these pods
+- [Module 9.2 Production Metrics](/ai-engineering/module-06/01-production-metrics) — tracing and metrics for pods serving AI workloads

@@ -329,4 +329,4 @@ Options give asymmetric protection: the producer buys put options at $3.00/MMBtu
 
 - [12.2 AI in Trading Architecture](./02-ai-in-trading-architecture) — where these concepts meet AI systems
 - [12.3 LLM + Quant Models](./03-llm-plus-quant) — how LLMs interpret these signals while quant models calculate
-- [Module 9 — LLMOps & Evaluation](../module-09/) — evaluation frameworks relevant to trading AI
+- [Module 9 — LLMOps & Evaluation](/ai-engineering/module-05/) — evaluation frameworks relevant to trading AI

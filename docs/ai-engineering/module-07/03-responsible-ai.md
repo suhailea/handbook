@@ -435,6 +435,6 @@ class AIAuditSystem {
 
 ## Related
 
-- [11.2 Agent Security](./02-agent-security) — security controls that prevent unfair automated actions
-- [9.3 Evaluation Pipeline](../module-09/03-evaluation-pipeline) — red teaming includes bias testing
+- [7.2 Agent Security](./02-agent-security) — security controls that prevent unfair automated actions
+- [5.2 Evaluation Pipeline](/ai-engineering/module-05/02-evaluation-pipeline) — red teaming includes bias testing
 - [ML 1.6 ML Metrics](/ml-foundations/module-01/06-ml-metrics) — the underlying metrics that fairness metrics extend

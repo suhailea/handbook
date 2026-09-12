@@ -1,37 +1,24 @@
 ---
-title: Module 9 Summary — LLMOps & Evaluation
+title: Module 3 Summary — Model Serving
 outline: deep
 ---
 
-# Module 9 Summary — LLMOps & Evaluation
+# Module 3 Summary
 
-## What you built
+Five things to remember from this module as we continue building TaskFlow's agent.
 
-The measurement and operational discipline for AI systems in production: how to measure retrieval quality, generation quality, and operational health; how to build an evaluation pipeline that acts as a CI gate; and how to safely deploy changes to prompts, models, and architectures.
+## Mental Models
 
-## 6 Mental Models to Take Forward
+**1. You have three choices for where your model lives — each with very different tradeoffs.** Cloud API (someone else's GPU, easy, data leaves your servers), self-hosted GPU (your GPU, more ops, data stays with you), local CPU (your machine, slow, fully private). The right choice depends on data sensitivity, volume, latency requirements, and team ops capacity.
 
-1. **RAG has two independent failure modes**: retrieval failure (wrong documents found) and generation failure (wrong answer from right documents). Measure both separately — a single quality score hides which component broke.
+**2. GGUF is a format for running models on regular hardware — not a model or an engine.** It's packaging. llama.cpp is the engine that reads it. Ollama wraps llama.cpp for developer convenience. The format enables quantized models to run on CPUs and Apple Silicon, but at the cost of speed and concurrency.
 
-2. **Faithfulness ≠ Correctness**: a faithful answer to a wrong document is still wrong. You need both: faithfulness (LLM stuck to context) and correctness (context was right). Monitor source document quality separately.
+**3. vLLM's superpower is continuous batching + PagedAttention.** Continuous batching means the GPU is never idle — requests share it in real-time. PagedAttention means KV cache memory is used efficiently. Together, these produce 5–10x better throughput than naive inference on the same hardware.
 
-3. **Golden dataset = unit tests for AI quality**: curated, human-verified test cases that must be run before every deployment. Version them alongside system prompts.
+**4. KV cache means you don't pay to re-read what you've already read.** Prompt caching (Anthropic/OpenAI feature) lets you cache the system prompt so you only pay full price once per cache window. This is one of the highest-ROI optimizations for production agents with large system prompts.
 
-4. **LLM-as-Judge scales, but biases must be managed**: calibrate against human labels, use fixed judge model versions, score dimensions separately (correctness, faithfulness, relevance) to reduce holistic bias.
+**5. Quantization trades precision for size — and the tradeoff is usually worth it.** INT4 at Q4_K_M quality is typically indistinguishable from FP16 for conversational tasks while using 4x less memory. Always measure on your specific use case rather than assuming the quality drop is or isn't acceptable.
 
-5. **Prompt is code — treat it that way**: version control, code review, evaluation gate before promotion to production. Un-gated prompt changes are the most common source of silent quality regressions.
+## What's next
 
-6. **A/B tests need statistical power and quality metrics** — task completion rate and LLM judge score, not session length or click metrics which measure engagement rather than quality.
-
-## Self-Assessment Checklist
-
-- [ ] Can you explain the difference between Recall@K and MRR and give a scenario where each is the better metric?
-- [ ] Can you explain the difference between faithfulness and correctness in RAG evaluation?
-- [ ] Can you describe the three components of a production AI evaluation pipeline?
-- [ ] Can you explain why you pin model versions and what happens if you don't?
-- [ ] Can you calculate the minimum sample size for an A/B test given a detectable effect size?
-- [ ] Can you describe how to run a red team sweep and what categories it must cover?
-
-## Next Module
-
-[Module 10 — AI Infrastructure & Cloud](../module-10/) covers the infrastructure that runs these systems at scale: Docker for AI workloads, Kubernetes for AI services, Azure OpenAI and AKS, and GPU-based model serving.
+Module 4 goes deeper: what if the model is good but it needs to know TaskFlow-specific things that no public model knows? That's when fine-tuning enters the picture.
