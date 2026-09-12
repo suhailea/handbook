@@ -1,9 +1,9 @@
 ---
-title: Module 11 Summary — Security & Responsible AI
+title: Module 7 Summary — Security & Guardrails
 outline: deep
 ---
 
-# Module 11 Summary — Security & Responsible AI
+# Module 7 Summary — Security & Guardrails
 
 ## What you built
 
@@ -36,4 +36,4 @@ A security-and-ethics framework for production AI systems: defenses against prom
 
 ## Next Module
 
-[Module 12 — Energy Trading AI](../module-12/) covers domain-specific AI for commodities trading: energy market concepts, AI trading architecture, and the critical principle that LLMs interpret while quantitative models calculate.
+[Module 8 — AI Architecture](/ai-engineering/module-08/) covers how to structure a system once its security posture is settled: system patterns, the enterprise stack, and data architecture.

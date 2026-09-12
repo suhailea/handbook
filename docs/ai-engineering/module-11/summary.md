@@ -1,9 +1,9 @@
 ---
-title: Module 10 Summary — AI Infrastructure & Cloud
+title: Module 11 Summary — AI Infrastructure & Cloud
 outline: deep
 ---
 
-# Module 10 Summary — AI Infrastructure & Cloud
+# Module 11 Summary — AI Infrastructure & Cloud
 
 ## What you built
 
@@ -34,4 +34,4 @@ A complete picture of AI infrastructure: how to containerize AI workloads correc
 
 ## Next Module
 
-[Module 11 — Security & Responsible AI](/ai-engineering/module-07/) covers the security and ethical considerations that are mandatory for production AI systems: prompt injection, agent security, bias, fairness, and compliance.
+[Module 12 — Case Studies](/ai-engineering/module-12/) puts the whole track together in worked systems, starting with AI in energy trading.

@@ -3,7 +3,7 @@ title: Module 10 Summary — Fine-Tuning
 outline: deep
 ---
 
-# Module 4 Summary
+# Module 10 Summary — Fine-Tuning
 
 Four things to remember from this module as TaskFlow's agent matures.
 
@@ -19,4 +19,4 @@ Four things to remember from this module as TaskFlow's agent matures.
 
 ## What's next
 
-Module 5 is about operating the agent in production. The agent is built and running — now how do we know it's working, catch failures before users do, and keep it from going off the rails?
+Module 11 covers the infrastructure that runs all of this at scale — Docker, Kubernetes, and GPU infrastructure patterns for whatever you're self-hosting or fine-tuning.

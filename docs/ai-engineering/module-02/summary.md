@@ -23,4 +23,4 @@ Six things to remember from this module as we continue building TaskFlow's agent
 
 ## What's next
 
-Module 3 asks a harder question: what if we can't send TaskFlow's customer data to OpenAI at all? That takes us into model serving — cloud APIs, self-hosted inference, and the tradeoffs between them.
+Module 3 asks a more immediate question: the agent works in a notebook — how does it survive contact with real users? That's streaming, structured output, reliability, and cost — the application layer around the loop you just built.

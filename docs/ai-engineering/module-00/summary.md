@@ -1,9 +1,9 @@
 ---
-title: Module 0 Summary — ML Foundations Mental Models
+title: Module 0 Summary — Mental Models
 outline: deep
 ---
 
-# Module 0 Summary — ML Foundations Mental Models
+# Module 0 Summary — Mental Models
 
 You don't need to understand the math to make good engineering decisions about AI systems. You need the right mental models. Here are the five that will serve you for everything that follows.
 
@@ -22,7 +22,7 @@ You don't need to understand the math to make good engineering decisions about A
 ---
 
 ::: tip You're ready for Module 1
-With these four concepts locked in, Module 1 will make a lot more sense. When we talk about token limits, you'll know it's about the attention mechanism's context window. When we talk about prompt engineering shaping model behavior, you'll know you're working with the grain of RLHF training. When we build the RAG system in Module 2, you'll know exactly why we're running two different kinds of models — one for retrieval, one for generation.
+With these four concepts locked in, Module 1 will make a lot more sense. When we talk about token limits, you'll know it's about the attention mechanism's context window. When we talk about prompt engineering shaping model behavior, you'll know you're working with the grain of RLHF training. When we reach retrieval in Module 4, you'll know exactly why embeddings and generation are two different jobs.
 :::
 
 ---

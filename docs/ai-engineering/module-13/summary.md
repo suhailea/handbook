@@ -38,6 +38,6 @@ Before marking any AI project as ready to launch:
 
 ## What's next
 
-This is the final module of the AI Engineering track. You've covered the full arc: from how transformers work (Module 0) through building agents (Module 2), serving models (Module 3), fine-tuning (Module 4), production operations (Module 5, 9), ML foundations (Module 6), NLP (Module 7), architecture (Module 8), infrastructure (Module 10), security (Module 11), and domain-specific AI (Module 12) — to strategic thinking (Module 13).
+This is the final module of the AI Engineering track. You've covered the full arc: from how transformers work (Module 0) through building agents (Module 2), the application layer and RAG (Modules 3–4), evaluation and observability (Modules 5–6), security (Module 7), architecture (Module 8), serving and fine-tuning (Modules 9–10), infrastructure (Module 11), and domain-specific AI (Module 12) — to strategic thinking, here.
 
 The next frontier: practice. Take a real problem, apply the decision framework, design the system end-to-end, build an evaluation pipeline, and iterate. That's what senior AI engineering actually looks like.

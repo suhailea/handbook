@@ -36,7 +36,7 @@ A complete picture of AI in commodity energy markets: the domain vocabulary trad
 
 ## Track Complete
 
-This is the final module in the AI Engineering track. The track has taken you from AI fundamentals (Module 0) through ML statistics, deep learning, production architecture, LLMOps, infrastructure, security, and domain-specific AI in energy trading.
+One module remains. The track has taken you from mental models (Module 0) through agents, the application layer, RAG, evaluation, observability, security, architecture, serving, fine-tuning, infrastructure, and this domain-specific case study in energy trading.
 
 **Suggested next tracks:**
 

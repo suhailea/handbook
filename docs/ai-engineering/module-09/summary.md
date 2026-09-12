@@ -3,7 +3,7 @@ title: Module 9 Summary — Model Serving
 outline: deep
 ---
 
-# Module 3 Summary
+# Module 9 Summary — Model Serving
 
 Five things to remember from this module as we continue building TaskFlow's agent.
 
@@ -21,4 +21,4 @@ Five things to remember from this module as we continue building TaskFlow's agen
 
 ## What's next
 
-Module 4 goes deeper: what if the model is good but it needs to know TaskFlow-specific things that no public model knows? That's when fine-tuning enters the picture.
+Module 10 goes deeper: what if the model is good but needs to reliably shift its behavior or style in a way prompting can't achieve? That's when fine-tuning enters the picture.
