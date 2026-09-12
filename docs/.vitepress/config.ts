@@ -803,10 +803,10 @@ export default withMermaid(defineConfig({
             { text: 'Summary', link: '/ai-engineering/module-02/summary' } ] },
         { text: 'Module 3 — Application Layer', collapsed: true, items: [
             { text: 'Overview', link: '/ai-engineering/module-03/' },
-            { text: '3.1 Streaming & SSE 🚧', link: '/ai-engineering/module-03/01-streaming-and-sse' },
-            { text: '3.2 Structured Outputs 🚧', link: '/ai-engineering/module-03/02-structured-outputs' },
-            { text: '3.3 Reliability & Fallbacks 🚧', link: '/ai-engineering/module-03/03-reliability-and-fallbacks' },
-            { text: '3.4 Cost & Token Accounting 🚧', link: '/ai-engineering/module-03/04-cost-and-token-accounting' },
+            { text: '3.1 Streaming & SSE', link: '/ai-engineering/module-03/01-streaming-and-sse' },
+            { text: '3.2 Structured Outputs', link: '/ai-engineering/module-03/02-structured-outputs' },
+            { text: '3.3 Reliability & Fallbacks', link: '/ai-engineering/module-03/03-reliability-and-fallbacks' },
+            { text: '3.4 Cost & Token Accounting', link: '/ai-engineering/module-03/04-cost-and-token-accounting' },
             { text: '3.5 Prompt Caching & KV Cache', link: '/ai-engineering/module-03/05-prompt-caching' },
             { text: '3.6 Semantic Caching', link: '/ai-engineering/module-03/06-semantic-caching' } ] },
         { text: 'Module 4 — RAG, The Bridge', collapsed: true, items: [
