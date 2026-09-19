@@ -794,6 +794,7 @@ export default withMermaid(defineConfig({
             { text: '1.1 LLMs & Tokens', link: '/ai-engineering/module-01/01-llms-and-tokens' },
             { text: '1.2 Prompt Engineering', link: '/ai-engineering/module-01/02-prompt-engineering' },
             { text: '1.3 Context Engineering', link: '/ai-engineering/module-01/03-context-engineering' },
+            { text: '1.4 Reasoning Models', link: '/ai-engineering/module-01/04-reasoning-models' },
             { text: 'Summary', link: '/ai-engineering/module-01/summary' } ] },
         { text: 'Module 2 — Agents', collapsed: true, items: [
             { text: 'Overview', link: '/ai-engineering/module-02/' },
@@ -805,6 +806,9 @@ export default withMermaid(defineConfig({
             { text: '2.6 Multi-Agent Systems', link: '/ai-engineering/module-02/06-multi-agent' },
             { text: '2.7 MCP', link: '/ai-engineering/module-02/07-mcp' },
             { text: '2.8 A2A', link: '/ai-engineering/module-02/08-a2a' },
+            { text: '2.9 Durable Agents & HITL', link: '/ai-engineering/module-02/09-durable-agents' },
+            { text: '2.10 Agent Frameworks', link: '/ai-engineering/module-02/10-agent-frameworks' },
+            { text: '2.11 Computer-Use & Voice Agents', link: '/ai-engineering/module-02/11-computer-use-and-voice-agents' },
             { text: 'Summary', link: '/ai-engineering/module-02/summary' } ] },
         { text: 'Module 3 — Application Layer', collapsed: true, items: [
             { text: 'Overview', link: '/ai-engineering/module-03/' },
@@ -823,6 +827,7 @@ export default withMermaid(defineConfig({
             { text: 'Overview', link: '/ai-engineering/module-05/' },
             { text: '5.1 Metrics', link: '/ai-engineering/module-05/01-metrics' },
             { text: '5.2 Evaluation Pipeline', link: '/ai-engineering/module-05/02-evaluation-pipeline' },
+            { text: '5.3 Agent Trajectory Evaluation', link: '/ai-engineering/module-05/03-agent-trajectory-evaluation' },
             { text: 'Summary', link: '/ai-engineering/module-05/summary' } ] },
         { text: 'Module 6 — Observability & LLMOps', collapsed: true, items: [
             { text: 'Overview', link: '/ai-engineering/module-06/' },
@@ -840,6 +845,7 @@ export default withMermaid(defineConfig({
             { text: '8.1 AI System Patterns', link: '/ai-engineering/module-08/01-ai-system-patterns' },
             { text: '8.2 Enterprise AI Architecture', link: '/ai-engineering/module-08/02-enterprise-ai-architecture' },
             { text: '8.3 Data Architecture', link: '/ai-engineering/module-08/03-data-architecture' },
+            { text: '8.4 Arabic LLMs & Sovereign AI', link: '/ai-engineering/module-08/04-arabic-and-sovereign-ai' },
             { text: 'Summary', link: '/ai-engineering/module-08/summary' } ] },
         { text: 'Module 9 — Model Serving', collapsed: true, items: [
             { text: 'Overview', link: '/ai-engineering/module-09/' },
@@ -860,12 +866,14 @@ export default withMermaid(defineConfig({
             { text: '11.2 Kubernetes for AI', link: '/ai-engineering/module-11/02-kubernetes-for-ai' },
             { text: '11.3 AKS & Azure', link: '/ai-engineering/module-11/03-aks-and-azure' },
             { text: '11.4 AI Infrastructure Patterns', link: '/ai-engineering/module-11/04-ai-infrastructure-patterns' },
+            { text: '11.5 Multi-Cloud AI', link: '/ai-engineering/module-11/05-multi-cloud-ai' },
             { text: 'Summary', link: '/ai-engineering/module-11/summary' } ] },
         { text: 'Module 12 — Case Studies', collapsed: true, items: [
             { text: 'Overview', link: '/ai-engineering/module-12/' },
             { text: '12.1 Energy Trading Concepts', link: '/ai-engineering/module-12/01-energy-trading-concepts' },
             { text: '12.2 AI in Trading Architecture', link: '/ai-engineering/module-12/02-ai-in-trading-architecture' },
             { text: '12.3 LLM + Quant Models', link: '/ai-engineering/module-12/03-llm-plus-quant' },
+            { text: '12.4 HR & Payroll Agent (UAE)', link: '/ai-engineering/module-12/04-hr-payroll-agent' },
             { text: 'Summary', link: '/ai-engineering/module-12/summary' } ] },
         { text: 'Module 13 — AI Business Strategy', collapsed: true, items: [
             { text: 'Overview', link: '/ai-engineering/module-13/' },
